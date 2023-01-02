@@ -1,0 +1,49 @@
+<div class="flex flex-col flex-auto items-center sm:justify-center min-w-0">
+  <div class="w-full sm:w-auto py-8 px-4 sm:p-12 sm:rounded-2xl sm:shadow sm:bg-white sm:dark:bg-gray-800">
+    <div class="w-full max-w-80 sm:w-80 mx-auto sm:mx-0">
+      <div class="w-12">
+        <img class="dark:hidden" src="assets/logo.svg">
+        <img class="hidden dark:block" src="assets/logo-dark.svg">
+      </div>
+      <div class="mt-8 text-4xl font-extrabold tracking-tight leading-tight">Inloggen</div>
+      <div class="flex items-baseline mt-0.5 font-medium">
+        <div>Heb je nog geen account?</div>
+        <a class="ml-1 text-accent hover:underline" href="/sign-up">Aanmelden</a>
+      </div>
+      <!---->
+      <form [formGroup]="signInForm" class="mt-8" (submit)="signIn()">
+        <div class="form-field w-full">
+          <label class="block font-medium mb-1" for="username">E-mailadres</label>
+          <input class="peer flex items-center h-12 border shadow-sm bg-transparent rounded-md px-4 w-full
+          invalid:border-danger" formControlName="username" autocomplete="email" spellcheck="false" type="email"
+            name="username" id="username" required>
+          <div class="invisible text-sm font-medium text-danger mt-1 peer-invalid:visible">
+            E-mailadres is een verplicht veld
+          </div>
+        </div>
+        <div class="form-field w-full">
+          <label class="block font-medium mb-1" for="password">Wachtwoord</label>
+          <input class="peer flex items-center h-12 border shadow-sm bg-transparent rounded-md px-4 w-full
+          invalid:border-danger" formControlName="password" autocomplete="current-password" spellcheck="false"
+            type="password" name="password" id="password" minlength="12" required>
+          <div class="invisible text-sm font-medium text-danger mt-1 peer-invalid:visible">
+            Wachtwoord is een verplicht veld
+          </div>
+        </div>
+        <div class="inline-flex items-center justify-between w-full mt-1.5">
+          <!-- <div class="form-field">
+            <input formControlName="remember_me" type="checkbox" name="remember_me" id="remember_me">
+            <label for="remember_me"> Onthoud mij</label>
+          </div> -->
+          <a class="text-md font-medium text-accent hover:underline" href="/forgot-password">
+            Wachtwoord vergeten?
+          </a>
+        </div>
+        <button
+          class="bg-primary text-lg text-white rounded-full hover:bg-lynch-700 cursor-pointer w-full mt-6 px-6 py-3">
+          Inloggen
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,14 @@
+<ng-container [ngSwitch]="layout">
+  <qf-empty-layout *ngSwitchCase="'empty'"></qf-empty-layout>
+  <qf-centered-layout *ngSwitchCase="'centered'"></qf-centered-layout>
+  <qf-enterprise-layout *ngSwitchCase="'enterprise'"></qf-enterprise-layout>
+  <qf-material-layout *ngSwitchCase="'material'"></qf-material-layout>
+  <qf-modern-layout *ngSwitchCase="'modern'"></qf-modern-layout>
+  <qf-classic-layout *ngSwitchCase="'classic'"></qf-classic-layout>
+  <qf-classy-layout *ngSwitchCase="'classy'"></qf-classy-layout>
+  <qf-compact-layout *ngSwitchCase="'compact'"></qf-compact-layout>
+  <qf-dense-layout *ngSwitchCase="'dense'"></qf-dense-layout>
+  <qf-futuristic-layout *ngSwitchCase="'futuristic'"></qf-futuristic-layout>
+  <qf-thin-layout *ngSwitchCase="'thin'"></qf-thin-layout>
+</ng-container>
+<qf-settings *ngIf="!forcedLayout"></qf-settings>

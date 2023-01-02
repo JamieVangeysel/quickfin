@@ -1,0 +1,11 @@
+<div class="qf-vertical-navigation-item-wrapper">
+  <div class="qf-vertical-navigation-item" [routerLink]="link"
+    routerLinkActive="qf-vertical-navigation-item-active">
+    <i class="qf-vertical-navigation-item-icon text-2xl w-6 h-6 fal fa-fw" [ngClass]="icon"></i>
+    <div class="qf-vertical-navigation-item-title-wrapper" *ngIf="title">
+      <div class="fuse-vertical-navigation-item-title">
+        <span>{{ title }}</span>
+      </div>
+    </div>
+  </div>
+</div>

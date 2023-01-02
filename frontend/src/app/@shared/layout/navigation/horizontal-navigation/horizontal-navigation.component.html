@@ -1,0 +1,52 @@
+<div class="flex items-center">
+  <div>
+    <div
+      class="w-full overflow-hidden rounded text-gray-600 hover:bg-gray-100 cursor-pointer dark:text-gray-200 dark:hover:bg-gray-900"
+      [routerLink]="['/dashboard']">
+      <div class="px-4 flex relative items-center flex-start h-12 w-full text-sm">
+        <i class="inline-flex items-center justify-center text-xl w-4 h-4 fal fa-home-lg mr-2"></i>
+        <div class="text-md font-medium">Dashboard</div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div
+      class="w-full overflow-hidden rounded text-gray-600 hover:bg-gray-100 cursor-pointer dark:text-gray-200 dark:hover:bg-gray-900"
+      [routerLink]="['/account/apps']">
+      <div class="px-4 flex relative items-center flex-start h-12 w-full text-sm">
+        <i class="inline-flex items-center justify-center text-xl w-4 h-4 fal fa-qrcode mr-2"></i>
+        <div class="text-md font-medium">Uitgaven</div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div
+      class="w-full overflow-hidden rounded text-gray-600 hover:bg-gray-100 cursor-pointer dark:text-gray-200 dark:hover:bg-gray-900"
+      [routerLink]="['/pages']" [attr.disabled]="true">
+      <div class="px-4 flex relative items-center flex-start h-12 w-full text-sm">
+        <i class="inline-flex items-center justify-center text-xl w-4 h-4 fal fa-copy mr-2"></i>
+        <div class="text-md font-medium">Inkomen</div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div
+      class="w-full overflow-hidden rounded text-gray-600 hover:bg-gray-100 cursor-pointer dark:text-gray-200 dark:hover:bg-gray-900"
+      [routerLink]="['/ui']" [attr.disabled]="true">
+      <div class="px-4 flex relative items-center flex-start h-12 w-full text-sm">
+        <i class="inline-flex items-center justify-center text-xl w-4 h-4 fal fa-layer-group mr-2"></i>
+        <div class="text-md font-medium">Categorieën</div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div
+      class="w-full overflow-hidden rounded text-gray-600 hover:bg-gray-100 cursor-pointer dark:text-gray-200 dark:hover:bg-gray-900"
+      [routerLink]="['/help']">
+      <div class="px-4 flex relative items-center flex-start h-12 w-full text-sm">
+        <i class="inline-flex items-center justify-center text-xl w-4 h-4 fal fa-life-ring mr-2"></i>
+        <div class="text-md font-medium">Yeet</div>
+      </div>
+    </div>
+  </div>
+</div>
