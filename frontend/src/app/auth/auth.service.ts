@@ -44,8 +44,9 @@ export class AuthService {
       this.change.next({
         id_token: {
           exp: new Date(2030, 1, 1).getTime() / 1000,
-          name: 'Vangeysel',
+          name: 'Jamie Vangeysel',
           given_name: 'Jamie',
+          family_name: 'Vangeysel',
           email: 'vangeysel-jamie@hotmail.com',
           preferred_username: 'bickyburger',
           picture: 'https://www.gravatar.com/avatar/46ddb451c995eec3d51cd7e94bbcefe5?s=28&d=mp&r=pg',

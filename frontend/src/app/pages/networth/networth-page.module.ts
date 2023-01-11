@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { RouterModule } from '@angular/router'
-import { NetworthPageComponent } from './networth-page.component';
-import { AssetsPageComponent } from './assets/assets-page.component';
-import { LiabilitiesPageComponent } from './liabilities/liabilities-page.component';
+import { NetworthPageComponent } from './networth-page.component'
+import { AssetsPageComponent } from './assets/assets-page.component'
+import { LiabilitiesPageComponent } from './liabilities/liabilities-page.component'
 import { OverviewPageComponent } from './overview/overview-page.component'
 
 @NgModule({
@@ -20,13 +20,22 @@ import { OverviewPageComponent } from './overview/overview-page.component'
       component: NetworthPageComponent,
       children: [{
         path: '',
-        component: OverviewPageComponent
+        component: OverviewPageComponent,
+        data: {
+          layout: 'modern'
+        }
       }, {
         path: 'assets',
-        component: AssetsPageComponent
+        component: AssetsPageComponent,
+        data: {
+          layout: 'modern'
+        }
       }, {
         path: 'liabilities',
-        component: LiabilitiesPageComponent
+        component: LiabilitiesPageComponent,
+        data: {
+          layout: 'modern'
+        }
       }]
     }])
   ]
