@@ -1,51 +1,51 @@
-<div class="flex items-center">
+<div class="flex items-center space-x-1">
   <div>
     <div
-      class="w-full overflow-hidden rounded text-gray-600 hover:bg-gray-100 cursor-pointer dark:text-gray-200 dark:hover:bg-gray-900"
-      [routerLink]="['/dashboard']">
+      class="w-full overflow-hidden rounded text-gray-600 hover:bg-gray-100 cursor-pointer dark:text-gray-200 dark:hover:bg-gray-800"
+      [routerLink]="['/']" routerLinkActive="bg-gray-100 dark:bg-gray-800" [routerLinkActiveOptions]="{exact: true}">
       <div class="px-4 flex relative items-center flex-start h-12 w-full text-sm">
-        <i class="inline-flex items-center justify-center text-xl w-4 h-4 fal fa-home-lg mr-2"></i>
+        <i class="inline-flex items-center justify-center text-xl w-4 h-4 fal fa-analytics mr-2"></i>
         <div class="text-md font-medium">Dashboard</div>
       </div>
     </div>
   </div>
   <div>
     <div
-      class="w-full overflow-hidden rounded text-gray-600 hover:bg-gray-100 cursor-pointer dark:text-gray-200 dark:hover:bg-gray-900"
-      [routerLink]="['/account/apps']">
+      class="w-full overflow-hidden rounded text-gray-600 hover:bg-gray-100 cursor-pointer dark:text-gray-200 dark:hover:bg-gray-800"
+      [routerLink]="['/expenses']" routerLinkActive="bg-gray-100 dark:bg-gray-800">
       <div class="px-4 flex relative items-center flex-start h-12 w-full text-sm">
-        <i class="inline-flex items-center justify-center text-xl w-4 h-4 fal fa-qrcode mr-2"></i>
+        <i class="inline-flex items-center justify-center text-xl w-4 h-4 fal fa-inbox-out mr-2"></i>
         <div class="text-md font-medium">Uitgaven</div>
       </div>
     </div>
   </div>
   <div>
     <div
-      class="w-full overflow-hidden rounded text-gray-600 hover:bg-gray-100 cursor-pointer dark:text-gray-200 dark:hover:bg-gray-900"
-      [routerLink]="['/pages']" [attr.disabled]="true">
+      class="w-full overflow-hidden rounded text-gray-600 hover:bg-gray-100 cursor-pointer dark:text-gray-200 dark:hover:bg-gray-800"
+      [routerLink]="['/revenue']" routerLinkActive="bg-gray-100 dark:bg-gray-800">
       <div class="px-4 flex relative items-center flex-start h-12 w-full text-sm">
-        <i class="inline-flex items-center justify-center text-xl w-4 h-4 fal fa-copy mr-2"></i>
+        <i class="inline-flex items-center justify-center text-xl w-4 h-4 fal fa-inbox-in mr-2"></i>
         <div class="text-md font-medium">Inkomen</div>
       </div>
     </div>
   </div>
   <div>
     <div
-      class="w-full overflow-hidden rounded text-gray-600 hover:bg-gray-100 cursor-pointer dark:text-gray-200 dark:hover:bg-gray-900"
-      [routerLink]="['/ui']" [attr.disabled]="true">
+      class="w-full overflow-hidden rounded text-gray-600 hover:bg-gray-100 cursor-pointer dark:text-gray-200 dark:hover:bg-gray-800"
+      [routerLink]="['/budget']" routerLinkActive="bg-gray-100 dark:bg-gray-800">
       <div class="px-4 flex relative items-center flex-start h-12 w-full text-sm">
-        <i class="inline-flex items-center justify-center text-xl w-4 h-4 fal fa-layer-group mr-2"></i>
-        <div class="text-md font-medium">Categorieën</div>
+        <i class="inline-flex items-center justify-center text-xl w-4 h-4 fal fa-chart-pie mr-2"></i>
+        <div class="text-md font-medium">Begroting</div>
       </div>
     </div>
   </div>
   <div>
     <div
-      class="w-full overflow-hidden rounded text-gray-600 hover:bg-gray-100 cursor-pointer dark:text-gray-200 dark:hover:bg-gray-900"
-      [routerLink]="['/help']">
+      class="w-full overflow-hidden rounded text-gray-600 hover:bg-gray-100 cursor-pointer dark:text-gray-200 dark:hover:bg-gray-800"
+      [routerLink]="['/networth']" routerLinkActive="bg-gray-100 dark:bg-gray-800">
       <div class="px-4 flex relative items-center flex-start h-12 w-full text-sm">
-        <i class="inline-flex items-center justify-center text-xl w-4 h-4 fal fa-life-ring mr-2"></i>
-        <div class="text-md font-medium">Yeet</div>
+        <i class="inline-flex items-center justify-center text-xl w-4 h-4 fal fa-user-chart mr-2"></i>
+        <div class="text-md font-medium">Netto-waarde</div>
       </div>
     </div>
   </div>

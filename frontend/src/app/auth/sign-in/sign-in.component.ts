@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http'
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { Router } from '@angular/router'
 import { firstValueFrom } from 'rxjs'
@@ -13,7 +13,7 @@ import { AuthService } from '../auth.service'
     class: 'relative flex flex-auto w-full'
   }
 })
-export class SignInComponent {
+export class SignInComponent implements OnInit, OnDestroy {
 
   signInForm: FormGroup
 
@@ -28,6 +28,16 @@ export class SignInComponent {
       password: ['', [Validators.required, Validators.minLength(12)]],
       remmeber_me: [false, []]
     })
+  }
+
+  async ngOnInit() {
+    if (this.auth.isAuthenticated()) {
+      this.goToDashboard()
+    }
+  }
+
+  async ngOnDestroy() {
+
   }
 
   async signIn() {

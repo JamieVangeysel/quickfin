@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core'
 import pck from '../../package.json'
+import { AuthService } from './auth/auth.service'
 
 @Component({
   selector: 'qf-root',
@@ -12,5 +13,7 @@ import pck from '../../package.json'
   }
 })
 export class AppComponent {
-
+  constructor(auth: AuthService) {
+    console.log(auth.access_token)
+  }
 }
