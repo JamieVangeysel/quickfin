@@ -123,17 +123,14 @@ module.exports = class Fastify {
       url += '/' + this.serviceName
     }
     route.url = url + route.url
+    console.log(route)
 
     // Add extra check if requiredPermissions is set, Otherwise prehandler has no effect
     // An empty requiredPermissions array / value will only validate if the token is present and not expired
     if (this.authPreHandler && route.requiredPermissions) {
-      this.server.log.debug({ requiredPermissions: route.requiredPermissions, isPromise: returnsPromise(this.authPreHandler) }, 'Adding Auth PreHandler to route')
+      this.server.log.debug({ requiredPermissions: route.requiredPermissions }, 'Adding Auth PreHandler to route')
       // Check if handler return Promise
-      if (returnsPromise(this.authPreHandler)) {
-        route.preHandler = (request, reply) => this.authPreHandler(request, reply, route.requiredPermissions)
-      } else {
-        route.preHandler = (request, reply, done) => this.authPreHandler(request, reply, done, route.requiredPermissions)
-      }
+      route.preHandler = (request, reply, done) => this.authPreHandler(request, reply, done, route.requiredPermissions)
     }
     this.server.log.debug({ route }, 'Adding route')
     this.server.route(route)

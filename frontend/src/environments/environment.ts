@@ -5,11 +5,10 @@
 export const environment = {
   production: false,
   defaultLanguage: 'nl-BE',
-  api: 'https://quickfin.be/api/test/',
+  api: 'https://quickfin.be/api/v1/',
   supportedLanguages: [
     'nl-BE'
-  ],
-  clientId: 'aHlNV1Y0TnpJM0',
+  ]
 }
 
 /*

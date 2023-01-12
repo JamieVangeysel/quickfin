@@ -14,70 +14,23 @@ const User = require('../models/user.model')
 exports.postSignUp = async (request, reply) => {
   try {
     const {
-      username,
+      email,
+      given_name,
+      family_name,
       password
     } = request.body
 
-    /** @type {any[]} */
-    const users = AAD.getAllUsers()
-    const user = users.find(u => u.userPrincipalName === username && u.department)
-
-    const dbUser = await SSO.get(username)
-    if (dbUser) {
-      if (!dbUser.active) {
-        return reply
-          .status(412)
-          .send({
-            status: 'Precondition Failed',
-            statusCode: 412,
-            message: 'This user already exists, but is not active!'
-          })
+    if (await User.create(email, bcrypt.hashSync(password, config.bcrypt.cost), given_name, family_name)) {
+      return {
+        success: true
       }
-      return reply
-        .status(412)
-        .send({
-          status: 'Precondition Failed',
-          statusCode: 412,
-          message: 'This user already exists!'
-        })
-    }
-
-    if (user) {
-      /* Start azure-ad sync to update all data */
-      const https = require('node:https')
-
-      const options = {
-        hostname: 'api.groupclaes.be',
-        port: 443,
-        path: '/azure-ad/sync?token=aCpnZUjK4cENXp3ZSFZypQcdj9zbmHMJE4K6jfsW4QyLrMMRRNw59h5wJGAPD7mc',
-        method: 'GET'
-      }
-
-      const req = https.request(options, (res) => {
-        console.log('statusCode:', res.statusCode)
-      })
-
-      req.end()
-
-      /* User found! Create entry in sapphire.users */
-
-      if (await User.create(user.onPremisesSamAccountName, username, bcrypt.hashSync(password, config.bcrypt.cost))) {
-        return { user }
-      }
-      return reply
-        .status(500)
-        .send({
-          status: 'Internal Server Error',
-          statusCode: 500,
-          message: 'Error while creating new user entry!'
-        })
     }
     return reply
-      .status(404)
+      .status(500)
       .send({
-        status: 'Not Found',
-        statusCode: 404,
-        message: 'User not found!'
+        status: 'Internal Server Error',
+        statusCode: 500,
+        message: 'Error while creating new user entry!'
       })
   } catch (err) {
     return reply

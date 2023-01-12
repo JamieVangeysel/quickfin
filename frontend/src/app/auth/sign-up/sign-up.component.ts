@@ -35,11 +35,10 @@ export class SignUpComponent {
     if (!this.signUpForm.valid) return
 
     try {
-      const authorizeResponse = await firstValueFrom(this.auth.register(this.signUpForm.value))
-      let authorization_code = authorizeResponse.authorization_code
-
-      await firstValueFrom(this.auth.getToken(authorization_code))
-      this.goToDashboard()
+      const response = await firstValueFrom(this.auth.register(this.signUpForm.value))
+      if (response.success) {
+        this.goToDashboard()
+      }
     } catch (err: any) {
       if (err.status && err.message) {
         const errRes = (err as HttpErrorResponse)
@@ -56,6 +55,6 @@ export class SignUpComponent {
   }
 
   goToDashboard() {
-    this.router.navigate(['/'])
+    this.router.navigate(['/auth/sign-in'])
   }
 }
