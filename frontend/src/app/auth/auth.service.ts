@@ -48,7 +48,6 @@ export class AuthService {
           given_name: 'Jamie',
           family_name: 'Vangeysel',
           email: 'vangeysel-jamie@hotmail.com',
-          preferred_username: 'bickyburger',
           picture: 'https://www.gravatar.com/avatar/46ddb451c995eec3d51cd7e94bbcefe5?s=28&d=mp&r=pg',
           roles: [
             '*'
@@ -65,7 +64,7 @@ export class AuthService {
     return this.http.post<any>(`${environment.api}authorize`, credentials, {
       params: {
         response_type: 'code',
-        scope: 'openid offline_access name given_name email preferred_username picture roles'
+        scope: 'openid offline_access name given_name family_name email picture roles'
       }
     }).pipe(shareReplay())
   }

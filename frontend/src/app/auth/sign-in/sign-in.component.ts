@@ -14,7 +14,6 @@ import { AuthService } from '../auth.service'
   }
 })
 export class SignInComponent implements OnInit, OnDestroy {
-
   signInForm: FormGroup
 
   constructor(
