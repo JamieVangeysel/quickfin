@@ -39,7 +39,7 @@ export class AuthService {
     if (window.sessionStorage.getItem('session')) {
       const response = JSON.parse(window.sessionStorage.getItem('session') || '')
       this.change.next(response)
-    } else if (!environment.production) {
+    } else if (!environment.production && window.location.hostname === 'localhost') {
       // openid offline_access name given_name email preferred_username picture roles
       this.change.next({
         id_token: {
@@ -87,17 +87,16 @@ export class AuthService {
 
   public async refresh(): Promise<boolean> {
     // check if there is a session and check if the refreshToken is still valid
-    const response = JSON.parse(window.sessionStorage.getItem('session') || '')
-    if (!this.isAuthenticated() && response) {
+    if (!this.isAuthenticated() && this.refresh_token) {
       // check if the token is expire
-      if (new Date(response.id_token.exp * 1000) < new Date()) {
-        if (!response.refresh_token) {
+      if (new Date(this.id_token.exp * 1000) < new Date()) {
+        if (!this.refresh_token) {
           console.warn('There is no refresh token defined!')
           return false
         }
         const resp = await this.http.post<any>(`${environment.api}users/refresh-token`, undefined, {
           params: {
-            token: response.refresh_token
+            token: this.refresh_token
           }
         }).toPromise()
         window.sessionStorage.setItem('session', JSON.stringify(resp))
@@ -122,7 +121,7 @@ export class AuthService {
       window.sessionStorage.removeItem('session')
       this.change.next(undefined)
     } finally {
-      this.router.navigate(['/'], {
+      this.router.navigate(['/auth/sign-in'], {
         replaceUrl: true
       })
     }

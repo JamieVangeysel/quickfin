@@ -3,15 +3,15 @@ import { RouterModule, Routes } from '@angular/router'
 import { AuthGuard } from '../auth/auth.guard'
 
 const routes: Routes = [{
-  path: 'auth',
-  loadChildren: () => import('../auth/auth.module').then(m => m.AuthModule),
-}, {
   path: '',
   loadChildren: () => import('./dashboard/dashboard-page.module').then(m => m.DashboardPageModule),
   canActivate: [AuthGuard],
   data: {
     layout: 'modern'
   }
+}, {
+  path: 'auth',
+  loadChildren: () => import('../auth/auth.module').then(m => m.AuthModule),
 }, {
   path: 'revenue',
   loadChildren: () => import('./revenue/revenue-page.module').then(m => m.RevenuePageModule),

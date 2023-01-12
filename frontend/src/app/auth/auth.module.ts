@@ -20,7 +20,7 @@ import { ReactiveFormsModule } from '@angular/forms'
     }, {
       path: '',
       pathMatch: 'full',
-      redirectTo: '/auth/sign-in'
+      redirectTo: 'sign-in'
     }]),
   ]
 })
