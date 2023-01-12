@@ -8,13 +8,13 @@ function bootstrap() {
     platformBrowserDynamic().bootstrapModule(AppModule, {
   defaultEncapsulation: ViewEncapsulation.None
 })
-  .catch(err => console.error(err));
-  };
+  .catch(err => console.error(err))
+  }
 
 
  if (document.readyState === 'complete') {
-   bootstrap();
+   bootstrap()
  } else {
-   document.addEventListener('DOMContentLoaded', bootstrap);
+   document.addEventListener('DOMContentLoaded', bootstrap)
  }
  

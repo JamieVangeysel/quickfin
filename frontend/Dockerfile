@@ -43,4 +43,4 @@ FROM base
 COPY --from=build /app/dist /app/dist
 
 WORKDIR /app
-CMD node dist/server/quickfin-frontend/main.js
+CMD node dist/server/main.js
