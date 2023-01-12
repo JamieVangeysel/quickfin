@@ -28,8 +28,4 @@ module.exports.routes = [{
   method: 'POST',
   url: '/users/update-password',
   handler: usersController.postUpdatePassword
-}, {
-  method: 'GET',
-  url: '/users/avatar/:hash',
-  handler: usersController.getAvatar
 }]

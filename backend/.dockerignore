@@ -7,6 +7,3 @@ readme.md
 
 #deps def
 package-lock.json
-
-.dockerignore
-Dockerfile

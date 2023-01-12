@@ -75,13 +75,7 @@ exports.get = async (request, reply) => {
       }
     }
 
-    const application = await SSO.getApplicationByClientId(authorization_code.client_id)
-
-    if (!application) {
-      request.log.debug({ authorization_code: code, client_id: authorization_code.client_id }, 'Unexpected client_id encountered for AuthorizationCode')
-    } else {
-      return payload
-    }
+    return payload
   } catch (err) {
     request.log.error({ error: err, authorizationCode: request.query.code, grantType: request.query.grant_type, redirectUri: request.query.redirect_uri  }, 'Couldn\'t retrieve token, something unexpected happened')
   } finally {

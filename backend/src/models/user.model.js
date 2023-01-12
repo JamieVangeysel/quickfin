@@ -7,6 +7,7 @@ const SSO = require('./sso.model')
 
 const issuer = 'https://quickfin.be'
 const expiresIn = 900
+const DB_NAME = 'quickfin'
 
 /**
  * 
@@ -28,12 +29,6 @@ exports.getIdToken = async (authorization_code) => {
       payload[key] = value
   }
 
-  if (scopes.indexOf('roles') !== -1) {
-    if (!payload)
-      payload = {}
-    payload.roles = await getRoles(authorization_code.user_id, authorization_code.client_id)
-  }
-
   if (!payload)
     throw new Error('Invalid payload')
 
@@ -46,8 +41,7 @@ exports.getIdToken = async (authorization_code) => {
 }
 
 exports.getAccessToken = async (authorization_code) => {
-  const { audience, subject } = await getAudSub(authorization_code.user_id, authorization_code.client_id)
-  const roles = await getRoles(authorization_code.user_id, authorization_code.client_id)
+  const { audience, subject } = await getAudSub(authorization_code.user_id)
 
   return jwt.sign({
     roles
@@ -89,13 +83,14 @@ exports.updatePassword = (id, password) => SSO.updatePassword(id, password)
  * @param {string} password
  * @returns 
  */
-exports.create = async (username, email, password) => {
-  const request = new sql.Request(await db.get('sapphire'))
-  request.input('username', sql.VarChar, username)
+exports.create = async (email, password, given_name, family_name, ) => {
+  const request = new sql.Request(await db.get(DB_NAME))
   request.input('email', sql.VarChar, email)
   request.input('password', sql.VarChar, password)
+  request.input('given_name', sql.VarChar, given_name)
+  request.input('family_name', sql.VarChar, family_name)
 
-  const result = await request.query(`EXEC [sso].[uspCreateUser] @username, @email, @password`)
+  const result = await request.query(`EXEC [sso].[usp_createUser] @email, @password, @given_name, @family_name`)
 
   if (result.rowsAffected[0] > 0) {
     return true
@@ -104,24 +99,11 @@ exports.create = async (username, email, password) => {
 }
 
 const getAudSub = async (user_id, client_id) => {
-  let application = await SSO.getApplicationByClientId(client_id)
-
   return {
     audience: [
       client_id,
-      application != null ? application.url : undefined
+      issuer
     ],
     subject: user_id.toString()
   }
-}
-
-const getRoles = async (user_id, client_id) => {
-  let roles = await SSO.getRolesForUserId(user_id)
-  let application = await SSO.getApplicationByClientId(client_id)
-
-  if (application) {
-    roles = roles.filter(role => role.scope.indexOf(application.scopePrefix) !== -1)
-  }
-
-  return roles.map((role) => role.name + ':' + role.scope)
 }

@@ -13,7 +13,7 @@ services:
           memory: 4M
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.quickfin-wan.rule=Host(`quickfin.be`, `www.quickfin.be`)"
+        - "traefik.http.routers.quickfin-wan.rule=Host(`quickfin.be`, `www.quickfin.be`) && !(PathPrefix(`/api`)"
         - "traefik.http.routers.quickfin-wan.entrypoints=web"
         - "traefik.http.services.quickfin-wan.loadbalancer.server.port=80"
     healthcheck:
@@ -25,6 +25,41 @@ services:
     networks:
       - traefik_web
 
+  quickfin-api:
+    image: jamievangeysel/quickfin-api:latest
+    environment:
+      APP_VERSION: api/v1
+      NODE_ENV: production
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.labels.worker == true]
+      resources:
+        reservations:
+          memory: 4M
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.quickfin-api.rule=Host(`quickfin.be`, `www.quickfin.be`) && (PathPrefix(`/api`)"
+        - "traefik.http.routers.quickfin-api.entrypoints=web"
+        - "traefik.http.services.quickfin-api.loadbalancer.server.port=80"
+    healthcheck:
+      test: wget -q --spider http://localhost/healthcheck || exit 1
+      interval: 10s
+      timeout: 5s
+      start_period: 5s
+      retries: 2
+    configs:
+      - source: quickfin_api
+        target: /usr/src/app/config.js
+    networks:
+      - traefik_web
+      - default
+
 networks:
   traefik_web:
+    external: true
+
+configs:
+  quickfin_api:
     external: true
