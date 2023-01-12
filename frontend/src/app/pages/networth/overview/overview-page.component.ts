@@ -10,4 +10,11 @@ import { ChangeDetectionStrategy, Component } from '@angular/core'
 })
 export class OverviewPageComponent {
 
+  get networth(): number {
+    return 76322
+  }
+
+  get culture(): string {
+    return 'nl-BE'
+  }
 }

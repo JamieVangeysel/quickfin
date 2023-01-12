@@ -1,10 +1,36 @@
-<div class="w-full space-y-2 rounded-xl p-8 bg-white dark:bg-gray-800">
-  <h1 class="text-4xl font-medium">Overzicht</h1>
-  <p>
-    Het tablad 'Overzicht' laat een overzicht van de nettowaarde zien op basis van berekeningen van de totale activa
-    en de
-    totale passiva. <br>
-    Om de gegevens aan te passen, wijzig je de gegevens op het Activa en het Passiva tablad. Deze pagina wordt dan
-    automatisch bijgewerkt.
-  </p>
+<div class="w-full flex flex-col">
+  <div class="flex flex-col p-2 sm:flex-row mb-4">
+    <div id="assets" class="w-full sm:w-1/2">
+      <div class="text-2xl font-medium text-center">Activa</div>
+    </div>
+    <div id="liabilities" class="w-full sm:w-1/2 sm:border-l">
+      <div class="text-2xl font-medium text-center">Passiva</div>
+    </div>
+  </div>
+
+
+  <div class="flex flex-row p-2 border-t border-b-2 mb-4">
+    <div>
+      Totale nettowaarde:
+    </div>
+    <div class="flex-auto">
+      &nbsp;
+    </div>
+    <div>
+      {{
+      networth | currency:'EUR':'symbol-narrow':'1.0-2':culture
+      }}
+    </div>
+  </div>
+
+  <div class="w-full space-y-2 rounded-xl p-8 bg-white dark:bg-gray-800">
+    <h1 class="text-4xl font-medium">Overzicht</h1>
+    <p>
+      Het tablad 'Overzicht' laat een overzicht van de nettowaarde zien op basis van berekeningen van de totale activa
+      en de
+      totale passiva. <br>
+      Om de gegevens aan te passen, wijzig je de gegevens op het Activa en het Passiva tablad. Deze pagina wordt dan
+      automatisch bijgewerkt.
+    </p>
+  </div>
 </div>
