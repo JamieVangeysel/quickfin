@@ -72,6 +72,12 @@
                   "maximumError": "4kb"
                 }
               ],
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
               "outputHashing": "all"
             },
             "development": {
@@ -102,60 +108,6 @@
           "options": {
             "browserTarget": "quickfin-frontend:build"
           }
-        },
-        "server": {
-          "builder": "@angular-devkit/build-angular:server",
-          "options": {
-            "outputPath": "dist/server",
-            "main": "server.ts",
-            "tsConfig": "tsconfig.server.json",
-            "inlineStyleLanguage": "scss"
-          },
-          "configurations": {
-            "production": {
-              "outputHashing": "media"
-            },
-            "development": {
-              "optimization": false,
-              "sourceMap": true,
-              "extractLicenses": false,
-              "vendorChunk": true
-            }
-          },
-          "defaultConfiguration": "production"
-        },
-        "serve-ssr": {
-          "builder": "@nguniversal/builders:ssr-dev-server",
-          "configurations": {
-            "development": {
-              "browserTarget": "quickfin-frontend:build:development",
-              "serverTarget": "quickfin-frontend:server:development"
-            },
-            "production": {
-              "browserTarget": "quickfin-frontend:build:production",
-              "serverTarget": "quickfin-frontend:server:production"
-            }
-          },
-          "defaultConfiguration": "development"
-        },
-        "prerender": {
-          "builder": "@nguniversal/builders:prerender",
-          "options": {
-            "routes": [
-              "/"
-            ]
-          },
-          "configurations": {
-            "production": {
-              "browserTarget": "quickfin-frontend:build:production",
-              "serverTarget": "quickfin-frontend:server:production"
-            },
-            "development": {
-              "browserTarget": "quickfin-frontend:build:development",
-              "serverTarget": "quickfin-frontend:server:development"
-            }
-          },
-          "defaultConfiguration": "production"
         }
       }
     }

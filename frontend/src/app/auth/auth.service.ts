@@ -39,7 +39,7 @@ export class AuthService {
     if (window.sessionStorage.getItem('session')) {
       const response = JSON.parse(window.sessionStorage.getItem('session') || '')
       this.change.next(response)
-    } else if (!environment.production && window.location.hostname === 'localhost') {
+    } else if (!environment.production) {
       // openid offline_access name given_name email preferred_username picture roles
       this.change.next({
         id_token: {
