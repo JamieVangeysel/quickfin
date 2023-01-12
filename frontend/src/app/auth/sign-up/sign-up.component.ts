@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http'
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core'
 import { FormGroup, FormBuilder, Validators } from '@angular/forms'
-import { Router } from 'express'
+import { Router } from '@angular/router'
 import { firstValueFrom } from 'rxjs/internal/firstValueFrom'
 import { AuthService } from '../auth.service'
 
