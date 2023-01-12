@@ -24,8 +24,8 @@ export class SignUpComponent {
   ) {
     this.signUpForm = fb.group({
       username: ['', [Validators.required, Validators.email]],
-      given_name: ['', [Validators.required]],
-      family_name: ['', [Validators.required]],
+      given_name: ['', [Validators.required, Validators.minLength(2)]],
+      family_name: ['', [Validators.required, Validators.minLength(2)]],
       password: ['', [Validators.required, Validators.minLength(12)]],
       remmeber_me: [false, []]
     })
