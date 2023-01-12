@@ -18,7 +18,7 @@ registerLocaleData(localeNlBe)
     AppComponent
   ],
   imports: [
-    BrowserModule,
+    BrowserModule.withServerTransition({ appId: 'serverApp' }),
     LayoutModule,
     HttpClientModule,
     BrowserAnimationsModule,
