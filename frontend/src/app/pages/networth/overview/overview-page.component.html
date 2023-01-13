@@ -3,7 +3,7 @@
     <div id="assets" class="w-full sm:w-1/2">
       <div class="text-4xl font-medium text-center">Activa</div>
       <div class="">
-        <div class="grid grid-cols-3 px-3 py-2 bg-gray-300">
+        <div class="grid grid-cols-3 px-3 py-2 bg-gray-300 dark:bg-gray-600">
           <div class="col-span-2">
             Categorie activa
           </div>
@@ -11,20 +11,20 @@
             Waarde activa
           </div>
         </div>
-        <div class="grid grid-cols-3 px-3 py-2 bg-white" *ngFor=" let asset of assets">
+        <div class="grid grid-cols-3 px-3 py-2 bg-white dark:bg-gray-800" *ngFor=" let asset of assets">
           <div class="col-span-2">
             {{ asset.name }}
           </div>
           <div class="col-auto text-right">
-            {{ asset.value | currency:'EUR':'symbol-narrow':'1.0-2':culture }}
+            {{ asset.value | currency:'EUR':'symbol-narrow':'1.2-2':culture }}
           </div>
         </div>
-        <div class="grid grid-cols-3 px-3 py-2 bg-gray-50 font-bold">
+        <div class="grid grid-cols-3 px-3 py-2 bg-gray-50 dark:bg-gray-700 font-bold">
           <div class="col-span-2">
             Totale activa
           </div>
           <div class="col-auto text-right">
-            {{ assetsValue | currency:'EUR':'symbol-narrow':'1.0-2':culture }}
+            {{ assetsValue | currency:'EUR':'symbol-narrow':'1.2-2':culture }}
           </div>
         </div>
       </div>
@@ -32,7 +32,7 @@
     <div id="liabilities" class="w-full sm:mt-0 sm:w-1/2">
       <div class="text-4xl font-medium text-center">Passiva</div>
       <div class="">
-        <div class="grid grid-cols-3 px-3 py-2 bg-gray-300">
+        <div class="grid grid-cols-3 px-3 py-2 bg-gray-300 dark:bg-gray-600">
           <div class="col-span-2">
             Categorie passiva
           </div>
@@ -40,20 +40,20 @@
             Waarde passiva
           </div>
         </div>
-        <div class="grid grid-cols-3 px-3 py-2 bg-white" *ngFor="let liability of liabilities">
+        <div class="grid grid-cols-3 px-3 py-2 bg-white dark:bg-gray-800" *ngFor="let liability of liabilities">
           <div class="col-span-2">
             {{ liability.name }}
           </div>
           <div class="col-auto text-right">
-            {{ liability.value | currency:'EUR':'symbol-narrow':'1.0-2':culture }}
+            {{ liability.value | currency:'EUR':'symbol-narrow':'1.2-2':culture }}
           </div>
         </div>
-        <div class="grid grid-cols-3 px-3 py-2 bg-gray-50 font-bold">
+        <div class="grid grid-cols-3 px-3 py-2 bg-gray-50 dark:bg-gray-700 font-bold">
           <div class="col-span-2">
             Totale passiva
           </div>
           <div class="col-auto text-right">
-            {{ liabilitiesValue | currency:'EUR':'symbol-narrow':'1.0-2':culture }}
+            {{ liabilitiesValue | currency:'EUR':'symbol-narrow':'1.2-2':culture }}
           </div>
         </div>
       </div>

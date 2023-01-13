@@ -29,8 +29,8 @@ export class NetworthApiService {
     return firstValueFrom(this.http.put<IPostResponse>(`${environment.api}networth/assets/${asset.id}`, asset))
   }
 
-  deleteAsset(asset: IGetNetworthEntry): Promise<IPostResponse> {
-    return firstValueFrom(this.http.delete<IPostResponse>(`${environment.api}networth/assets/${asset.id}`))
+  deleteAsset(id: number): Promise<IPostResponse> {
+    return firstValueFrom(this.http.delete<IPostResponse>(`${environment.api}networth/assets/${id}`))
   }
 
   createLiability(liability: INameValueEntry): Promise<IPostResponse> {
@@ -41,8 +41,8 @@ export class NetworthApiService {
     return firstValueFrom(this.http.put<IPostResponse>(`${environment.api}networth/liabilities/${liability.id}`, liability))
   }
 
-  deleteLiability(liability: IGetNetworthEntry): Promise<IPostResponse> {
-    return firstValueFrom(this.http.delete<IPostResponse>(`${environment.api}networth/liabilities/${liability.id}`))
+  deleteLiability(id: number): Promise<IPostResponse> {
+    return firstValueFrom(this.http.delete<IPostResponse>(`${environment.api}networth/liabilities/${id}`))
   }
 }
 

@@ -32,9 +32,48 @@ export class LiabilitiesPageComponent implements OnInit {
     }
   }
 
+  async create(group_id: number) {
+    const newLabel = prompt('Label: ')
+    if (!newLabel) return
+    const newValue = prompt('Waarde: ')
+    if (!newValue) return
+
+    if (+newValue >= 0 && newLabel.length > 0) {
+      // try to create item !
+      try {
+        const resp = await this.networthApi.createLiability({
+          name: newLabel,
+          value: +newValue,
+          group_id
+        })
+
+        if (resp.success) {
+          alert('Aangemaakt!')
+
+          const group = this._groups.find(e => e.id === group_id)
+          group?.liabilities.push({
+            id: resp.id,
+            name: newLabel,
+            value: +newValue,
+            group_id
+          })
+        }
+      } catch (err) {
+        console.log(err)
+        alert('Er is een onbekende fout opgetreden tijdens het behandelen van je verzoek!')
+      } finally {
+        this.ref.markForCheck()
+      }
+    } else {
+      alert('De ingevoerde waardes bevatten een fout!')
+    }
+  }
+
   async edit(liability: IGetNetworthEntry, group_id: number) {
-    const newLabel = prompt('Nieuwe label: ', liability.name) ?? liability.name
-    const newValue = prompt('Nieuwe waarde: ', liability.value.toString()) ?? liability.value
+    const newLabel = prompt('Nieuwe label: ', liability.name)
+    if (!newLabel) return
+    const newValue = prompt('Nieuwe waarde: ', liability.value.toString())
+    if (!newValue) return
 
     if (+newValue >= 0) {
       if (newLabel === liability.name && +newValue === liability.value) {
@@ -64,6 +103,29 @@ export class LiabilitiesPageComponent implements OnInit {
       }
     } else {
       alert('Er is een fout opgetreden tijdens het verwerken van je ingegeven waardes, waarde moet een getal groter of gelijk aan 0 zijn!')
+    }
+  }
+
+  async delete(liability: IGetNetworthEntry, group_id: number) {
+    const confirmed = confirm(`Weet je zeker dat je '${liability.name}' wilt verwijderen?`)
+    if (confirmed === true) {
+      // try to update item !
+      try {
+        const resp = await this.networthApi.deleteLiability(liability.id)
+
+        if (resp.success) {
+          alert('Verwijderd!')
+          const group = this._groups.find(e => e.id === group_id)
+          if (group) {
+            group.liabilities.splice(group.liabilities.indexOf(liability), 1)
+          }
+        }
+      } catch (err) {
+        console.log(err)
+        alert('Er is een onbekende fout opgetreden tijdens het behandelen van je verzoek!')
+      } finally {
+        this.ref.markForCheck()
+      }
     }
   }
 
