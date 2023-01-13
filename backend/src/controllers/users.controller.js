@@ -14,13 +14,13 @@ const User = require('../models/user.model')
 exports.postSignUp = async (request, reply) => {
   try {
     const {
-      email,
+      username,
+      password,
       given_name,
-      family_name,
-      password
+      family_name
     } = request.body
 
-    if (await User.create(email, bcrypt.hashSync(password, config.bcrypt.cost), given_name, family_name)) {
+    if (await User.create(username, bcrypt.hashSync(password, config.bcrypt.cost), given_name, family_name)) {
       return {
         success: true
       }

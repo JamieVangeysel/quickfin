@@ -341,3 +341,18 @@ GO
 -- GRANT EXEC PERMISSIONS TO sso_agent
 GRANT EXEC ON [sso].[usp_revokeRefreshToken] TO [sso_agent]
 GO
+
+-- GRANT EXEC PERMISSIONS ON TO sso
+GRANT EXEC ON [sso].[usp_getUser] TO [sso]
+GRANT EXEC ON [sso].[usp_getUserInfo] TO [sso]
+GRANT EXEC ON [sso].[usp_updateUserPassword] TO [sso]
+GRANT EXEC ON [sso].[usp_getTokenExists] TO [sso]
+GRANT EXEC ON [sso].[usp_createAuthorizationCode] TO [sso]
+GRANT EXEC ON [sso].[usp_getAuthorizationCode] TO [sso]
+GRANT EXEC ON [sso].[usp_createUser] TO [sso]
+GRANT EXEC ON [sso].[usp_getFailedAuthAttempts] TO [sso]
+GRANT EXEC ON [sso].[usp_addAuthLog] TO [sso]
+GRANT EXEC ON [sso].[usp_updateRefreshToken] TO [sso]
+GRANT EXEC ON [sso].[usp_createRefreshToken] TO [sso]
+GRANT EXEC ON [sso].[usp_getRefreshToken] TO [sso]
+GO

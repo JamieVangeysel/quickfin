@@ -15,7 +15,7 @@ const DB_NAME = 'quickfin'
  * @returns 
  */
 exports.getIdToken = async (authorization_code) => {
-  const { audience, subject } = await getAudSub(authorization_code.user_id, authorization_code.client_id)
+  const { audience, subject } = await getAudSub(authorization_code.user_id)
   const userinfo = await SSO.getUserInfo(authorization_code.user_id)
 
   let payload
@@ -44,7 +44,7 @@ exports.getAccessToken = async (authorization_code) => {
   const { audience, subject } = await getAudSub(authorization_code.user_id)
 
   return jwt.sign({
-    roles
+    roles: ['*']
   }, config.keys[0].secret, {
     issuer,
     audience,
@@ -83,7 +83,7 @@ exports.updatePassword = (id, password) => SSO.updatePassword(id, password)
  * @param {string} password
  * @returns 
  */
-exports.create = async (email, password, given_name, family_name, ) => {
+exports.create = async (email, password, given_name, family_name) => {
   const request = new sql.Request(await db.get(DB_NAME))
   request.input('email', sql.VarChar, email)
   request.input('password', sql.VarChar, password)
@@ -98,10 +98,9 @@ exports.create = async (email, password, given_name, family_name, ) => {
   return false
 }
 
-const getAudSub = async (user_id, client_id) => {
+const getAudSub = async (user_id) => {
   return {
     audience: [
-      client_id,
       issuer
     ],
     subject: user_id.toString()

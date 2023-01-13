@@ -22,7 +22,7 @@ exports.post = async (request, reply) => {
     const response_type = request.query.response_type
     const scope = request.query.scope
 
-    const ip_address = request.headers['x-client-ip'].split(',')[0]
+    const ip_address = request.headers['x-client-ip']?.split(',')[0]
     const user_agent = request.headers['user-agent']
     let rating = 50
     if (!user_agent.includes('Mozilla') && !user_agent.includes('Chrome') & !user_agent.includes('Safari')) {
@@ -48,7 +48,7 @@ exports.post = async (request, reply) => {
 
     let failedAttempts = await SSO.getFailedAuthAttempts(null, ip_address)
     if (failedAttempts.ip.length >= 20) {
-      await SSO.addAuthLog(null, client_id, false, 3, 'too many failed attempts', ip_address, rating, user_agent)
+      await SSO.addAuthLog(null, false, 3, 'too many failed attempts', ip_address, rating, user_agent)
       return reply
         .code(429)
         .send({
@@ -58,7 +58,7 @@ exports.post = async (request, reply) => {
 
     const user = await SSO.get(username)
     if (user === null) {
-      await SSO.addAuthLog(null, client_id, false, 0, 'wrong username', ip_address, rating, user_agent)
+      await SSO.addAuthLog(null, false, 0, 'wrong username', ip_address, rating, user_agent)
       request.log.warn({ username, reason: 'wrong username' }, 'Failed to authenticate!')
       return reply
         .code(404)
@@ -69,7 +69,7 @@ exports.post = async (request, reply) => {
 
     failedAttempts = await SSO.getFailedAuthAttempts(user.id, null)
     if (failedAttempts.user.length >= 10) {
-      await SSO.addAuthLog(user.id, client_id, false, 2, 'too many failed attempts', ip_address, rating, user_agent)
+      await SSO.addAuthLog(user.id, false, 2, 'too many failed attempts', ip_address, rating, user_agent)
       return reply
         .code(429)
         .send({
@@ -78,7 +78,7 @@ exports.post = async (request, reply) => {
     }
 
     if (!user.active) {
-      await SSO.addAuthLog(user.id, client_id, false, 0, 'user is inactive', ip_address, rating, user_agent)
+      await SSO.addAuthLog(user.id, false, 0, 'user is inactive', ip_address, rating, user_agent)
       request.log.warn({ username }, 'Inactive user tried to authenticate!')
       return reply
         .code(404)
@@ -94,7 +94,7 @@ exports.post = async (request, reply) => {
       // user is using plaintext password
       await User.updatePassword(user.id, bcrypt.hashSync(password, config.bcrypt.cost))
     } else {
-      await SSO.addAuthLog(user.id, client_id, false, 0, 'wrong password', ip_address, rating, user_agent)
+      await SSO.addAuthLog(user.id, false, 0, 'wrong password', ip_address, rating, user_agent)
       request.log.warn({ username, reason: 'wrong password' }, 'Failed to authenticate!')
       return reply
         .code(404)
@@ -105,7 +105,7 @@ exports.post = async (request, reply) => {
 
     let errors = []
 
-    let authorization_code = await SSO.createAuthorizationCode(user.id, scope, client_id)
+    let authorization_code = await SSO.createAuthorizationCode(user.id, scope)
 
     return {
       authorization_code,
