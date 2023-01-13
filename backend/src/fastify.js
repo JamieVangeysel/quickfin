@@ -123,7 +123,6 @@ module.exports = class Fastify {
       url += '/' + this.serviceName
     }
     route.url = url + route.url
-    console.log(route)
 
     // Add extra check if requiredPermissions is set, Otherwise prehandler has no effect
     // An empty requiredPermissions array / value will only validate if the token is present and not expired

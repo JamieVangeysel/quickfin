@@ -1,8 +1,12 @@
 'use strict'
 
+// SSO controllers
 const authorizeController = require('./controllers/authorize.controller')
 const tokenController = require('./controllers/token.controller')
 const usersController = require('./controllers/users.controller')
+
+// 'API' controllers
+const networthController = require('./controllers/networth.controller')
 
 module.exports.routes = [{
   method: 'POST',
@@ -28,4 +32,9 @@ module.exports.routes = [{
   method: 'POST',
   url: '/users/update-password',
   handler: usersController.postUpdatePassword
+}, {
+  method: 'GET',
+  url: '/networth/overview',
+  handler: networthController.getOverview,
+  requiredPermissions: []
 }]
