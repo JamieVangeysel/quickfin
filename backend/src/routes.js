@@ -37,4 +37,14 @@ module.exports.routes = [{
   url: '/networth/overview',
   handler: networthController.getOverview,
   requiredPermissions: []
+}, {
+  method: 'GET',
+  url: '/networth/assets',
+  handler: networthController.getAssets,
+  requiredPermissions: []
+}, {
+  method: 'GET',
+  url: '/networth/liabilities',
+  handler: networthController.getLiabilities,
+  requiredPermissions: []
 }]

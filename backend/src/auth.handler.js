@@ -118,7 +118,7 @@ function isValidIssuer(issuer) {
 
 function validateExpiration(request, reply, done, requiredPermissions, token) {
   if (token.exp <= new Date().getTime() / 1000) {
-    error(request, reply, done, requiredPermissions, {}, 'Access denied: token has expired!', 403)
+    error(request, reply, done, requiredPermissions, {}, 'Access denied: token has expired!', 401)
   }
 }
 

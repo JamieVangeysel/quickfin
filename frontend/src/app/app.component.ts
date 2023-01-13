@@ -14,6 +14,6 @@ import { AuthService } from './auth/auth.service'
 })
 export class AppComponent {
   constructor(auth: AuthService) {
-    console.log(auth.access_token)
+    console.debug('isAuthenticated?', auth.isAuthenticated())
   }
 }

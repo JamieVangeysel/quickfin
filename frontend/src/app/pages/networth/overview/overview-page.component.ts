@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core'
+import { NetworthApiService } from 'src/app/api/networth-api.service'
 
 @Component({
   selector: 'qf-overview-page',
@@ -8,33 +9,28 @@ import { ChangeDetectionStrategy, Component } from '@angular/core'
     class: 'relative flex flex-auto w-full'
   }
 })
-export class OverviewPageComponent {
+export class OverviewPageComponent implements OnInit {
   private _assets: any[] = []
   private _liabilities: any[] = []
 
-  constructor() {
-    this._assets = [
-      {
-        name: 'Grote/vaste bezittingen',
-        value: 99250
-      }, {
-        name: 'Liquide middelen',
-        value: 75223
-      }, {
-        name: 'Persoonlijke voorwerpen',
-        value: 3200
-      }
-    ]
+  constructor(
+    private ref: ChangeDetectorRef,
+    private networthApi: NetworthApiService
+  ) {
+  }
 
-    this._liabilities = [
-      {
-        name: 'Langlopende schulden',
-        value: 102834
-      }, {
-        name: 'Kortlopende schulden',
-        value: 400
+  async ngOnInit() {
+    try {
+      const overview = await this.networthApi.getOverview()
+      if (overview) {
+        this._assets = overview.assets
+        this._liabilities = overview.liabilities
       }
-    ]
+    } catch (err) {
+      console.log(err)
+    } finally {
+      this.ref.markForCheck()
+    }
   }
 
   get assets(): any[] {

@@ -1,68 +1,75 @@
 <div class="w-full flex flex-col">
-  <div class="flex flex-col p-2 sm:flex-row mb-4">
-    <div id="assets" class="w-full sm:w-1/2 sm:pr-4">
-      <div class="text-2xl font-medium text-center">Activa</div>
-      <div class="grid grid-cols-3 px-2" *ngFor="let asset of assets">
-        <div class="col-span-2">
-          {{ asset.name }}
+  <div class="flex flex-col px-2 sm:flex-row mb-4 gap-4">
+    <div id="assets" class="w-full sm:w-1/2">
+      <div class="text-4xl font-medium text-center">Activa</div>
+      <div class="">
+        <div class="grid grid-cols-3 px-3 py-2 bg-gray-300">
+          <div class="col-span-2">
+            Categorie activa
+          </div>
+          <div class="col-auto text-right">
+            Waarde activa
+          </div>
         </div>
-        <div class="col-auto text-right">
-          {{ asset.value | currency:'EUR':'symbol-narrow':'1.0-2':culture }}
+        <div class="grid grid-cols-3 px-3 py-2 bg-white" *ngFor=" let asset of assets">
+          <div class="col-span-2">
+            {{ asset.name }}
+          </div>
+          <div class="col-auto text-right">
+            {{ asset.value | currency:'EUR':'symbol-narrow':'1.0-2':culture }}
+          </div>
         </div>
-      </div>
-      <div class="grid grid-cols-3 px-2 pt-2 border-t mt-2">
-        <div class="col-span-2">
-          Totale activa
-        </div>
-        <div class="col-auto text-right font-bold">
-          {{ assetsValue | currency:'EUR':'symbol-narrow':'1.0-2':culture }}
+        <div class="grid grid-cols-3 px-3 py-2 bg-gray-50 font-bold">
+          <div class="col-span-2">
+            Totale activa
+          </div>
+          <div class="col-auto text-right">
+            {{ assetsValue | currency:'EUR':'symbol-narrow':'1.0-2':culture }}
+          </div>
         </div>
       </div>
     </div>
-    <div id="liabilities" class="w-full sm:w-1/2 sm:border-l sm:pl-4">
-      <div class="text-2xl font-medium text-center">Passiva</div>
-      <div class="grid grid-cols-3 px-2" *ngFor="let liability of liabilities">
-        <div class="col-span-2">
-          {{ liability.name }}
+    <div id="liabilities" class="w-full sm:mt-0 sm:w-1/2">
+      <div class="text-4xl font-medium text-center">Passiva</div>
+      <div class="">
+        <div class="grid grid-cols-3 px-3 py-2 bg-gray-300">
+          <div class="col-span-2">
+            Categorie passiva
+          </div>
+          <div class="col-auto text-right">
+            Waarde passiva
+          </div>
         </div>
-        <div class="col-auto text-right">
-          {{ liability.value | currency:'EUR':'symbol-narrow':'1.0-2':culture }}
+        <div class="grid grid-cols-3 px-3 py-2 bg-white" *ngFor="let liability of liabilities">
+          <div class="col-span-2">
+            {{ liability.name }}
+          </div>
+          <div class="col-auto text-right">
+            {{ liability.value | currency:'EUR':'symbol-narrow':'1.0-2':culture }}
+          </div>
         </div>
-      </div>
-      <div class="grid grid-cols-3 px-2 pt-2 border-t mt-2">
-        <div class="col-span-2">
-          Totale passiva
-        </div>
-        <div class="col-auto text-right font-bold">
-          {{ liabilitiesValue | currency:'EUR':'symbol-narrow':'1.0-2':culture }}
+        <div class="grid grid-cols-3 px-3 py-2 bg-gray-50 font-bold">
+          <div class="col-span-2">
+            Totale passiva
+          </div>
+          <div class="col-auto text-right">
+            {{ liabilitiesValue | currency:'EUR':'symbol-narrow':'1.0-2':culture }}
+          </div>
         </div>
       </div>
     </div>
   </div>
-
-
-  <div class="flex flex-row p-2 border-t border-b-2 mb-4">
-    <div>
-      Totale nettowaarde:
-    </div>
-    <div class="flex-auto">
-      &nbsp;
-    </div>
-    <div>
-      {{
-      networth | currency:'EUR':'symbol-narrow':'1.0-2':culture
-      }}
+  <div class="px-2">
+    <div class="flex flex-row px-3 py-2 text-xl bg-gray-500 text-white">
+      <div>
+        Totale nettowaarde:
+      </div>
+      <div class="flex-auto">
+        &nbsp;
+      </div>
+      <div class="text-right">
+        {{ networth | currency:'EUR':'symbol-narrow':'1.0-2':culture }}
+      </div>
     </div>
   </div>
-
-  <!-- <div class="w-full space-y-2 rounded-xl p-8 bg-white dark:bg-gray-800">
-    <h1 class="text-4xl font-medium">Overzicht</h1>
-    <p>
-      Het tablad 'Overzicht' laat een overzicht van de nettowaarde zien op basis van berekeningen van de totale activa
-      en de
-      totale passiva. <br>
-      Om de gegevens aan te passen, wijzig je de gegevens op het Activa en het Passiva tablad. Deze pagina wordt dan
-      automatisch bijgewerkt.
-    </p>
-  </div> -->
 </div>

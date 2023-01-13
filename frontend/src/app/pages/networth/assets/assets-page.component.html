@@ -1,20 +1,37 @@
-<div class="w-full space-y-2 rounded-xl p-8 bg-white dark:bg-gray-800">
-  <h1 class="text-4xl font-medium">Activa</h1>
-  <p>
-    Op het tablad 'Activa' geef je de huidige waarde van je grote bezittingen, je liquide middelen en je
-    persoonlijke bezittingen in de weergegeven tabellen in. <br>
-    Wijzig bestaande rijen of voeg nieuwe toe om je activa te beschrijven.
-  </p>
-  
-  <br>
+<div class="w-full flex flex-col">
+  <div class="flex flex-col p-2 w-full sm:flex-row mb-4 gap-2">
+    <div class="w-full" *ngFor="let group of groups">
+      <div class="text-xl font-medium text-center mb-3">{{ group.name }}</div>
+      <div class="">
+        <div class="grid grid-cols-3 px-3 py-2 bg-gray-300 dark:bg-gray-600">
+          <div class="col-span-2">
+            Activa
+          </div>
+          <div class="col-auto text-right">
+            Waarde
+          </div>
+        </div>
 
-  <p>
-    Het tablad activa bestaat uit 3 delen:
-  </p>
+        <div
+          class="grid grid-cols-3 px-3 py-2 bg-white hover:ring-2 ring-inset dark:bg-gray-800 cursor-pointer"
+          *ngFor="let asset of group.assets" (click)="edit(asset, group.id)">
+          <div class="col-span-2">
+            {{ asset.name }}
+          </div>
+          <div class="col-auto text-right">
+            {{ asset.value | currency:'EUR':'symbol-narrow':'1.0-2':culture }}
+          </div>
+        </div>
 
-  <ul>
-    <li> - Grote/Vaste middelen (Voorbeelden: Huis, Auto)</li>
-    <li> - Liquide middelen (Voorbeelden: Zichtrekening, Spaargelden, Investeringportefuile)</li>
-    <li> - Persoonlijke bezittingen (Voorbeelden: MacBook, Antieke kast, trouwring)</li>
-  </ul>
+        <div class="grid grid-cols-3 px-3 py-2 bg-gray-50 dark:bg-gray-700 font-bold">
+          <div class="col-span-2">
+            Totaal
+          </div>
+          <div class="col-auto text-right">
+            {{ totalValue(group.assets) | currency:'EUR':'symbol-narrow':'1.0-2':culture }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

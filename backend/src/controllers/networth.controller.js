@@ -21,7 +21,41 @@ exports.getOverview = async (request, reply) => {
     return reply
       .status(500)
       .send(err)
-  } finally {
+  }
+}
 
+/**
+ * Get assets
+ * @param {FastifyRequest} request 
+ * @param {FastifyReply} reply 
+ */
+exports.getAssets = async (request, reply) => {
+  try {
+    /** @type {JwtPayload} */
+    const token = request.token
+
+    return Networth.getAssets(token.sub)
+  } catch (err) {
+    return reply
+      .status(500)
+      .send(err)
+  }
+}
+
+/**
+ * Get Liabilities
+ * @param {FastifyRequest} request 
+ * @param {FastifyReply} reply 
+ */
+exports.getLiabilities = async (request, reply) => {
+  try {
+    /** @type {JwtPayload} */
+    const token = request.token
+
+    return Networth.getLiabilities(token.sub)
+  } catch (err) {
+    return reply
+      .status(500)
+      .send(err)
   }
 }

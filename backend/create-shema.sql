@@ -444,4 +444,56 @@ AS BEGIN
 END
 GO
 
+CREATE PROCEDURE [networth].[usp_getAssets]
+  @user_id INT
+WITH EXECUTE AS 'networth_agent'
+AS BEGIN
+  SELECT
+    [groups] = (
+      SELECT
+        [id] = [group].[id],
+        [name] = [group].[name],
+        [assets] = (
+          SELECT
+            [id] = [asset].[id],
+            [name] = [asset].[name],
+            [value] = [asset].[value]
+          FROM [networth].[assets] [asset]
+          WHERE [asset].[user_id] = @user_id AND [group].[id] = [asset].[group_id]
+          FOR JSON PATH, INCLUDE_NULL_VALUES
+        )
+      FROM [networth].[assetGroups] [group]
+      FOR JSON PATH, INCLUDE_NULL_VALUES
+    )
+  FOR JSON PATH
+END
+GO
+
+CREATE PROCEDURE [networth].[usp_getLiabilities]
+  @user_id INT
+WITH EXECUTE AS 'networth_agent'
+AS BEGIN
+  SELECT
+    [groups] = (
+      SELECT
+        [id] = [group].[id],
+        [name] = [group].[name],
+        [liabilities] = (
+          SELECT
+            [id] = [liability].[id],
+            [name] = [liability].[name],
+            [value] = [liability].[value]
+          FROM [networth].[liabilities] [liability]
+          WHERE [liability].[user_id] = @user_id AND [group].[id] = [liability].[group_id]
+          FOR JSON PATH, INCLUDE_NULL_VALUES
+        )
+      FROM [networth].[liabilityGroups] [group]
+      FOR JSON PATH, INCLUDE_NULL_VALUES
+    )
+  FOR JSON PATH
+END
+GO
+
 GRANT EXEC ON [networth].[usp_getOverview] TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [networth].[usp_getAssets] TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [networth].[usp_getLiabilities] TO [sso] -- TEMPORARY ACTION

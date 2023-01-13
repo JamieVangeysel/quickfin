@@ -1,18 +1,36 @@
-<div class="w-full space-y-2 rounded-xl p-8 bg-white dark:bg-gray-800">
-  <h1 class="text-4xl font-medium">Passiva</h1>
-  <p>
-    Op het tablad 'Passiva' word je totale schuld berekend. <br>
-    Wijzig de tabelrijen of voeg nieuwe rijen toe om je schulden te beschrijven.
-  </p>
-  
-  <br>
+<div class="w-full flex flex-col">
+  <div class="flex flex-col p-2 w-full sm:flex-row mb-4 gap-2">
+    <div class="w-full" *ngFor="let group of groups">
+      <div class="text-xl font-medium text-center mb-3">{{ group.name }}</div>
+      <div class="">
+        <div class="grid grid-cols-3 px-3 py-2 bg-gray-300 dark:bg-gray-600">
+          <div class="col-span-2">
+            Passiva
+          </div>
+          <div class="col-auto text-right">
+            Te betalen
+          </div>
+        </div>
 
-  <p>
-    Het tablad pasiva bestaat uit 2 delen:
-  </p>
+        <div class="grid grid-cols-3 px-3 py-2 bg-white hover:ring-2 ring-inset dark:bg-gray-800 cursor-pointer"
+          *ngFor="let liability of group.liabilities" (click)="edit(liability, group.id)">
+          <div class="col-span-2">
+            {{ liability.name }}
+          </div>
+          <div class="col-auto text-right">
+            {{ liability.value | currency:'EUR':'symbol-narrow':'1.0-2':culture }}
+          </div>
+        </div>
 
-  <ul>
-    <li> - Langlopende schulden (Voorbeelden: Hypotheek, Leasing)</li>
-    <li> - kortlopende Schulden (Voorbeelden: Creditcard afrekening)</li>
-  </ul>
+        <div class="grid grid-cols-3 px-3 py-2 bg-gray-50 dark:bg-gray-700 font-bold">
+          <div class="col-span-2">
+            Totaal
+          </div>
+          <div class="col-auto text-right">
+            {{ totalValue(group.liabilities) | currency:'EUR':'symbol-narrow':'1.0-2':culture }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

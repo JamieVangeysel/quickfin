@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
-import { firstValueFrom, Observable, Subject } from 'rxjs'
-import { shareReplay } from 'rxjs/operators'
+import { firstValueFrom, from, Observable, of, Subject } from 'rxjs'
+import { map, share, shareReplay } from 'rxjs/operators'
 import { Router } from '@angular/router'
 import { environment } from 'src/environments/environment'
 
@@ -92,27 +92,30 @@ export class AuthService {
     return getTokenSub
   }
 
-  public async refresh(): Promise<boolean> {
+  public refresh(): Observable<string | undefined> {
     // check if there is a session and check if the refreshToken is still valid
     if (!this.isAuthenticated() && this.refresh_token) {
       // check if the token is expire
       if (new Date(this.id_token.exp * 1000) < new Date()) {
         if (!this.refresh_token) {
           console.warn('There is no refresh token defined!')
-          return false
+          return of(undefined)
         }
-        const resp = await firstValueFrom(this.http.post<any>(`${environment.api}users/refresh-token`, undefined, {
+
+        const r = this.http.post<any>(`${environment.api}users/refresh-token`, undefined, {
           params: {
             token: this.refresh_token
           }
-        }))
-        window.sessionStorage.setItem('session', JSON.stringify(resp))
-        this.change.next(resp)
-        return true
+        }).pipe(shareReplay())
+        r.subscribe(resp => {
+          window.sessionStorage.setItem('session', JSON.stringify(resp))
+          this.change.next(resp)
+        })
+        return r.pipe<string | undefined>(map(resp => this.refresh_token))
       }
     }
 
-    return false
+    return of(undefined)
   }
 
   public updatePassword(credentials: any) {
