@@ -51,12 +51,17 @@ export class LiabilitiesPageComponent implements OnInit {
           alert('Aangemaakt!')
 
           const group = this._groups.find(e => e.id === group_id)
-          group?.liabilities.push({
-            id: resp.id,
-            name: newLabel,
-            value: +newValue,
-            group_id
-          })
+          if (group) {
+            if (!group.liabilities) group.liabilities = []
+            if (group.liabilities) {
+              group.liabilities.push({
+                id: resp.id,
+                name: newLabel,
+                value: +newValue,
+                group_id
+              })
+            }
+          }
         }
       } catch (err) {
         console.log(err)
@@ -129,8 +134,8 @@ export class LiabilitiesPageComponent implements OnInit {
     }
   }
 
-  totalValue(entries: IGetNetworthEntry[]) {
-    return entries.reduce((prev, curr) => prev + curr.value, 0)
+  totalValue(entries: IGetNetworthEntry[] | null) {
+    return entries ? entries.reduce((prev, curr) => prev + curr.value, 0) : 0
   }
 
   get groups(): ILiabilitiesGroup[] {

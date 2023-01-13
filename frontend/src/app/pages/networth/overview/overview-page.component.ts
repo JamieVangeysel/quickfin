@@ -23,8 +23,8 @@ export class OverviewPageComponent implements OnInit {
     try {
       const overview = await this.networthApi.getOverview()
       if (overview) {
-        this._assets = overview.assets
-        this._liabilities = overview.liabilities
+        this._assets = overview.assets ?? []
+        this._liabilities = overview.liabilities ?? []
       }
     } catch (err) {
       console.log(err)
