@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
-import { Observable, Subject } from 'rxjs'
+import { firstValueFrom, Observable, Subject } from 'rxjs'
 import { shareReplay } from 'rxjs/operators'
 import { Router } from '@angular/router'
 import { environment } from 'src/environments/environment'
@@ -22,9 +22,17 @@ export class AuthService {
     private http: HttpClient,
     private router: Router
   ) {
-    this.change.subscribe(response => {
+    this.change.subscribe((response: IGetTokenResponse) => {
       console.debug('AuthService.constructor() -- response', response)
       if (response) {
+        if (!response.id_token_jwt) {
+          const object = JSON.parse(window.atob(response.id_token.split('.')[1]))
+          response = {
+            ...response,
+            id_token: object,
+            id_token_jwt: response.id_token
+          }
+        }
         this.id_token = response.id_token
         this.id_token_jwt = response.id_token_jwt
         this.access_token = response.access_token
@@ -70,16 +78,16 @@ export class AuthService {
   }
 
   public getToken(authorization_code: string) {
-    const getTokenSub = this.http.get<any>(`${environment.api}token`, {
+    const getTokenSub = this.http.get<IGetTokenResponse>(`${environment.api}token`, {
       params: {
         grant_type: 'authorization_code',
         code: authorization_code
       }
     }).pipe(shareReplay())
-    getTokenSub.subscribe(response => {
-      window.sessionStorage.setItem('session', JSON.stringify(response))
+    getTokenSub.subscribe(session => {
+      window.sessionStorage.setItem('session', JSON.stringify(session))
 
-      this.change.next(response)
+      this.change.next(session)
     })
     return getTokenSub
   }
@@ -93,11 +101,11 @@ export class AuthService {
           console.warn('There is no refresh token defined!')
           return false
         }
-        const resp = await this.http.post<any>(`${environment.api}users/refresh-token`, undefined, {
+        const resp = await firstValueFrom(this.http.post<any>(`${environment.api}users/refresh-token`, undefined, {
           params: {
             token: this.refresh_token
           }
-        }).toPromise()
+        }))
         window.sessionStorage.setItem('session', JSON.stringify(resp))
         this.change.next(resp)
         return true
@@ -135,4 +143,13 @@ export class AuthService {
     }
     return false
   }
+}
+
+export interface IGetTokenResponse {
+  access_token: string
+  token_type: 'Bearer'
+  expires_in: number
+  id_token: string
+  refresh_token?: string
+  id_token_jwt?: string
 }
