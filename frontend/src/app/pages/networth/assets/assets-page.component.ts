@@ -47,7 +47,7 @@ export class AssetsPageComponent implements OnInit {
         })
 
         if (resp.success) {
-          alert('Aangemaakt!')
+          // alert('Aangemaakt!')
 
           const group = this._groups.find(e => e.id === group_id)
           if (group) {
@@ -93,7 +93,7 @@ export class AssetsPageComponent implements OnInit {
           })
 
           if (resp.success) {
-            alert('Opgeslagen!')
+            // alert('Opgeslagen!')
             asset.name = newLabel
             asset.value = +newValue
           }
@@ -117,7 +117,7 @@ export class AssetsPageComponent implements OnInit {
         const resp = await this.networthApi.deleteLiability(asset.id)
 
         if (resp.success) {
-          alert('Verwijderd!')
+          // alert('Verwijderd!')
           const group = this._groups.find(e => e.id === group_id)
           if (group) {
             group.assets.splice(group.assets.indexOf(asset), 1)
