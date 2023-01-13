@@ -26,7 +26,7 @@ export class NetworthApiService {
   }
 
   updateAsset(asset: IGetNetworthEntry): Promise<IPostResponse> {
-    return firstValueFrom(this.http.post<IPostResponse>(`${environment.api}networth/assets`, asset))
+    return firstValueFrom(this.http.post<IPostResponse>(`${environment.api}networth/assets/${asset.id}`, asset))
   }
 
   createLiability(liability: INameValueEntry): Promise<IPostResponse> {
@@ -34,7 +34,7 @@ export class NetworthApiService {
   }
 
   updateLiability(liability: IGetNetworthEntry): Promise<IPostResponse> {
-    return firstValueFrom(this.http.post<IPostResponse>(`${environment.api}networth/liabilities`, liability))
+    return firstValueFrom(this.http.post<IPostResponse>(`${environment.api}networth/liabilities/${liability.id}`, liability))
   }
 }
 

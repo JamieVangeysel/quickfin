@@ -43,8 +43,38 @@ module.exports.routes = [{
   handler: networthController.getAssets,
   requiredPermissions: []
 }, {
+  method: 'POST',
+  url: '/networth/assets',
+  handler: networthController.postAsset,
+  requiredPermissions: []
+}, {
+  method: 'POPUTST',
+  url: '/networth/assets/:id',
+  handler: networthController.putAsset,
+  requiredPermissions: []
+}, {
+  method: 'DELETE',
+  url: '/networth/assets/:id',
+  handler: networthController.deleteAsset,
+  requiredPermissions: []
+}, {
   method: 'GET',
   url: '/networth/liabilities',
   handler: networthController.getLiabilities,
+  requiredPermissions: []
+}, {
+  method: 'POST',
+  url: '/networth/liabilities',
+  handler: networthController.postLiability,
+  requiredPermissions: []
+}, {
+  method: 'PUT',
+  url: '/networth/liabilities/:id',
+  handler: networthController.putLiability,
+  requiredPermissions: []
+}, {
+  method: 'DELETE',
+  url: '/networth/liabilities/:id',
+  handler: networthController.deleteLiability,
   requiredPermissions: []
 }]

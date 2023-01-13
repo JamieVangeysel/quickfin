@@ -497,3 +497,96 @@ GO
 GRANT EXEC ON [networth].[usp_getOverview] TO [sso] -- TEMPORARY ACTION
 GRANT EXEC ON [networth].[usp_getAssets] TO [sso] -- TEMPORARY ACTION
 GRANT EXEC ON [networth].[usp_getLiabilities] TO [sso] -- TEMPORARY ACTION
+
+CREATE PROCEDURE [networth].[usp_insertAsset]
+  @user_id INT,
+  @group_id INT,
+  @name VARCHAR(40),
+  @value MONEY
+WITH EXECUTE AS 'networth_agent'
+AS BEGIN
+  INSERT INTO [networth].[assets] ([user_id], [group_id], [name], [value])
+  VALUES (@user_id, @group_id, @name, @value)
+
+  SELECT [id] = SCOPE_IDENTITY()
+END
+GO
+
+CREATE PROCEDURE [networth].[usp_updateAsset]
+  @user_id INT,
+  @id INT,
+  @group_id INT,
+  @name VARCHAR(40),
+  @value MONEY
+WITH EXECUTE AS 'networth_agent'
+AS BEGIN
+  UPDATE [networth].[assets]
+  SET [group_id] = @group_id,
+    [name] = @name,
+    [value] = @value,
+    [modified] = GETUTCDATE()
+  WHERE [id] = @id
+    AND [user_id] = @user_id
+END
+GO
+
+CREATE PROCEDURE [networth].[usp_deleteAsset]
+  @user_id INT,
+  @id INT
+WITH EXECUTE AS 'networth_agent'
+AS BEGIN
+  DELETE FROM [networth].[assets]
+  WHERE [id] = @id
+    AND [user_id] = @user_id
+END
+GO
+
+CREATE PROCEDURE [networth].[usp_insertLiability]
+  @user_id INT,
+  @group_id INT,
+  @name VARCHAR(40),
+  @value MONEY
+WITH EXECUTE AS 'networth_agent'
+AS BEGIN
+  INSERT INTO [networth].[liabilities] ([user_id], [group_id], [name], [value])
+  VALUES (@user_id, @group_id, @name, @value)
+
+  SELECT [id] = SCOPE_IDENTITY()
+END
+GO
+
+CREATE PROCEDURE [networth].[usp_updateLiability]
+  @user_id INT,
+  @id INT,
+  @group_id INT,
+  @name VARCHAR(40),
+  @value MONEY
+WITH EXECUTE AS 'networth_agent'
+AS BEGIN
+  UPDATE [networth].[liabilities]
+  SET [group_id] = @group_id,
+    [name] = @name,
+    [value] = @value,
+    [modified] = GETUTCDATE()
+  WHERE [id] = @id
+    AND [user_id] = @user_id
+END
+GO
+
+CREATE PROCEDURE [networth].[usp_deleteLiability]
+  @user_id INT,
+  @id INT
+WITH EXECUTE AS 'networth_agent'
+AS BEGIN
+  DELETE FROM [networth].[liabilities]
+  WHERE [id] = @id
+    AND [user_id] = @user_id
+END
+GO
+
+GRANT EXEC ON [networth].[usp_insertAsset] TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [networth].[usp_updateAsset] TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [networth].[usp_deleteAsset] TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [networth].[usp_insertLiability] TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [networth].[usp_updateLiability] TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [networth].[usp_deleteLiability] TO [sso] -- TEMPORARY ACTION
