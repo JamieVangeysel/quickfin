@@ -2,7 +2,6 @@
 
 // import external node packages
 const { FastifyRequest, FastifyReply } = require('fastify')
-const jwt = require('jsonwebtoken')
 
 const SSO = require('../models/sso.model')
 const User = require('../models/user.model')
@@ -60,8 +59,7 @@ exports.get = async (request, reply) => {
       access_token,
       token_type: 'Bearer',
       expires_in: 900, // 15 minutes
-      id_token_jwt: id_token,
-      id_token: jwt.decode(id_token)
+      id_token
     }
 
     try {
