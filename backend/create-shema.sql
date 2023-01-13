@@ -590,3 +590,187 @@ GRANT EXEC ON [networth].[usp_deleteAsset] TO [sso] -- TEMPORARY ACTION
 GRANT EXEC ON [networth].[usp_insertLiability] TO [sso] -- TEMPORARY ACTION
 GRANT EXEC ON [networth].[usp_updateLiability] TO [sso] -- TEMPORARY ACTION
 GRANT EXEC ON [networth].[usp_deleteLiability] TO [sso] -- TEMPORARY ACTION
+
+-- 
+CREATE SCHEMA [budget]
+GO
+
+CREATE USER [budget_agent] WITHOUT LOGIN
+  WITH DEFAULT_SCHEMA = [guest]
+GO
+
+CREATE TABLE [budget].[incomes](
+  [id] INT IDENTITY(1,1) PRIMARY KEY,
+  [year] SMALLINT NOT NULL DEFAULT YEAR(GETUTCDATE()),
+  [user_id] INT NOT NULL,
+  [name] VARCHAR(40) NOT NULL,
+  [value] MONEY NOT NULL DEFAULT 0.00,
+  -- [previous_value] MONEY NULL, -- previous value?, informative field
+  [created] DATETIME NOT NULL DEFAULT GETUTCDATE(),
+  [modified] DATETIME NULL
+)
+GO
+
+CREATE TABLE [budget].[expenses](
+  [id] INT IDENTITY(1,1) PRIMARY KEY,
+  [year] SMALLINT NOT NULL DEFAULT YEAR(GETUTCDATE()),
+  [user_id] INT NOT NULL,
+  [name] VARCHAR(40) NOT NULL,
+  [value] MONEY NOT NULL DEFAULT 0.00,
+  -- [previous_value] MONEY NULL, -- previous value?, informative field
+  [created] DATETIME NOT NULL DEFAULT GETUTCDATE(),
+  [modified] DATETIME NULL
+)
+GO
+
+ALTER TABLE [budget].[incomes]
+  ADD CONSTRAINT [FK_usersIncomes] FOREIGN KEY (user_id) REFERENCES [sso].[users] (id);
+GO
+
+ALTER TABLE [budget].[expenses]
+  ADD CONSTRAINT [FK_usersExpenses] FOREIGN KEY (user_id) REFERENCES [sso].[users] (id);
+GO
+
+CREATE PROCEDURE [budget].[usp_getOverview]
+  @user_id INT
+WITH EXECUTE AS 'budget_agent'
+AS BEGIN
+  DECLARE @years TABLE (
+    [year] SMALLINT
+  )
+
+  INSERT INTO @years ([year]) VALUES (YEAR(GETUTCDATE()))
+
+  INSERT INTO @years ([year])
+  SELECT DISTINCT [income].[year]
+  FROM [budget].[incomes] [income]
+  WHERE [income].[user_id] = @user_id
+
+  INSERT INTO @years ([year])
+  SELECT DISTINCT [expense].[year]
+  FROM [budget].[expenses] [expense]
+  WHERE [expense].[user_id] = @user_id
+
+  SELECT
+    [years] = (
+      SELECT DISTINCT
+        [year]
+      FROM @years
+      ORDER BY [year] ASC
+      FOR JSON PATH
+    ),
+    [incomes] = (
+      SELECT
+        [name] = [income].[name],
+        [value] = [income].[value]
+      FROM [budget].[incomes] [income]
+      WHERE [income].[user_id] = @user_id
+        AND [year] = YEAR(GETUTCDATE())
+      FOR JSON PATH
+    ),
+    [expenses] = (
+      SELECT
+        [name] = [expense].[name],
+        [value] = [expense].[value]
+      FROM [budget].[expenses] [expense]
+      WHERE [expense].[user_id] = @user_id
+        AND [year] = YEAR(GETUTCDATE())
+      FOR JSON PATH
+    )
+  FOR JSON PATH, INCLUDE_NULL_VALUES
+END
+GO
+
+CREATE PROCEDURE [budget].[usp_insertIncome]
+  @user_id INT,
+  @year SMALLINT,
+  @name VARCHAR(40),
+  @value MONEY
+WITH EXECUTE AS 'budget_agent'
+AS BEGIN
+  INSERT INTO [budget].[incomes] ([user_id], [year], [name], [value])
+  VALUES (@user_id, @year, @name, @value)
+
+  SELECT [id] = SCOPE_IDENTITY()
+END
+GO
+
+CREATE PROCEDURE [budget].[usp_updateIncome]
+  @user_id INT,
+  @id INT,
+  @year SMALLINT,
+  @name VARCHAR(40),
+  @value MONEY
+WITH EXECUTE AS 'budget_agent'
+AS BEGIN
+  UPDATE [budget].[incomes]
+  SET [year] = @year,
+    [name] = @name,
+    [value] = @value,
+    [modified] = GETUTCDATE()
+  WHERE [id] = @id
+    AND [user_id] = @user_id
+END
+GO
+
+CREATE PROCEDURE [budget].[usp_deleteIncome]
+  @user_id INT,
+  @id INT
+WITH EXECUTE AS 'budget_agent'
+AS BEGIN
+  DELETE FROM [budget].[incomes]
+  WHERE [id] = @id
+    AND [user_id] = @user_id
+END
+GO
+
+CREATE PROCEDURE [budget].[usp_insertExpense]
+  @user_id INT,
+  @year SMALLINT,
+  @name VARCHAR(40),
+  @value MONEY
+WITH EXECUTE AS 'budget_agent'
+AS BEGIN
+  INSERT INTO [budget].[expenses] ([user_id], [year], [name], [value])
+  VALUES (@user_id, @year, @name, @value)
+
+  SELECT [id] = SCOPE_IDENTITY()
+END
+GO
+
+CREATE PROCEDURE [budget].[usp_updateExpense]
+  @user_id INT,
+  @id INT,
+  @year SMALLINT,
+  @name VARCHAR(40),
+  @value MONEY
+WITH EXECUTE AS 'budget_agent'
+AS BEGIN
+  UPDATE [budget].[expenses]
+  SET [year] = @year,
+    [name] = @name,
+    [value] = @value,
+    [modified] = GETUTCDATE()
+  WHERE [id] = @id
+    AND [user_id] = @user_id
+END
+GO
+
+CREATE PROCEDURE [budget].[usp_deleteExpense]
+  @user_id INT,
+  @id INT
+WITH EXECUTE AS 'budget_agent'
+AS BEGIN
+  DELETE FROM [budget].[expenses]
+  WHERE [id] = @id
+    AND [user_id] = @user_id
+END
+GO
+
+GRANT EXEC ON [budget].[usp_getOverview] TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [budget].[usp_insertIncome] TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [budget].[usp_updateIncome] TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [budget].[usp_deleteIncome] TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [budget].[usp_insertExpense] TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [budget].[usp_updateExpense] TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [budget].[usp_deleteExpense] TO [sso] -- TEMPORARY ACTION
