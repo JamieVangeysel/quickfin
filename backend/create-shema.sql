@@ -356,3 +356,92 @@ GRANT EXEC ON [sso].[usp_updateRefreshToken] TO [sso]
 GRANT EXEC ON [sso].[usp_createRefreshToken] TO [sso]
 GRANT EXEC ON [sso].[usp_getRefreshToken] TO [sso]
 GO
+
+CREATE SCHEMA [networth]
+GO
+
+CREATE USER [networth_agent] WITHOUT LOGIN
+  WITH DEFAULT_SCHEMA = [guest]
+GO
+
+CREATE TABLE [networth].[assets](
+  [id] INT IDENTITY(1,1) PRIMARY KEY,
+  [user_id] INT NOT NULL,
+  [group_id] INT NOT NULL,
+  [name] VARCHAR(40) NOT NULL,
+  [value] MONEY NOT NULL DEFAULT 0.00,
+  -- [previous_value] MONEY NULL, -- previous value?, informative field
+  [created] DATETIME NOT NULL DEFAULT GETUTCDATE(),
+  [modified] DATETIME NULL
+)
+
+CREATE TABLE [networth].[liabilities](
+  [id] INT IDENTITY(1,1) PRIMARY KEY,
+  [user_id] INT NOT NULL,
+  [group_id] INT NOT NULL,
+  [name] VARCHAR(40) NOT NULL,
+  [value] MONEY NOT NULL DEFAULT 0.00,
+  -- [previous_value] MONEY NULL, -- previous value?, informative field
+  [created] DATETIME NOT NULL DEFAULT GETUTCDATE(),
+  [modified] DATETIME NULL
+)
+
+CREATE TABLE [networth].[assetGroups](
+  [id] INT IDENTITY(1,1) PRIMARY KEY,
+  [name] VARCHAR(40) NOT NULL
+)
+
+CREATE TABLE [networth].[liabilityGroups](
+  [id] INT IDENTITY(1,1) PRIMARY KEY,
+  [name] VARCHAR(40) NOT NULL
+)
+
+ALTER TABLE [networth].[assets]
+  ADD CONSTRAINT [FK_usersAssets] FOREIGN KEY (user_id) REFERENCES [sso].[users] (id),
+      CONSTRAINT [FK_assetGroupsAssets] FOREIGN KEY (group_id) REFERENCES [sso].[assetGroups] (id);
+GO
+
+ALTER TABLE [networth].[liabilities]
+  ADD CONSTRAINT [FK_usersLiabilities] FOREIGN KEY (user_id) REFERENCES [sso].[users] (id),
+      CONSTRAINT [FK_liabilityGroupsLiabilities] FOREIGN KEY (group_id) REFERENCES [sso].[liabilityGroups] (id);
+GO
+
+INSERT INTO [networth].[assetGroups] ([name])
+VALUES ('Grote/vaste bezittingen'), ('Liquide middelen'), ('Persoonlijke voorwerpen') -- change to english labels in future, translate in frontend
+
+INSERT INTO [networth].[liabilityGroups] ([name])
+VALUES ('Langlopende schulden'), ('Kortlopende schulden') -- change to english labels in future, translate in frontend
+
+-- DBCC CHECKIDENT ('[networth].[assetGroups]')
+-- DBCC CHECKIDENT ('[networth].[liabilityGroups]')
+
+CREATE PROCEDURE [networth].[usp_getOverview]
+  @user_id INT
+WITH EXECUTE AS 'networth_agent'
+AS BEGIN
+  SELECT
+    [assets] = (
+      SELECT
+        [name] = MIN([group].[name]),
+        [value] = SUM([asset].[value])
+      FROM [networth].[assets] [asset]
+      INNER JOIN [networth].[assetGroups] [group] ON [group].[id] = [asset].[group_id]
+      WHERE [asset].[user_id] = @user_id
+      GROUP BY [asset].[group_id]
+      FOR JSON PATH, INCLUDE_NULL_VALUES
+    ),
+    [liabilities] = (
+      SELECT
+        [name] = MIN([group].[name]),
+        [value] = SUM([liability].[value])
+      FROM [networth].[liabilities] [liability]
+      INNER JOIN [networth].[liabilityGroups] [group] ON [group].[id] = [liability].[group_id]
+      WHERE [liability].[user_id] = @user_id
+      GROUP BY [liability].[group_id]
+      FOR JSON PATH, INCLUDE_NULL_VALUES
+    )
+  FOR JSON PATH
+END
+GO
+
+GRANT EXEC ON [networth].[usp_getOverview] TO [sso] -- TEMPORARY ACTION
