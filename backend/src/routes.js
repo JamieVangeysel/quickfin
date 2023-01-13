@@ -48,7 +48,7 @@ module.exports.routes = [{
   handler: networthController.postAsset,
   requiredPermissions: []
 }, {
-  method: 'POPUTST',
+  method: 'PUT',
   url: '/networth/assets/:id',
   handler: networthController.putAsset,
   requiredPermissions: []
