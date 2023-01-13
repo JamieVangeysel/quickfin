@@ -64,22 +64,25 @@ exports.get = async (request, reply) => {
       id_token: jwt.decode(id_token)
     }
 
-    if (authorization_code.scope.indexOf('offline_access') !== -1) {
-      payload = {
-        ...payload,
-        refresh_token: await User.getRefreshToken(
-          authorization_code.user_id,
-          code,
-          access_token.split('.')[2]
-        )
+    try {
+      if (authorization_code.scope.indexOf('offline_access') !== -1) {
+        payload = {
+          ...payload,
+          refresh_token: await User.getRefreshToken(
+            authorization_code.user_id,
+            code,
+            access_token.split('.')[2]
+          )
+        }
       }
+    } catch (err) {
+      request.log.warn({ error: err, authorizationCode: request.query.code, grantType: request.query.grant_type, redirectUri: request.query.redirect_uri }, 'Couldn\'t create refresh token, something unexpected happened')
     }
 
     return payload
   } catch (err) {
     console.error(err)
     request.log.error({ error: err, authorizationCode: request.query.code, grantType: request.query.grant_type, redirectUri: request.query.redirect_uri }, 'Couldn\'t retrieve token, something unexpected happened')
-  } finally {
     return reply
       .code(500)
       .send({
