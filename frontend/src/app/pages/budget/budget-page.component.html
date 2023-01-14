@@ -1,9 +1,102 @@
 <div class="w-full p-8">
-  <div class="flex flex-col flex-auto space-y-8">
+  <div class="flex flex-col flex-auto space-y-4">
     <blockquote class="p-4 border-l-4 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-800">
       <p class="text-xl italic font-medium leading-relaxed text-gray-900 dark:text-gray-200">
         Op deze pagina stel je je maandelijkse budget jaarlijks in, je budget word automatisch overgenomen naar de
         volgende periode, je krijgt hierdoor inzicht in de budgetten van de afgelopen jaren.
+      </p>
+    </blockquote>
+
+    <div class="flex flex-col px-2 sm:flex-row mb-4 gap-4">
+      <div id="invomes" class="w-full sm:w-1/2">
+        <div class="text-4xl font-medium text-center mb-2" (contextmenu)="create(0);$event.preventDefault()">Inkomsten
+        </div>
+        <div class="">
+          <div class="grid grid-cols-3 px-3 py-2 bg-gray-300 dark:bg-gray-600">
+            <div class="col-span-2">
+              Bron inkomst
+            </div>
+            <div class="col-auto text-right">
+              Waarde inkomst
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 px-3 py-2 bg-white dark:bg-gray-800" *ngFor=" let income of incomes"
+            (click)="edit(0, income)" (contextmenu)="delete(0, income);$event.preventDefault()">
+            <div class="col-span-2">
+              {{ income.name }}
+            </div>
+            <div class="col-auto text-right">
+              {{ income.value | currency:'EUR':'symbol-narrow':'1.2-2':culture }}
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 px-3 py-2 bg-gray-50 dark:bg-gray-700 font-bold">
+            <div class="col-span-2">
+              Totale Inkomsten
+            </div>
+            <div class="col-auto text-right">
+              {{ incomesValue | currency:'EUR':'symbol-narrow':'1.2-2':culture }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="expenses" class="w-full sm:mt-0 sm:w-1/2">
+        <div class="text-4xl font-medium text-center mb-2" (contextmenu)="create(1);$event.preventDefault()">Uitgaven
+        </div>
+        <div class="">
+          <div class="grid grid-cols-3 px-3 py-2 bg-gray-300 dark:bg-gray-600">
+            <div class="col-span-2">
+              Doel uitgave
+            </div>
+            <div class="col-auto text-right">
+              Waarde uitgave
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 px-3 py-2 bg-white dark:bg-gray-800" *ngFor="let expense of expenses"
+            (click)="edit(1, expense)" (contextmenu)="delete(1, expense);$event.preventDefault()">
+            <div class="col-span-2">
+              {{ expense.name }}
+            </div>
+            <div class="col-auto text-right">
+              {{ expense.value | currency:'EUR':'symbol-narrow':'1.2-2':culture }}
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 px-3 py-2 bg-gray-50 dark:bg-gray-700 font-bold">
+            <div class="col-span-2">
+              Totale uitgaven
+            </div>
+            <div class="col-auto text-right">
+              {{ expensesValue | currency:'EUR':'symbol-narrow':'1.2-2':culture }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="px-2">
+      <div class="flex flex-row px-3 py-2 text-xl bg-gray-500 text-white">
+        <div>
+          Balans:
+        </div>
+        <div class="flex-auto">
+          &nbsp;
+        </div>
+        <div class="text-right">
+          {{ balance | currency:'EUR':'symbol-narrow':'1.0-2':culture }}
+        </div>
+      </div>
+    </div>
+
+    <blockquote class="p-4 border-l-4 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-800">
+      <p class="text-md italic font-medium leading-relaxed text-gray-900 dark:text-gray-200">
+        <span class="text-lg"><i class="far fa-info-circle"></i> Hoe gebruiken?</span> <br>
+        <br>
+        Passiva toevoegen: RMB op titel <br>
+        Passiva bewerken: LMB <br>
+        Passiva verwijderen: RMB
       </p>
     </blockquote>
   </div>

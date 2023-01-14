@@ -661,8 +661,10 @@ AS BEGIN
     ),
     [incomes] = (
       SELECT
+        [id] = [income].[id],
         [name] = [income].[name],
-        [value] = [income].[value]
+        [value] = [income].[value],
+        [year] = [income].[year]
       FROM [budget].[incomes] [income]
       WHERE [income].[user_id] = @user_id
         AND [year] = YEAR(GETUTCDATE())
@@ -670,8 +672,10 @@ AS BEGIN
     ),
     [expenses] = (
       SELECT
+        [id] = [expense].[id],
         [name] = [expense].[name],
-        [value] = [expense].[value]
+        [value] = [expense].[value],
+        [year] = [expense].[year]
       FROM [budget].[expenses] [expense]
       WHERE [expense].[user_id] = @user_id
         AND [year] = YEAR(GETUTCDATE())
