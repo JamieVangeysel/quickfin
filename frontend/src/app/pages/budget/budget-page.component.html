@@ -9,7 +9,8 @@
 
     <div class="flex flex-col px-2 sm:flex-row mb-4 gap-4">
       <div id="invomes" class="w-full sm:w-1/2">
-        <div class="text-4xl font-medium text-center mb-2" (contextmenu)="create(0);$event.preventDefault()">Inkomsten
+        <div class="text-4xl font-medium text-center mb-2" (dblclick)="create(0)"
+          (contextmenu)="create(0);$event.preventDefault()">Inkomsten
         </div>
         <div class="">
           <div class="grid grid-cols-3 px-3 py-2 bg-gray-300 dark:bg-gray-600">
@@ -22,7 +23,8 @@
           </div>
 
           <div class="grid grid-cols-3 px-3 py-2 bg-white dark:bg-gray-800" *ngFor=" let income of incomes"
-            (click)="edit(0, income)" (contextmenu)="delete(0, income);$event.preventDefault()">
+            (click)="edit(0, income)" (dblclick)="delete(0, income)"
+            (contextmenu)="delete(0, income);$event.preventDefault()">
             <div class="col-span-2">
               {{ income.name }}
             </div>
@@ -42,7 +44,8 @@
         </div>
       </div>
       <div id="expenses" class="w-full sm:mt-0 sm:w-1/2">
-        <div class="text-4xl font-medium text-center mb-2" (contextmenu)="create(1);$event.preventDefault()">Uitgaven
+        <div class="text-4xl font-medium text-center mb-2" (dblclick)="create(1)"
+          (contextmenu)="create(1);$event.preventDefault()">Uitgaven
         </div>
         <div class="">
           <div class="grid grid-cols-3 px-3 py-2 bg-gray-300 dark:bg-gray-600">
@@ -55,7 +58,8 @@
           </div>
 
           <div class="grid grid-cols-3 px-3 py-2 bg-white dark:bg-gray-800" *ngFor="let expense of expenses"
-            (click)="edit(1, expense)" (contextmenu)="delete(1, expense);$event.preventDefault()">
+            (click)="edit(1, expense)" (dblclick)="delete(1, expense)"
+            (contextmenu)="delete(1, expense);$event.preventDefault()">
             <div class="col-span-2">
               {{ expense.name }}
             </div>
@@ -94,9 +98,9 @@
       <p class="text-md italic font-medium leading-relaxed text-gray-900 dark:text-gray-200">
         <span class="text-lg"><i class="far fa-info-circle"></i> Hoe gebruiken?</span> <br>
         <br>
-        Inkomsten/Uitgaven toevoegen: RMB op titel <br>
+        Inkomsten/Uitgaven toevoegen: RMB/2xLMB op titel <br>
         Inkomsten/Uitgaven bewerken: LMB <br>
-        Inkomsten/Uitgaven verwijderen: RMB
+        Inkomsten/Uitgaven verwijderen: RMB/2xLMB
       </p>
     </blockquote>
   </div>

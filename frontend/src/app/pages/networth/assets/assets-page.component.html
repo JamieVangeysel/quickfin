@@ -1,7 +1,7 @@
 <div class="w-full flex flex-col">
   <div class="flex flex-col p-2 w-full sm:flex-row mb-4 gap-2">
     <div class="w-full" *ngFor="let group of groups">
-      <div class="text-xl font-medium text-center mb-3" (contextmenu)="create(group.id);$event.preventDefault()">
+      <div class="text-xl font-medium text-center mb-3" (dblclick)="create(group.id)" (contextmenu)="create(group.id);$event.preventDefault()">
         {{ group.name }}
       </div>
       <div class="">
@@ -15,7 +15,7 @@
         </div>
 
         <div class="grid grid-cols-3 px-3 py-2 bg-white hover:ring-2 ring-inset dark:bg-gray-800 cursor-pointer"
-          *ngFor="let asset of group.assets" (click)="edit(asset, group.id)"
+          *ngFor="let asset of group.assets" (click)="edit(asset, group.id)" (dblclick)="delete(asset, group.id)"
           (contextmenu)="delete(asset, group.id);$event.preventDefault()">
           <div class="col-span-2">
             {{ asset.name }}
@@ -41,9 +41,9 @@
     <p class="text-md italic font-medium leading-relaxed text-gray-900 dark:text-gray-200">
       <span class="text-lg"><i class="far fa-info-circle"></i> Hoe gebruiken?</span> <br>
       <br>
-      Activa toevoegen: RMB op titel <br>
+      Activa toevoegen: RMB/2xLMB op titel <br>
       Activa bewerken: LMB <br>
-      Activa verwijderen: RMB
+      Activa verwijderen: RMB/2xLMB
     </p>
   </blockquote>
 </div>
