@@ -635,11 +635,12 @@ CREATE PROCEDURE [budget].[usp_getOverview]
   @user_id INT
 WITH EXECUTE AS 'budget_agent'
 AS BEGIN
+  DECLARE @year SMALLINT = YEAR(GETUTCDATE())
   DECLARE @years TABLE (
     [year] SMALLINT
   )
 
-  INSERT INTO @years ([year]) VALUES (YEAR(GETUTCDATE()))
+  INSERT INTO @years ([year]) VALUES (@year)
 
   INSERT INTO @years ([year])
   SELECT DISTINCT [income].[year]
@@ -650,6 +651,32 @@ AS BEGIN
   SELECT DISTINCT [expense].[year]
   FROM [budget].[expenses] [expense]
   WHERE [expense].[user_id] = @user_id
+
+  DECLARE @totalIncomes MONEY = 0.00
+  DECLARE @totalExpenses MONEY = 0.00
+  DECLARE @balance MONEY = 0.00
+
+  -- Get total Incomes value
+  SET @totalIncomes = (SELECT SUM([value]) FROM [budget].[incomes] [income] WHERE [income].[user_id] = @user_id AND [income].[year] = @year)
+  -- Get total Expenses value
+  SET @totalExpenses = (SELECT SUM([value]) FROM [budget].[expenses] [expense] WHERE [expense].[user_id] = @user_id AND [expense].[year] = @year)
+
+  SET @balance = @totalIncomes - @totalExpenses
+  IF (@balance > 100) BEGIN
+    -- if balance is over 100 euro we can do a growing budget calculation we will guestimate a 1.5% growth each month.
+    -- power of compounding interests over each year 3%
+    DECLARE @roa MONEY = 0.00
+
+    DECLARE @months TINYINT = 120
+    WHILE @months > 0
+    BEGIN
+      SET @roa = (@roa + @balance) * .015
+
+      SET @months = @months - 1
+    END
+
+    SET @roa = @rao * .03
+  END
 
   SELECT
     [years] = (
@@ -667,7 +694,7 @@ AS BEGIN
         [year] = [income].[year]
       FROM [budget].[incomes] [income]
       WHERE [income].[user_id] = @user_id
-        AND [year] = YEAR(GETUTCDATE())
+        AND [year] = @year
       FOR JSON PATH
     ),
     [expenses] = (
@@ -678,9 +705,13 @@ AS BEGIN
         [year] = [expense].[year]
       FROM [budget].[expenses] [expense]
       WHERE [expense].[user_id] = @user_id
-        AND [year] = YEAR(GETUTCDATE())
+        AND [year] = @year
       FOR JSON PATH
-    )
+    ),
+    [totalIncomes] = @totalIncomes,
+    [totalExpenses] = @totalExpenses
+    [balance] = @balance,
+    [roa] = @roa
   FOR JSON PATH, INCLUDE_NULL_VALUES
 END
 GO
@@ -771,10 +802,36 @@ AS BEGIN
 END
 GO
 
-GRANT EXEC ON [budget].[usp_getOverview] TO [sso] -- TEMPORARY ACTION
-GRANT EXEC ON [budget].[usp_insertIncome] TO [sso] -- TEMPORARY ACTION
-GRANT EXEC ON [budget].[usp_updateIncome] TO [sso] -- TEMPORARY ACTION
-GRANT EXEC ON [budget].[usp_deleteIncome] TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [budget].[usp_getOverview]   TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [budget].[usp_insertIncome]  TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [budget].[usp_updateIncome]  TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [budget].[usp_deleteIncome]  TO [sso] -- TEMPORARY ACTION
 GRANT EXEC ON [budget].[usp_insertExpense] TO [sso] -- TEMPORARY ACTION
 GRANT EXEC ON [budget].[usp_updateExpense] TO [sso] -- TEMPORARY ACTION
 GRANT EXEC ON [budget].[usp_deleteExpense] TO [sso] -- TEMPORARY ACTION
+
+CREATE SCHEMA [journal]
+GO
+
+CREATE TABLE [journal].[entries](
+  [id] INT PRIMARY KEY IDENTITY(1, 1),
+  [user_id] INT NOT NULL,
+  [date] DATETIME NOT NULL,
+  [name] VARCHAR(40) NOT NULL,
+  [category] VARCHAR(40) NOT NULL,
+  [value] MONEY NOT NULL DEFAULT 0.00,
+  [direction] BIT NOT NULL DEFAULT 0, -- 0 for debit, 1 for credit
+  [created] DATETIME NOT NULL DEFAULT GETUTCDATE(),
+  [modified] DATETIME NULL
+)
+GO
+
+ALTER TABLE [journal].[entries]
+  ADD CONSTRAINT [FK_usersEntries] FOREIGN KEY (user_id) REFERENCES [sso].[users] (id);
+GO
+
+CREATE TABLE [journal].[]
+
+-- in order to calculate total return on liquidity
+
+-- CREATE TABLE [journal].[]
