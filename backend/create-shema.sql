@@ -678,6 +678,9 @@ AS BEGIN
     SET @roa = @rao * .03
   END
 
+  -- Return on investment per 10 months
+  DECLARE @roi MONEY = @roa / 10
+
   SELECT
     [years] = (
       SELECT DISTINCT
