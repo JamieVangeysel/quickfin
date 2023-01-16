@@ -14,3 +14,5 @@ const main = async () => {
 }
 
 main()
+
+// https://auth0.github.io/node-auth0/AuthenticationClient.html#passwordGrant
