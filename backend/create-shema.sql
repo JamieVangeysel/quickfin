@@ -655,6 +655,8 @@ AS BEGIN
   DECLARE @totalIncomes MONEY = 0.00
   DECLARE @totalExpenses MONEY = 0.00
   DECLARE @balance MONEY = 0.00
+  DECLARE @investedAssets MONEY = 0.00
+  DECLARE @investment MONEY = 0.00
 
   -- Get total Incomes value
   SET @totalIncomes = (SELECT SUM([value]) FROM [budget].[incomes] [income] WHERE [income].[user_id] = @user_id AND [income].[year] = @year)
@@ -662,24 +664,58 @@ AS BEGIN
   SET @totalExpenses = (SELECT SUM([value]) FROM [budget].[expenses] [expense] WHERE [expense].[user_id] = @user_id AND [expense].[year] = @year)
 
   SET @balance = @totalIncomes - @totalExpenses
-  IF (@balance > 100) BEGIN
-    -- if balance is over 100 euro we can do a growing budget calculation we will guestimate a 1.5% growth each month.
-    -- power of compounding interests over each year 3%
-    DECLARE @roa MONEY = 0.00
+  DECLARE @months TINYINT = 120
 
-    DECLARE @months TINYINT = 120
+  IF (@balance >= 50 AND @balance < 100) BEGIN
+    -- if balance is over 50 euro we can do a growing budget calculation we will guestimate a .5% growth each month.
+    -- power of compounding interests over each year 1.5%
+
     WHILE @months > 0
     BEGIN
-      SET @roa = (@roa + @balance) * .015
+      -- @investedAssets = previousValue + add balance + add interest on previous value + balance
+      SET @investedAssets = @investedAssets + @balance + ((@investedAssets + @balance) * .005)
+      -- @investment is the sum of all investments
+      SET @investment = @investment + @balance
 
       SET @months = @months - 1
     END
 
-    SET @roa = @rao * .03
+    SET @investedAssets = @investedAssets + (@investedAssets * .015)
+  END
+  ELSE IF (@balance >= 100 AND @balance < 1000) BEGIN
+    -- if balance is over 100 euro we can do a growing budget calculation we will guestimate a 1.5% growth each month.
+    -- power of compounding interests over each year 3%
+
+    WHILE @months > 0
+    BEGIN
+      -- @investedAssets = previousValue + add balance + add interest on previous value + balance
+      SET @investedAssets = @investedAssets + @balance + ((@investedAssets + @balance) * .015)
+      -- @investment is the sum of all investments
+      SET @investment = @investment + @balance
+      
+      SET @months = @months - 1
+    END
+
+    SET @investedAssets = @investedAssets + (@investedAssets * .03)
+  END
+  ELSE IF (@balance >= 1000) BEGIN
+    -- if balance is over 1000 euro we can do a growing budget calculation we will guestimate a 2% growth each month.
+    -- power of compounding interests over each year 4%
+
+    WHILE @months > 0
+    BEGIN
+      -- @investedAssets = previousValue + add balance + add interest on previous value + balance
+      SET @investedAssets = @investedAssets + @balance + ((@investedAssets + @balance) * .02)
+      -- @investment is the sum of all investments
+      SET @investment = @investment + @balance
+      
+      SET @months = @months - 1
+    END
+
+    SET @investedAssets = @investedAssets + (@investedAssets * .04)
   END
 
   -- Return on investment per 10 months
-  DECLARE @roi MONEY = @roa / 10
 
   SELECT
     [years] = (
@@ -711,10 +747,15 @@ AS BEGIN
         AND [year] = @year
       FOR JSON PATH
     ),
-    [totalIncomes] = @totalIncomes,
-    [totalExpenses] = @totalExpenses
+    [total_incomes] = @totalIncomes,
+    [total_expenses] = @totalExpenses,
     [balance] = @balance,
-    [roa] = @roa
+    [balance_precent] = @balance / @totalIncomes,
+    [investment] = @investment,
+    [investment_assets] = @investedAssets,
+    [investment_return] = @investedAssets - @investment,
+    [investment_return_percent] = (@investedAssets - @investment) / @investedAssets
+    -- [roe] = @balance / @totalIncomes
   FOR JSON PATH, INCLUDE_NULL_VALUES
 END
 GO
