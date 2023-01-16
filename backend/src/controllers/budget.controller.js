@@ -4,7 +4,7 @@
 const { JwtPayload } = require('jsonwebtoken')
 const { FastifyRequest, FastifyReply } = require('fastify')
 
-const Networth = require('../models/networth.model')
+const Budget = require('../models/budget.model')
 
 /**
  * Get Overview
@@ -16,25 +16,7 @@ exports.getOverview = async (request, reply) => {
     /** @type {JwtPayload} */
     const token = request.token
 
-    return Networth.getOverview(token.sub)
-  } catch (err) {
-    return reply
-      .status(500)
-      .send(err)
-  }
-}
-
-/**
- * Get assets
- * @param {FastifyRequest} request 
- * @param {FastifyReply} reply 
- */
-exports.getAssets = async (request, reply) => {
-  try {
-    /** @type {JwtPayload} */
-    const token = request.token
-
-    return Networth.getAssets(token.sub)
+    return Budget.getOverview(token.sub)
   } catch (err) {
     return reply
       .status(500)
@@ -47,12 +29,12 @@ exports.getAssets = async (request, reply) => {
  * @param {FastifyRequest} request 
  * @param {FastifyReply} reply 
  */
-exports.postAsset = async (request, reply) => {
+exports.postIncome = async (request, reply) => {
   try {
     /** @type {JwtPayload} */
     const token = request.token
 
-    return Networth.insertAsset(token.sub, request.body)
+    return Budget.insertIncome(token.sub, request.body)
   } catch (err) {
     return reply
       .status(500)
@@ -65,14 +47,14 @@ exports.postAsset = async (request, reply) => {
  * @param {FastifyRequest} request 
  * @param {FastifyReply} reply 
  */
-exports.putAsset = async (request, reply) => {
+exports.putIncome = async (request, reply) => {
   try {
     /** @type {JwtPayload} */
     const token = request.token
 
     const id = +request.params.id
 
-    return Networth.updateAsset(token.sub, id, request.body)
+    return Budget.updateIncome(token.sub, id, request.body)
   } catch (err) {
     return reply
       .status(500)
@@ -85,14 +67,14 @@ exports.putAsset = async (request, reply) => {
  * @param {FastifyRequest} request 
  * @param {FastifyReply} reply 
  */
-exports.deleteAsset = async (request, reply) => {
+exports.deleteIncome = async (request, reply) => {
   try {
     /** @type {JwtPayload} */
     const token = request.token
 
     const id = +request.params.id
 
-    return Networth.deleteAsset(token.sub, id)
+    return Budget.deleteIncome(token.sub, id)
   } catch (err) {
     return reply
       .status(500)
@@ -101,16 +83,16 @@ exports.deleteAsset = async (request, reply) => {
 }
 
 /**
- * Get Liabilities
+ * Create expense
  * @param {FastifyRequest} request 
  * @param {FastifyReply} reply 
  */
-exports.getLiabilities = async (request, reply) => {
+exports.postExpense = async (request, reply) => {
   try {
     /** @type {JwtPayload} */
     const token = request.token
 
-    return Networth.getLiabilities(token.sub)
+    return Budget.insertExpense(token.sub, request.body)
   } catch (err) {
     return reply
       .status(500)
@@ -119,36 +101,18 @@ exports.getLiabilities = async (request, reply) => {
 }
 
 /**
- * Create liability
+ * Update expense
  * @param {FastifyRequest} request 
  * @param {FastifyReply} reply 
  */
-exports.postLiability = async (request, reply) => {
-  try {
-    /** @type {JwtPayload} */
-    const token = request.token
-
-    return Networth.insertLiability(token.sub, request.body)
-  } catch (err) {
-    return reply
-      .status(500)
-      .send(err)
-  }
-}
-
-/**
- * Update liability
- * @param {FastifyRequest} request 
- * @param {FastifyReply} reply 
- */
-exports.putLiability = async (request, reply) => {
+exports.putExpense = async (request, reply) => {
   try {
     /** @type {JwtPayload} */
     const token = request.token
 
     const id = +request.params.id
 
-    return Networth.updateLiability(token.sub, id, request.body)
+    return Budget.updateExpense(token.sub, id, request.body)
   } catch (err) {
     return reply
       .status(500)
@@ -157,18 +121,18 @@ exports.putLiability = async (request, reply) => {
 }
 
 /**
- * Delete liability
+ * Delete expense
  * @param {FastifyRequest} request 
  * @param {FastifyReply} reply 
  */
-exports.deleteLiability = async (request, reply) => {
+exports.deleteExpense = async (request, reply) => {
   try {
     /** @type {JwtPayload} */
     const token = request.token
 
     const id = +request.params.id
 
-    return Networth.deleteLiability(token.sub, id)
+    return Budget.deleteExpense(token.sub, id)
   } catch (err) {
     return reply
       .status(500)

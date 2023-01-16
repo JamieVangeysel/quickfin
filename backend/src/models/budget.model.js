@@ -10,7 +10,7 @@ exports.getOverview = async (user_id) => {
   const request = new sql.Request(await db.get(DB_NAME))
   request.input('user_id', sql.Int, user_id)
 
-  const result = await request.query(`EXEC [networth].[usp_getOverview] @user_id`)
+  const result = await request.query(`EXEC [budget].[usp_getOverview] @user_id`)
 
   if (result.recordset.length > 0) {
     return result.recordset[0][0] /* for JSON responses we get an extra array, so we use an extra [0] */
@@ -18,27 +18,15 @@ exports.getOverview = async (user_id) => {
   return null
 }
 
-exports.getAssets = async (user_id) => {
+exports.insertIncome = async (user_id, asset) => {
   const request = new sql.Request(await db.get(DB_NAME))
   request.input('user_id', sql.Int, user_id)
 
-  const result = await request.query(`EXEC [networth].[usp_getAssets] @user_id`)
-
-  if (result.recordset.length > 0) {
-    return result.recordset[0][0] /* for JSON responses we get an extra array, so we use an extra [0] */
-  }
-  return null
-}
-
-exports.insertAsset = async (user_id, asset) => {
-  const request = new sql.Request(await db.get(DB_NAME))
-  request.input('user_id', sql.Int, user_id)
-
-  request.input('group_id', sql.Int, asset.group_id)
+  request.input('year', sql.SmallInt, asset.year)
   request.input('name', sql.VarChar(40), asset.name)
   request.input('value', sql.Money, asset.value)
 
-  const result = await request.query(`EXEC [networth].[usp_insertAsset] @user_id, @group_id, @name, @value`)
+  const result = await request.query(`EXEC [budget].[usp_insertIncome] @user_id, @year, @name, @value`)
 
   if (result.rowsAffected.length > 0) {
     return {
@@ -49,16 +37,16 @@ exports.insertAsset = async (user_id, asset) => {
   return null
 }
 
-exports.updateAsset = async (user_id, id, asset) => {
+exports.updateIncome = async (user_id, id, asset) => {
   const request = new sql.Request(await db.get(DB_NAME))
   request.input('user_id', sql.Int, user_id)
   request.input('id', sql.Int, id)
 
-  request.input('group_id', sql.Int, asset.group_id)
+  request.input('year', sql.SmallInt, asset.year)
   request.input('name', sql.VarChar(40), asset.name)
   request.input('value', sql.Money, asset.value)
 
-  const result = await request.query(`EXEC [networth].[usp_updateAsset] @user_id, @id, @group_id, @name, @value`)
+  const result = await request.query(`EXEC [budget].[usp_updateIncome] @user_id, @id, @year, @name, @value`)
 
   if (result.rowsAffected.length > 0) {
     return {
@@ -68,12 +56,12 @@ exports.updateAsset = async (user_id, id, asset) => {
   return null
 }
 
-exports.deleteAsset = async (user_id, id) => {
+exports.deleteIncome = async (user_id, id) => {
   const request = new sql.Request(await db.get(DB_NAME))
   request.input('user_id', sql.Int, user_id)
   request.input('id', sql.Int, id)
 
-  const result = await request.query(`EXEC [networth].[usp_deleteAsset] @user_id, @id`)
+  const result = await request.query(`EXEC [budget].[usp_deleteIncome] @user_id, @id`)
 
   if (result.rowsAffected.length > 0) {
     return {
@@ -83,27 +71,15 @@ exports.deleteAsset = async (user_id, id) => {
   return null
 }
 
-exports.getLiabilities = async (user_id) => {
+exports.insertExpense = async (user_id, asset) => {
   const request = new sql.Request(await db.get(DB_NAME))
   request.input('user_id', sql.Int, user_id)
 
-  const result = await request.query(`EXEC [networth].[usp_getLiabilities] @user_id`)
-
-  if (result.recordset.length > 0) {
-    return result.recordset[0][0] /* for JSON responses we get an extra array, so we use an extra [0] */
-  }
-  return null
-}
-
-exports.insertLiability = async (user_id, asset) => {
-  const request = new sql.Request(await db.get(DB_NAME))
-  request.input('user_id', sql.Int, user_id)
-
-  request.input('group_id', sql.Int, asset.group_id)
+  request.input('year', sql.SmallInt, asset.year)
   request.input('name', sql.VarChar(40), asset.name)
   request.input('value', sql.Money, asset.value)
 
-  const result = await request.query(`EXEC [networth].[usp_insertLiability] @user_id, @group_id, @name, @value`)
+  const result = await request.query(`EXEC [budget].[usp_insertExpense] @user_id, @year, @name, @value`)
 
   if (result.rowsAffected.length > 0) {
     return {
@@ -114,16 +90,16 @@ exports.insertLiability = async (user_id, asset) => {
   return null
 }
 
-exports.updateLiability = async (user_id, id, asset) => {
+exports.updateExpense = async (user_id, id, asset) => {
   const request = new sql.Request(await db.get(DB_NAME))
   request.input('user_id', sql.Int, user_id)
   request.input('id', sql.Int, id)
 
-  request.input('group_id', sql.Int, asset.group_id)
+  request.input('year', sql.SmallInt, asset.year)
   request.input('name', sql.VarChar(40), asset.name)
   request.input('value', sql.Money, asset.value)
 
-  const result = await request.query(`EXEC [networth].[usp_updateLiability] @user_id, @id, @group_id, @name, @value`)
+  const result = await request.query(`EXEC [budget].[usp_updateExpense] @user_id, @id, @year, @name, @value`)
 
   if (result.rowsAffected.length > 0) {
     return {
@@ -133,12 +109,12 @@ exports.updateLiability = async (user_id, id, asset) => {
   return null
 }
 
-exports.deleteLiability = async (user_id, id) => {
+exports.deleteExpense = async (user_id, id) => {
   const request = new sql.Request(await db.get(DB_NAME))
   request.input('user_id', sql.Int, user_id)
   request.input('id', sql.Int, id)
 
-  const result = await request.query(`EXEC [networth].[usp_deleteLiability] @user_id, @id`)
+  const result = await request.query(`EXEC [budget].[usp_deleteExpense] @user_id, @id`)
 
   if (result.rowsAffected.length > 0) {
     return {

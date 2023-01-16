@@ -7,6 +7,7 @@ const usersController = require('./controllers/users.controller')
 
 // 'API' controllers
 const networthController = require('./controllers/networth.controller')
+const budgetController = require('./controllers/budget.controller')
 
 module.exports.routes = [{
   method: 'POST',
@@ -43,8 +44,73 @@ module.exports.routes = [{
   handler: networthController.getAssets,
   requiredPermissions: []
 }, {
+  method: 'POST',
+  url: '/networth/assets',
+  handler: networthController.postAsset,
+  requiredPermissions: []
+}, {
+  method: 'PUT',
+  url: '/networth/assets/:id',
+  handler: networthController.putAsset,
+  requiredPermissions: []
+}, {
+  method: 'DELETE',
+  url: '/networth/assets/:id',
+  handler: networthController.deleteAsset,
+  requiredPermissions: []
+}, {
   method: 'GET',
   url: '/networth/liabilities',
   handler: networthController.getLiabilities,
+  requiredPermissions: []
+}, {
+  method: 'POST',
+  url: '/networth/liabilities',
+  handler: networthController.postLiability,
+  requiredPermissions: []
+}, {
+  method: 'PUT',
+  url: '/networth/liabilities/:id',
+  handler: networthController.putLiability,
+  requiredPermissions: []
+}, {
+  method: 'DELETE',
+  url: '/networth/liabilities/:id',
+  handler: networthController.deleteLiability,
+  requiredPermissions: []
+}, {
+  method: 'GET',
+  url: '/budget/overview',
+  handler: budgetController.getOverview,
+  requiredPermissions: []
+}, {
+  method: 'POST',
+  url: '/budget/incomes',
+  handler: budgetController.postIncome,
+  requiredPermissions: []
+}, {
+  method: 'PUT',
+  url: '/budget/incomes/:id',
+  handler: budgetController.putIncome,
+  requiredPermissions: []
+}, {
+  method: 'DELETE',
+  url: '/budget/incomes/:id',
+  handler: budgetController.deleteIncome,
+  requiredPermissions: []
+}, {
+  method: 'POST',
+  url: '/budget/expenses',
+  handler: budgetController.postExpense,
+  requiredPermissions: []
+}, {
+  method: 'PUT',
+  url: '/budget/expenses/:id',
+  handler: budgetController.putExpense,
+  requiredPermissions: []
+}, {
+  method: 'DELETE',
+  url: '/budget/expenses/:id',
+  handler: budgetController.deleteExpense,
   requiredPermissions: []
 }]

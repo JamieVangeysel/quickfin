@@ -1,12 +1,12 @@
-<div class="w-full p-8">
+<div class="w-full">
   <div class="flex flex-col flex-auto space-y-8">
-    <blockquote class="p-4 border-l-4 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-800">
+    <!-- <blockquote class="p-4 border-l-4 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-800">
       <p class="text-xl italic font-medium leading-relaxed text-gray-900 dark:text-gray-200">
         Deze pagina beschikt over 3 tabs, overzicht, activa en passiva
       </p>
-    </blockquote>
+    </blockquote> -->
 
-    <div class="flex flex-row space-x-4 border-b text-gray-400">
+    <div class="flex flex-row space-x-4 border-b text-gray-400 mt-2">
       <a class="font-medium border-b-2 px-3 py-1 border-transparent hover:text-gray-900 dark:hover:text-white"
         routerLinkActive="border-accent text-gray-700 dark:text-gray-200" [routerLinkActiveOptions]="{exact: true}"
         routerLink="/networth">
@@ -27,7 +27,7 @@
     </div>
   </div>
 
-  <div class="mt-4 flex-auto">
+  <div class="mt-2 flex-auto">
     <router-outlet></router-outlet>
   </div>
 </div>

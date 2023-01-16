@@ -1,7 +1,10 @@
 <div class="w-full flex flex-col">
   <div class="flex flex-col p-2 w-full sm:flex-row mb-4 gap-2">
     <div class="w-full" *ngFor="let group of groups">
-      <div class="text-xl font-medium text-center mb-3">{{ group.name }}</div>
+      <div class="text-xl font-medium text-center mb-3" (dblclick)="create(group.id)"
+        (contextmenu)="create(group.id);$event.preventDefault()">
+        {{ group.name }}
+      </div>
       <div class="">
         <div class="grid grid-cols-3 px-3 py-2 bg-gray-300 dark:bg-gray-600">
           <div class="col-span-2">
@@ -13,12 +16,13 @@
         </div>
 
         <div class="grid grid-cols-3 px-3 py-2 bg-white hover:ring-2 ring-inset dark:bg-gray-800 cursor-pointer"
-          *ngFor="let liability of group.liabilities" (click)="edit(liability, group.id)">
-          <div class="col-span-2">
+          *ngFor="let liability of group.liabilities" (click)="edit(liability, group.id)"
+          (dblclick)="delete(liability, group.id)" (contextmenu)="delete(liability, group.id);$event.preventDefault()">
+          <div class=" col-span-2">
             {{ liability.name }}
           </div>
           <div class="col-auto text-right">
-            {{ liability.value | currency:'EUR':'symbol-narrow':'1.0-2':culture }}
+            {{ liability.value | currency:'EUR':'symbol-narrow':'1.2-2':culture }}
           </div>
         </div>
 
@@ -27,10 +31,20 @@
             Totaal
           </div>
           <div class="col-auto text-right">
-            {{ totalValue(group.liabilities) | currency:'EUR':'symbol-narrow':'1.0-2':culture }}
+            {{ totalValue(group.liabilities) | currency:'EUR':'symbol-narrow':'1.2-2':culture }}
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  <blockquote class="p-4 border-l-4 mx-2 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-800">
+    <p class="text-md italic font-medium leading-relaxed text-gray-900 dark:text-gray-200">
+      <span class="text-lg"><i class="far fa-info-circle"></i> Hoe gebruiken?</span> <br>
+      <br>
+      Passiva toevoegen: RMB/2xLMB op titel <br>
+      Passiva bewerken: LMB <br>
+      Passiva verwijderen: RMB/2xLMB
+    </p>
+  </blockquote>
 </div>

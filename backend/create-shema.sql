@@ -497,3 +497,385 @@ GO
 GRANT EXEC ON [networth].[usp_getOverview] TO [sso] -- TEMPORARY ACTION
 GRANT EXEC ON [networth].[usp_getAssets] TO [sso] -- TEMPORARY ACTION
 GRANT EXEC ON [networth].[usp_getLiabilities] TO [sso] -- TEMPORARY ACTION
+
+CREATE PROCEDURE [networth].[usp_insertAsset]
+  @user_id INT,
+  @group_id INT,
+  @name VARCHAR(40),
+  @value MONEY
+WITH EXECUTE AS 'networth_agent'
+AS BEGIN
+  INSERT INTO [networth].[assets] ([user_id], [group_id], [name], [value])
+  VALUES (@user_id, @group_id, @name, @value)
+
+  SELECT [id] = SCOPE_IDENTITY()
+END
+GO
+
+CREATE PROCEDURE [networth].[usp_updateAsset]
+  @user_id INT,
+  @id INT,
+  @group_id INT,
+  @name VARCHAR(40),
+  @value MONEY
+WITH EXECUTE AS 'networth_agent'
+AS BEGIN
+  UPDATE [networth].[assets]
+  SET [group_id] = @group_id,
+    [name] = @name,
+    [value] = @value,
+    [modified] = GETUTCDATE()
+  WHERE [id] = @id
+    AND [user_id] = @user_id
+END
+GO
+
+CREATE PROCEDURE [networth].[usp_deleteAsset]
+  @user_id INT,
+  @id INT
+WITH EXECUTE AS 'networth_agent'
+AS BEGIN
+  DELETE FROM [networth].[assets]
+  WHERE [id] = @id
+    AND [user_id] = @user_id
+END
+GO
+
+CREATE PROCEDURE [networth].[usp_insertLiability]
+  @user_id INT,
+  @group_id INT,
+  @name VARCHAR(40),
+  @value MONEY
+WITH EXECUTE AS 'networth_agent'
+AS BEGIN
+  INSERT INTO [networth].[liabilities] ([user_id], [group_id], [name], [value])
+  VALUES (@user_id, @group_id, @name, @value)
+
+  SELECT [id] = SCOPE_IDENTITY()
+END
+GO
+
+CREATE PROCEDURE [networth].[usp_updateLiability]
+  @user_id INT,
+  @id INT,
+  @group_id INT,
+  @name VARCHAR(40),
+  @value MONEY
+WITH EXECUTE AS 'networth_agent'
+AS BEGIN
+  UPDATE [networth].[liabilities]
+  SET [group_id] = @group_id,
+    [name] = @name,
+    [value] = @value,
+    [modified] = GETUTCDATE()
+  WHERE [id] = @id
+    AND [user_id] = @user_id
+END
+GO
+
+CREATE PROCEDURE [networth].[usp_deleteLiability]
+  @user_id INT,
+  @id INT
+WITH EXECUTE AS 'networth_agent'
+AS BEGIN
+  DELETE FROM [networth].[liabilities]
+  WHERE [id] = @id
+    AND [user_id] = @user_id
+END
+GO
+
+GRANT EXEC ON [networth].[usp_insertAsset] TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [networth].[usp_updateAsset] TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [networth].[usp_deleteAsset] TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [networth].[usp_insertLiability] TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [networth].[usp_updateLiability] TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [networth].[usp_deleteLiability] TO [sso] -- TEMPORARY ACTION
+
+-- 
+CREATE SCHEMA [budget]
+GO
+
+CREATE USER [budget_agent] WITHOUT LOGIN
+  WITH DEFAULT_SCHEMA = [guest]
+GO
+
+CREATE TABLE [budget].[incomes](
+  [id] INT IDENTITY(1,1) PRIMARY KEY,
+  [year] SMALLINT NOT NULL DEFAULT YEAR(GETUTCDATE()),
+  [user_id] INT NOT NULL,
+  [name] VARCHAR(40) NOT NULL,
+  [value] MONEY NOT NULL DEFAULT 0.00,
+  -- [previous_value] MONEY NULL, -- previous value?, informative field
+  [created] DATETIME NOT NULL DEFAULT GETUTCDATE(),
+  [modified] DATETIME NULL
+)
+GO
+
+CREATE TABLE [budget].[expenses](
+  [id] INT IDENTITY(1,1) PRIMARY KEY,
+  [year] SMALLINT NOT NULL DEFAULT YEAR(GETUTCDATE()),
+  [user_id] INT NOT NULL,
+  [name] VARCHAR(40) NOT NULL,
+  [value] MONEY NOT NULL DEFAULT 0.00,
+  -- [previous_value] MONEY NULL, -- previous value?, informative field
+  [created] DATETIME NOT NULL DEFAULT GETUTCDATE(),
+  [modified] DATETIME NULL
+)
+GO
+
+ALTER TABLE [budget].[incomes]
+  ADD CONSTRAINT [FK_usersIncomes] FOREIGN KEY (user_id) REFERENCES [sso].[users] (id);
+GO
+
+ALTER TABLE [budget].[expenses]
+  ADD CONSTRAINT [FK_usersExpenses] FOREIGN KEY (user_id) REFERENCES [sso].[users] (id);
+GO
+
+CREATE PROCEDURE [budget].[usp_getOverview]
+  @user_id INT
+WITH EXECUTE AS 'budget_agent'
+AS BEGIN
+  DECLARE @year SMALLINT = YEAR(GETUTCDATE())
+  DECLARE @years TABLE (
+    [year] SMALLINT
+  )
+
+  INSERT INTO @years ([year]) VALUES (@year)
+
+  INSERT INTO @years ([year])
+  SELECT DISTINCT [income].[year]
+  FROM [budget].[incomes] [income]
+  WHERE [income].[user_id] = @user_id
+
+  INSERT INTO @years ([year])
+  SELECT DISTINCT [expense].[year]
+  FROM [budget].[expenses] [expense]
+  WHERE [expense].[user_id] = @user_id
+
+  DECLARE @totalIncomes MONEY = 0.00
+  DECLARE @totalExpenses MONEY = 0.00
+  DECLARE @balance MONEY = 0.00
+  DECLARE @investedAssets MONEY = 0.00
+  DECLARE @investment MONEY = 0.00
+
+  -- Get total Incomes value
+  SET @totalIncomes = (SELECT SUM([value]) FROM [budget].[incomes] [income] WHERE [income].[user_id] = @user_id AND [income].[year] = @year)
+  -- Get total Expenses value
+  SET @totalExpenses = (SELECT SUM([value]) FROM [budget].[expenses] [expense] WHERE [expense].[user_id] = @user_id AND [expense].[year] = @year)
+
+  SET @balance = @totalIncomes - @totalExpenses
+  DECLARE @months TINYINT = 120
+
+  IF (@balance >= 50 AND @balance < 100) BEGIN
+    -- if balance is over 50 euro we can do a growing budget calculation we will guestimate a .5% growth each month.
+    -- power of compounding interests over each year 1.5%
+
+    WHILE @months > 0
+    BEGIN
+      -- @investedAssets = previousValue + add balance + add interest on previous value + balance
+      SET @investedAssets = @investedAssets + @balance + ((@investedAssets + @balance) * .005)
+      -- @investment is the sum of all investments
+      SET @investment = @investment + @balance
+
+      SET @months = @months - 1
+    END
+
+    SET @investedAssets = @investedAssets + (@investedAssets * .015)
+  END
+  ELSE IF (@balance >= 100 AND @balance < 1000) BEGIN
+    -- if balance is over 100 euro we can do a growing budget calculation we will guestimate a 1.5% growth each month.
+    -- power of compounding interests over each year 3%
+
+    WHILE @months > 0
+    BEGIN
+      -- @investedAssets = previousValue + add balance + add interest on previous value + balance
+      SET @investedAssets = @investedAssets + @balance + ((@investedAssets + @balance) * .015)
+      -- @investment is the sum of all investments
+      SET @investment = @investment + @balance
+      
+      SET @months = @months - 1
+    END
+
+    SET @investedAssets = @investedAssets + (@investedAssets * .03)
+  END
+  ELSE IF (@balance >= 1000) BEGIN
+    -- if balance is over 1000 euro we can do a growing budget calculation we will guestimate a 2% growth each month.
+    -- power of compounding interests over each year 4%
+
+    WHILE @months > 0
+    BEGIN
+      -- @investedAssets = previousValue + add balance + add interest on previous value + balance
+      SET @investedAssets = @investedAssets + @balance + ((@investedAssets + @balance) * .02)
+      -- @investment is the sum of all investments
+      SET @investment = @investment + @balance
+      
+      SET @months = @months - 1
+    END
+
+    SET @investedAssets = @investedAssets + (@investedAssets * .04)
+  END
+
+  -- Return on investment per 10 months
+
+  SELECT
+    [years] = (
+      SELECT DISTINCT
+        [year]
+      FROM @years
+      ORDER BY [year] ASC
+      FOR JSON PATH
+    ),
+    [incomes] = (
+      SELECT
+        [id] = [income].[id],
+        [name] = [income].[name],
+        [value] = [income].[value],
+        [year] = [income].[year]
+      FROM [budget].[incomes] [income]
+      WHERE [income].[user_id] = @user_id
+        AND [year] = @year
+      FOR JSON PATH
+    ),
+    [expenses] = (
+      SELECT
+        [id] = [expense].[id],
+        [name] = [expense].[name],
+        [value] = [expense].[value],
+        [year] = [expense].[year]
+      FROM [budget].[expenses] [expense]
+      WHERE [expense].[user_id] = @user_id
+        AND [year] = @year
+      FOR JSON PATH
+    ),
+    [total_incomes] = @totalIncomes,
+    [total_expenses] = @totalExpenses,
+    [balance] = @balance,
+    [balance_precent] = @balance / @totalIncomes,
+    [investment] = @investment,
+    [investment_assets] = @investedAssets,
+    [investment_return] = @investedAssets - @investment,
+    [investment_return_percent] = (@investedAssets - @investment) / @investedAssets
+    -- [roe] = @balance / @totalIncomes
+  FOR JSON PATH, INCLUDE_NULL_VALUES
+END
+GO
+
+CREATE PROCEDURE [budget].[usp_insertIncome]
+  @user_id INT,
+  @year SMALLINT,
+  @name VARCHAR(40),
+  @value MONEY
+WITH EXECUTE AS 'budget_agent'
+AS BEGIN
+  INSERT INTO [budget].[incomes] ([user_id], [year], [name], [value])
+  VALUES (@user_id, @year, @name, @value)
+
+  SELECT [id] = SCOPE_IDENTITY()
+END
+GO
+
+CREATE PROCEDURE [budget].[usp_updateIncome]
+  @user_id INT,
+  @id INT,
+  @year SMALLINT,
+  @name VARCHAR(40),
+  @value MONEY
+WITH EXECUTE AS 'budget_agent'
+AS BEGIN
+  UPDATE [budget].[incomes]
+  SET [year] = @year,
+    [name] = @name,
+    [value] = @value,
+    [modified] = GETUTCDATE()
+  WHERE [id] = @id
+    AND [user_id] = @user_id
+END
+GO
+
+CREATE PROCEDURE [budget].[usp_deleteIncome]
+  @user_id INT,
+  @id INT
+WITH EXECUTE AS 'budget_agent'
+AS BEGIN
+  DELETE FROM [budget].[incomes]
+  WHERE [id] = @id
+    AND [user_id] = @user_id
+END
+GO
+
+CREATE PROCEDURE [budget].[usp_insertExpense]
+  @user_id INT,
+  @year SMALLINT,
+  @name VARCHAR(40),
+  @value MONEY
+WITH EXECUTE AS 'budget_agent'
+AS BEGIN
+  INSERT INTO [budget].[expenses] ([user_id], [year], [name], [value])
+  VALUES (@user_id, @year, @name, @value)
+
+  SELECT [id] = SCOPE_IDENTITY()
+END
+GO
+
+CREATE PROCEDURE [budget].[usp_updateExpense]
+  @user_id INT,
+  @id INT,
+  @year SMALLINT,
+  @name VARCHAR(40),
+  @value MONEY
+WITH EXECUTE AS 'budget_agent'
+AS BEGIN
+  UPDATE [budget].[expenses]
+  SET [year] = @year,
+    [name] = @name,
+    [value] = @value,
+    [modified] = GETUTCDATE()
+  WHERE [id] = @id
+    AND [user_id] = @user_id
+END
+GO
+
+CREATE PROCEDURE [budget].[usp_deleteExpense]
+  @user_id INT,
+  @id INT
+WITH EXECUTE AS 'budget_agent'
+AS BEGIN
+  DELETE FROM [budget].[expenses]
+  WHERE [id] = @id
+    AND [user_id] = @user_id
+END
+GO
+
+GRANT EXEC ON [budget].[usp_getOverview]   TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [budget].[usp_insertIncome]  TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [budget].[usp_updateIncome]  TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [budget].[usp_deleteIncome]  TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [budget].[usp_insertExpense] TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [budget].[usp_updateExpense] TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [budget].[usp_deleteExpense] TO [sso] -- TEMPORARY ACTION
+
+CREATE SCHEMA [journal]
+GO
+
+CREATE TABLE [journal].[entries](
+  [id] INT PRIMARY KEY IDENTITY(1, 1),
+  [user_id] INT NOT NULL,
+  [date] DATETIME NOT NULL,
+  [name] VARCHAR(40) NOT NULL,
+  [category] VARCHAR(40) NOT NULL,
+  [value] MONEY NOT NULL DEFAULT 0.00,
+  [direction] BIT NOT NULL DEFAULT 0, -- 0 for debit, 1 for credit
+  [created] DATETIME NOT NULL DEFAULT GETUTCDATE(),
+  [modified] DATETIME NULL
+)
+GO
+
+ALTER TABLE [journal].[entries]
+  ADD CONSTRAINT [FK_usersEntries] FOREIGN KEY (user_id) REFERENCES [sso].[users] (id);
+GO
+
+CREATE TABLE [journal].[]
+
+-- in order to calculate total return on liquidity
+
+-- CREATE TABLE [journal].[]
