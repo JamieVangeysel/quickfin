@@ -198,7 +198,7 @@ AS BEGIN
   -- Check if the token exists
   IF NOT EXISTS (SELECT [token] FROM [sso].[refreshTokens] WHERE [token] = @token) BEGIN
     RETURN 0
-  END 
+  END
 
   -- Check if the token is revoked
   IF EXISTS (SELECT [token] FROM [sso].[refreshTokens] WHERE [token] = @token AND [revoked] < GETUTCDATE()) BEGIN
@@ -396,6 +396,13 @@ CREATE TABLE [networth].[liabilityGroups](
   [name] VARCHAR(40) NOT NULL
 )
 
+CREATE TABLE [networth].[snapshots](
+  [user_id] INT NOT NULL,
+  [value] MONEY NOT NULL,
+  [date] DATETIME NOT NULL DEFAULT DATEADD(dd, DATEDIFF(dd, 0, GETDATE()) - 1, 0),
+  PRIMARY KEY ([user_id], [date])
+)
+
 ALTER TABLE [networth].[assets]
   ADD CONSTRAINT [FK_usersAssets] FOREIGN KEY (user_id) REFERENCES [sso].[users] (id),
       CONSTRAINT [FK_assetGroupsAssets] FOREIGN KEY (group_id) REFERENCES [sso].[assetGroups] (id);
@@ -404,6 +411,10 @@ GO
 ALTER TABLE [networth].[liabilities]
   ADD CONSTRAINT [FK_usersLiabilities] FOREIGN KEY (user_id) REFERENCES [sso].[users] (id),
       CONSTRAINT [FK_liabilityGroupsLiabilities] FOREIGN KEY (group_id) REFERENCES [sso].[liabilityGroups] (id);
+GO
+
+ALTER TABLE [networth].[snapshots]
+  ADD CONSTRAINT [FK_usersSnapshots] FOREIGN KEY (user_id) REFERENCES [sso].[users] (id);
 GO
 
 INSERT INTO [networth].[assetGroups] ([name])
@@ -584,6 +595,53 @@ AS BEGIN
 END
 GO
 
+CREATE PROCEDURE [networth].[usp_createSnapshots]
+WITH EXECUTE AS 'networth_agent'
+AS BEGIN
+  INSERT INTO [networth].[snapshots] ([user_id], [value])
+  SELECT [user_id] = [user].[id], [value] = (
+    (
+      SELECT SUM([value])
+      FROM [networth].[assets] [asset]
+      WHERE [asset].[user_id] = [user].[id]
+    ) - (
+      SELECT SUM([value])
+      FROM [networth].[liabilities] [liability]
+      WHERE [liability].[user_id] = [user].[id]
+    )
+  )
+  FROM [sso].[users] [user]
+END
+GO
+
+USE msdb;
+GO
+EXEC dbo.sp_add_job
+  @job_name = N'DailyQuickfinSnapshot';
+GO
+EXEC sp_add_jobstep
+  @job_name = N'DailyQuickfinSnapshot',
+  @step_name = N'Create networth snaphot for all users',
+  @subsystem = N'TSQL',
+  @command = N'EXEC [quickfin].[networth].[usp_createSnapshots]',
+  @retry_attempts = 5,
+  @retry_interval = 5 ;
+GO
+EXEC dbo.sp_add_schedule
+  @schedule_name = N'NightlyJobs',
+  @freq_type = 4,
+  @freq_interval = 1,
+  @active_start_time = 010000;
+USE msdb ;
+GO
+EXEC sp_attach_schedule
+  @job_name = N'DailyQuickfinSnapshot',
+  @schedule_name = N'NightlyJobs';
+GO
+EXEC dbo.sp_add_jobserver
+   @job_name = N'DailyQuickfinSnapshot',
+GO
+
 GRANT EXEC ON [networth].[usp_insertAsset] TO [sso] -- TEMPORARY ACTION
 GRANT EXEC ON [networth].[usp_updateAsset] TO [sso] -- TEMPORARY ACTION
 GRANT EXEC ON [networth].[usp_deleteAsset] TO [sso] -- TEMPORARY ACTION
@@ -591,7 +649,7 @@ GRANT EXEC ON [networth].[usp_insertLiability] TO [sso] -- TEMPORARY ACTION
 GRANT EXEC ON [networth].[usp_updateLiability] TO [sso] -- TEMPORARY ACTION
 GRANT EXEC ON [networth].[usp_deleteLiability] TO [sso] -- TEMPORARY ACTION
 
--- 
+--
 CREATE SCHEMA [budget]
 GO
 
@@ -693,7 +751,7 @@ AS BEGIN
       SET @investedAssets = @investedAssets + @balance + ((@investedAssets + @balance) * .015)
       -- @investment is the sum of all investments
       SET @investment = @investment + @balance
-      
+
       SET @months = @months - 1
     END
 
@@ -709,7 +767,7 @@ AS BEGIN
       SET @investedAssets = @investedAssets + @balance + ((@investedAssets + @balance) * .02)
       -- @investment is the sum of all investments
       SET @investment = @investment + @balance
-      
+
       SET @months = @months - 1
     END
 
@@ -852,7 +910,7 @@ AS BEGIN
       SET @total_assets_value = @total_assets_value + @period_investment
       SET @total_assets_invested_value = @total_assets_invested_value + @period_investment
     END
-    
+
     SET @ci = @ci + 1
   END
 
