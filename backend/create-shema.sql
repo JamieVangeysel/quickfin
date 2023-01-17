@@ -614,34 +614,6 @@ AS BEGIN
 END
 GO
 
-USE msdb;
-GO
-EXEC dbo.sp_add_job
-  @job_name = N'DailyQuickfinSnapshot';
-GO
-EXEC sp_add_jobstep
-  @job_name = N'DailyQuickfinSnapshot',
-  @step_name = N'Create networth snaphot for all users',
-  @subsystem = N'TSQL',
-  @command = N'EXEC [quickfin].[networth].[usp_createSnapshots]',
-  @retry_attempts = 5,
-  @retry_interval = 5 ;
-GO
-EXEC dbo.sp_add_schedule
-  @schedule_name = N'NightlyJobs',
-  @freq_type = 4,
-  @freq_interval = 1,
-  @active_start_time = 010000;
-USE msdb ;
-GO
-EXEC sp_attach_schedule
-  @job_name = N'DailyQuickfinSnapshot',
-  @schedule_name = N'NightlyJobs';
-GO
-EXEC dbo.sp_add_jobserver
-   @job_name = N'DailyQuickfinSnapshot',
-GO
-
 GRANT EXEC ON [networth].[usp_insertAsset] TO [sso] -- TEMPORARY ACTION
 GRANT EXEC ON [networth].[usp_updateAsset] TO [sso] -- TEMPORARY ACTION
 GRANT EXEC ON [networth].[usp_deleteAsset] TO [sso] -- TEMPORARY ACTION
@@ -1058,3 +1030,32 @@ CREATE TABLE [journal].[]
 -- in order to calculate total return on liquidity
 
 -- CREATE TABLE [journal].[]
+
+
+USE msdb;
+GO
+EXEC dbo.sp_add_job
+  @job_name = N'DailyQuickfinSnapshot';
+GO
+EXEC sp_add_jobstep
+  @job_name = N'DailyQuickfinSnapshot',
+  @step_name = N'Create networth snaphot for all users',
+  @subsystem = N'TSQL',
+  @command = N'EXEC [quickfin].[networth].[usp_createSnapshots]',
+  @retry_attempts = 5,
+  @retry_interval = 5 ;
+GO
+EXEC dbo.sp_add_schedule
+  @schedule_name = N'NightlyJobs',
+  @freq_type = 4,
+  @freq_interval = 1,
+  @active_start_time = 010000;
+USE msdb ;
+GO
+EXEC sp_attach_schedule
+  @job_name = N'DailyQuickfinSnapshot',
+  @schedule_name = N'NightlyJobs';
+GO
+EXEC dbo.sp_add_jobserver
+   @job_name = N'DailyQuickfinSnapshot',
+GO
