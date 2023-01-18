@@ -8,8 +8,8 @@ const Budget = require('../models/budget.model')
 
 /**
  * Get Overview
- * @param {FastifyRequest} request 
- * @param {FastifyReply} reply 
+ * @param {FastifyRequest} request
+ * @param {FastifyReply} reply
  */
 exports.getOverview = async (request, reply) => {
   try {
@@ -26,8 +26,8 @@ exports.getOverview = async (request, reply) => {
 
 /**
  * Create asset
- * @param {FastifyRequest} request 
- * @param {FastifyReply} reply 
+ * @param {FastifyRequest} request
+ * @param {FastifyReply} reply
  */
 exports.postIncome = async (request, reply) => {
   try {
@@ -44,8 +44,8 @@ exports.postIncome = async (request, reply) => {
 
 /**
  * Update asset
- * @param {FastifyRequest} request 
- * @param {FastifyReply} reply 
+ * @param {FastifyRequest} request
+ * @param {FastifyReply} reply
  */
 exports.putIncome = async (request, reply) => {
   try {
@@ -64,8 +64,8 @@ exports.putIncome = async (request, reply) => {
 
 /**
  * Delete asset
- * @param {FastifyRequest} request 
- * @param {FastifyReply} reply 
+ * @param {FastifyRequest} request
+ * @param {FastifyReply} reply
  */
 exports.deleteIncome = async (request, reply) => {
   try {
@@ -84,8 +84,8 @@ exports.deleteIncome = async (request, reply) => {
 
 /**
  * Create expense
- * @param {FastifyRequest} request 
- * @param {FastifyReply} reply 
+ * @param {FastifyRequest} request
+ * @param {FastifyReply} reply
  */
 exports.postExpense = async (request, reply) => {
   try {
@@ -102,8 +102,8 @@ exports.postExpense = async (request, reply) => {
 
 /**
  * Update expense
- * @param {FastifyRequest} request 
- * @param {FastifyReply} reply 
+ * @param {FastifyRequest} request
+ * @param {FastifyReply} reply
  */
 exports.putExpense = async (request, reply) => {
   try {
@@ -122,8 +122,8 @@ exports.putExpense = async (request, reply) => {
 
 /**
  * Delete expense
- * @param {FastifyRequest} request 
- * @param {FastifyReply} reply 
+ * @param {FastifyRequest} request
+ * @param {FastifyReply} reply
  */
 exports.deleteExpense = async (request, reply) => {
   try {

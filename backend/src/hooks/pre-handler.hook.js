@@ -1,9 +1,9 @@
 /**
  * preHandler hook
  * Add default securityHeaders
- * @param {FastifyRequest} req 
- * @param {FastifyReply} reply 
- * @param {*} next 
+ * @param {FastifyRequest} req
+ * @param {FastifyReply} reply
+ * @param {*} next
  */
 module.exports = function (req, reply, next) {
   // reply.header('Content-Security-Policy', `default-src 'none'`)

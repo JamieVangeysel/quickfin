@@ -4,11 +4,11 @@ const { FastifyRequest, FastifyReply } = require('fastify')
 const jwt = require('jsonwebtoken')
 
 /**
- * 
- * @param {FastifyRequest} request 
+ *
+ * @param {FastifyRequest} request
  * @param {FastifyReply} reply
  * @param {function} done
- * @param {string[] | string} requiredPermissions 
+ * @param {string[] | string} requiredPermissions
  */
 module.exports = function handle(request, reply, done, requiredPermissions) {
   // if requiredPermissions is a string create array
@@ -95,7 +95,7 @@ function validateIssuer(request, reply, done, requiredPermissions, token) {
     error(request, reply, done, requiredPermissions, {}, 'Issuer is required')
   }
 
-  // - must be a valid issuer string (14 characters) or 
+  // - must be a valid issuer string (14 characters) or
   if (!isValidIssuer(token.iss)) {
     error(request, reply, done, requiredPermissions, {}, 'Invalid issuer provided, must be a valid issuer string (14 characters) or URI.')
   }
@@ -131,14 +131,14 @@ function validatPermissions(request, reply, done, requiredPermissions, token) {
 }
 
 /**
- * 
- * @param {FastifyRequest} request 
- * @param {FastifyReply} reply 
- * @param {Function} done 
- * @param {String[] | String} requiredPermissions 
- * @param {String} body 
- * @param {String} message 
- * @param {Number} code 
+ *
+ * @param {FastifyRequest} request
+ * @param {FastifyReply} reply
+ * @param {Function} done
+ * @param {String[] | String} requiredPermissions
+ * @param {String} body
+ * @param {String} message
+ * @param {Number} code
  */
 function error(request, reply, done, requiredPermissions, body, message, code = 400) {
   body = {
@@ -158,9 +158,9 @@ function error(request, reply, done, requiredPermissions, body, message, code = 
 }
 
 /**
- * 
- * @param {string[]} roles 
- * @param {string} required 
+ *
+ * @param {string[]} roles
+ * @param {string} required
  * @returns {boolean}
  */
 function validatePermission(roles, permission) {
