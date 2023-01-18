@@ -19,7 +19,7 @@ export class ExpensesPageComponent {
 
   async ngOnInit() {
     try {
-      const journal = await this.journalApi.getEntries(0)
+      const journal = await this.journalApi.getEntries(false)
       if (journal) {
         this._expenses = journal.entries ?? []
       }

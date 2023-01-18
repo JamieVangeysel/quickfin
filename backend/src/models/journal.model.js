@@ -14,10 +14,8 @@ exports.getEntries = async (user_id, direction) => {
 
   const result = await request.query(`EXEC [journal].[usp_getEntries] @user_id, @direction`)
 
-  if (result.recordset.length > 0) {
-    return result.recordset[0][0] /* for JSON responses we get an extra array, so we use an extra [0] */
-  }
-  return null
+  // always return resultset
+  return result.recordset
 }
 
 exports.insertEntry = async (user_id, entry) => {
