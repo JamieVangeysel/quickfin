@@ -1,6 +1,41 @@
-<div class="w-full p-8">
-  <div class="flex flex-col flex-auto space-y-8">
-    <blockquote class="p-4 border-l-4 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-800">
+<div class="w-full pt-4">
+  <div class="flex flex-col flex-auto space-y-4">
+    <div class="flex flex-col px-2 md:flex-row mb-4 gap-4">
+      <div id="revenues" class="w-full">
+        <div class="text-4xl font-medium text-center mb-2" (dblclick)="create()"
+          (contextmenu)="create();$event.preventDefault()">Inkomens
+        </div>
+        <div class="">
+          <div class="flex flex-row px-3 py-2 bg-gray-300 dark:bg-gray-600">
+            <div class="w-32">
+              Datum
+            </div>
+            <div class="flex-auto">
+              Label (Categorie)
+            </div>
+            <div class="w-24 text-right">
+              Bedrag
+            </div>
+          </div>
+
+          <div class="flex flex-row px-3 py-2 bg-white dark:bg-gray-800" *ngFor="let revenue of revenues"
+            (click)="edit(revenue)" (dblclick)="delete(revenue)"
+            (contextmenu)="delete(revenue);$event.preventDefault()">
+            <div class="w-32">
+              {{ revenue.date | date:'d MMMM YYYY':undefined:culture }}
+            </div>
+            <div class="flex-auto">
+              {{ revenue.name }} ({{ revenue.category }})
+            </div>
+            <div class="w-24 text-right">
+              {{ revenue.amount | currency:'EUR':'symbol-narrow':'1.2-2':culture }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <blockquote class="p-4 border-l-4 mx-2 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-800">
       <p class="text-xl italic font-medium leading-relaxed text-gray-900 dark:text-gray-200">
         Op deze pagina krijg je een lijst van al je inkomende gelden.
       </p>

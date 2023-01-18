@@ -9,10 +9,10 @@ import { environment } from 'src/environments/environment'
 export class JournalApiService {
   constructor(private http: HttpClient) { }
 
-  getEntries(direction: boolean | null): Promise<IGetJournalOverviewResponse> {
+  getEntries(direction: boolean | null): Promise<IJournalEntry[]> {
     let params = {}
-    if (direction) params = { direction }
-    return firstValueFrom(this.http.get<IGetJournalOverviewResponse>(`${environment.api}journal/entries`, { params }))
+    if (direction != null) params = { direction }
+    return firstValueFrom(this.http.get<IJournalEntry[]>(`${environment.api}journal/entries`, { params }))
   }
 
   createEntry(income: IWJournalEntry): Promise<IPostResponse> {
@@ -26,10 +26,6 @@ export class JournalApiService {
   deleteEntry(id: number): Promise<IPostResponse> {
     return firstValueFrom(this.http.delete<IPostResponse>(`${environment.api}journal/entries/${id}`))
   }
-}
-
-export interface IGetJournalOverviewResponse {
-  entries: IJournalEntry[]
 }
 
 export interface IWJournalEntry {

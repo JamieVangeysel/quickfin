@@ -15,7 +15,11 @@ exports.getEntries = async (request, reply) => {
   try {
     /** @type {JwtPayload} */
     const token = request.token
-    const direction = request.query.direction
+    let direction
+
+    if (request.query.direction != undefined) {
+      direction = request.query.direction === 'true'
+    }
 
     return Journal.getEntries(token.sub, direction)
   } catch (err) {
