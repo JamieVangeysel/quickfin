@@ -6,6 +6,7 @@ const tokenController = require('./controllers/token.controller')
 const usersController = require('./controllers/users.controller')
 
 // 'API' controllers
+const journalController = require('./controllers/journal.controller')
 const networthController = require('./controllers/networth.controller')
 const budgetController = require('./controllers/budget.controller')
 
@@ -33,6 +34,26 @@ module.exports.routes = [{
   method: 'POST',
   url: '/users/update-password',
   handler: usersController.postUpdatePassword
+}, {
+  method: 'GET',
+  url: '/journal/entries',
+  handler: journalController.getEntries,
+  requiredPermissions: []
+}, {
+  method: 'POST',
+  url: '/journal/entries',
+  handler: journalController.postEntry,
+  requiredPermissions: []
+}, {
+  method: 'PUT',
+  url: '/journal/entries/:id',
+  handler: journalController.putEntry,
+  requiredPermissions: []
+}, {
+  method: 'DELETE',
+  url: '/journal/entries/:id',
+  handler: journalController.deleteEntry,
+  requiredPermissions: []
 }, {
   method: 'GET',
   url: '/networth/overview',
