@@ -1059,7 +1059,7 @@ AS BEGIN
     @direction IS NULL OR
     direction = @direction
   )
-  FOR JSON PATH
+  ORDER BY [date] DESC
 END
 GO
 

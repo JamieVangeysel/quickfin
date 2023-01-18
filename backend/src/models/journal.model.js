@@ -22,10 +22,10 @@ exports.insertEntry = async (user_id, entry) => {
   const request = new sql.Request(await db.get(DB_NAME))
   request.input('user_id', sql.Int, user_id)
 
-  request.input('date', sql.DateTime, entry.group_id)
+  request.input('date', sql.DateTime, entry.date)
   request.input('name', sql.VarChar(40), entry.name)
   request.input('category', sql.VarChar(40), entry.category)
-  request.input('amount', sql.Money, entry.value)
+  request.input('amount', sql.Money, entry.amount)
 
   const result = await request.query(`EXEC [journal].[usp_insertEntry] @user_id, @date, @name, @category, @amount`)
 
@@ -43,10 +43,10 @@ exports.updateEntry = async (user_id, id, entry) => {
   request.input('user_id', sql.Int, user_id)
   request.input('id', sql.Int, id)
 
-  request.input('date', sql.DateTime, entry.group_id)
+  request.input('date', sql.DateTime, entry.date)
   request.input('name', sql.VarChar(40), entry.name)
   request.input('category', sql.VarChar(40), entry.category)
-  request.input('amount', sql.Money, entry.value)
+  request.input('amount', sql.Money, entry.amount)
 
   const result = await request.query(`EXEC [journal].[usp_updateEntry] @user_id, @id, @date, @name, @category, @amount`)
 
