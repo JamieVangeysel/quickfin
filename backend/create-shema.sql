@@ -1008,16 +1008,31 @@ GRANT EXEC ON [budget].[usp_deleteExpense] TO [sso] -- TEMPORARY ACTION
 CREATE SCHEMA [journal]
 GO
 
+CREATE USER [journal_agent] WITHOUT LOGIN
+  WITH DEFAULT_SCHEMA = [guest]
+GO
+
 CREATE TABLE [journal].[entries](
   [id] INT PRIMARY KEY IDENTITY(1, 1),
   [user_id] INT NOT NULL,
   [date] DATETIME NOT NULL,
   [name] VARCHAR(40) NOT NULL,
   [category] VARCHAR(40) NOT NULL,
-  [value] MONEY NOT NULL DEFAULT 0.00,
-  [direction] BIT NOT NULL DEFAULT 0, -- 0 for debit, 1 for credit
+  [amount] MONEY NOT NULL DEFAULT 0.00,
+  [direction] BIT NOT NULL DEFAULT 0, -- 1 for debit, 0 for credit
   [created] DATETIME NOT NULL DEFAULT GETUTCDATE(),
   [modified] DATETIME NULL
+)
+GO
+
+CREATE TABLE [journal].[entryDetails](
+  [entry_id] INT NOT NULL,
+  [line] TINYINT NOT NULL,
+  [name] VARCHAR(40) NOT NULL,
+  [amount] MONEY NOT NULL DEFAULT 0.00,
+  [created] DATETIME NOT NULL DEFAULT GETUTCDATE(),
+  [modified] DATETIME NULL,
+  PRIMARY KEY ([entry_id], [line])
 )
 GO
 
@@ -1025,13 +1040,62 @@ ALTER TABLE [journal].[entries]
   ADD CONSTRAINT [FK_usersEntries] FOREIGN KEY (user_id) REFERENCES [sso].[users] (id);
 GO
 
-CREATE TABLE [journal].[]
+ALTER TABLE [journal].[entryDetails]
+  ADD CONSTRAINT [FK_entriesEntryDetails] FOREIGN KEY (entry_id) REFERENCES [journal].[entries] (id);
+GO
 
--- in order to calculate total return on liquidity
+CREATE PROCEDURE [journal].[usp_insertEntry]
+  @user_id INT,
+  @date DATETIME,
+  @name VARCHAR(40),
+  @category VARCHAR(40),
+  @amount MONEY
+WITH EXECUTE AS 'journal_agent'
+AS BEGIN
+  INSERT INTO [journal].[entries] ([user_id], [date], [name], [category], [amount], [direction])
+  VALUES (@user_id, @date, @name, @category, @amount, CASE WHEN @amount >= 0 THEN 1 ELSE 0 END)
 
--- CREATE TABLE [journal].[]
+  SELECT [id] = SCOPE_IDENTITY()
+END
+GO
 
+CREATE PROCEDURE [journal].[usp_updateEntry]
+  @user_id INT,
+  @id INT,
+  @date DATETIME,
+  @name VARCHAR(40),
+  @category VARCHAR(40),
+  @amount MONEY
+WITH EXECUTE AS 'journal_agent'
+AS BEGIN
+  UPDATE [journal].[entries]
+  SET [date] = @date,
+    [name] = @name,
+    [category] = @category,
+    [amount] = @amount,
+    [direction] = CASE WHEN @amount >= 0 THEN 1 ELSE 0 END,
+    [modified] = GETUTCDATE()
+  WHERE [id] = @id
+    AND [user_id] = @user_id
+END
+GO
 
+CREATE PROCEDURE [journal].[usp_deleteEntry]
+  @user_id INT,
+  @id INT
+WITH EXECUTE AS 'journal_agent'
+AS BEGIN
+  DELETE FROM [journal].[entries]
+  WHERE [id] = @id
+    AND [user_id] = @user_id
+END
+GO
+
+GRANT EXEC ON [journal].[usp_insertEntry] TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [journal].[usp_updateEntry] TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [journal].[usp_deleteEntry] TO [sso] -- TEMPORARY ACTION
+
+-- Create sql server agent job
 USE msdb;
 GO
 EXEC dbo.sp_add_job
