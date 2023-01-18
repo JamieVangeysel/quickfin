@@ -1044,6 +1044,25 @@ ALTER TABLE [journal].[entryDetails]
   ADD CONSTRAINT [FK_entriesEntryDetails] FOREIGN KEY (entry_id) REFERENCES [journal].[entries] (id);
 GO
 
+CREATE PROCEDURE [journal].[usp_getEntries]
+  @user_id INT,
+  @direction BIT = NULL
+WITH EXECUTE AS 'journal_agent'
+AS BEGIN
+  SELECT [date],
+    [name],
+    [category],
+    [amount],
+    [direction]
+  FROM [journal].[entries]
+  WHERE [User_id] = @user_id AND (
+    @direction IS NULL OR
+    direction = @direction
+  )
+  FOR JSON PATH
+END
+GO
+
 CREATE PROCEDURE [journal].[usp_insertEntry]
   @user_id INT,
   @date DATETIME,
@@ -1091,6 +1110,7 @@ AS BEGIN
 END
 GO
 
+GRANT EXEC ON [journal].[usp_getEntries]  TO [sso] -- TEMPORARY ACTION
 GRANT EXEC ON [journal].[usp_insertEntry] TO [sso] -- TEMPORARY ACTION
 GRANT EXEC ON [journal].[usp_updateEntry] TO [sso] -- TEMPORARY ACTION
 GRANT EXEC ON [journal].[usp_deleteEntry] TO [sso] -- TEMPORARY ACTION
