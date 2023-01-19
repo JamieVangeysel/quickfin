@@ -35,7 +35,7 @@ exports.getIdToken = async (authorization_code) => {
 
   const privateKey = await jose.importJWK(config.key)
   return await new jose.SignJWT(payload)
-    .setProtectedHeader({ alg: config.key.alg, kid: config.key.kid, jku: config.key.iss })
+    .setProtectedHeader({ alg: config.key.alg, kid: config.key.kid, jku: config.key.jku })
     .setIssuer(config.key.iss)
     .setAudience(audience)
     .setExpirationTime(expiresIn + 's')
@@ -48,7 +48,7 @@ exports.getAccessToken = async (authorization_code) => {
 
   const privateKey = await jose.importJWK(config.key)
   return await new jose.SignJWT({ roles: ['*'] })
-    .setProtectedHeader({ alg: config.key.alg, kid: config.key.kid, jku: config.key.iss })
+    .setProtectedHeader({ alg: config.key.alg, kid: config.key.kid, jku: config.key.jku })
     .setIssuer(config.key.iss)
     .setAudience(audience)
     .setExpirationTime(expiresIn + 's')

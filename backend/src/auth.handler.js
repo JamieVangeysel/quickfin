@@ -45,6 +45,7 @@ module.exports = async function handle(request, reply, requiredPermissions) {
       return error(request, reply, requiredPermissions, {}, 'Unauthorized', 401)
     }
   } catch (err) {
+    console.log(err)
     return error(request, reply, requiredPermissions, {}, 'Unauthorized', 401)
   }
 }

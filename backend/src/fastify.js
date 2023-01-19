@@ -39,8 +39,10 @@ module.exports = class Fastify {
   authPreHandler
 
   config
+
   /** @type {fastify.FastifyInstance} */
   server
+
   /** @type {string} */
   serviceName
 
@@ -129,7 +131,7 @@ module.exports = class Fastify {
     if (this.authPreHandler && route.requiredPermissions) {
       this.server.log.debug({ requiredPermissions: route.requiredPermissions }, 'Adding Auth PreHandler to route')
       // Check if handler return Promise
-      route.preHandler = (request, reply, done) => this.authPreHandler(request, reply, done, route.requiredPermissions)
+      route.preHandler = (request, reply) => this.authPreHandler(request, reply, route.requiredPermissions)
     }
     this.server.log.debug({ route }, 'Adding route')
     this.server.route(route)
