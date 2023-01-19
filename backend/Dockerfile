@@ -1,26 +1,22 @@
-FROM node:lts-alpine as node
+# ---- Dependencies ----
+FROM alpine:latest  AS base
 # add nodejs, create group node, create user node, create folder to run app in and give exlusive rights to new node user
-RUN apk add --no-cache --update tzdata && mkdir -p /usr/src/app && chown node:node /usr/src/app && rm -vrf /var/cache/apk/*
+RUN apk add --no-cache --update nodejs curl tzdata && addgroup -S node && adduser -S node -G node && mkdir -p /usr/src/app && chown node:node /usr/src/app && rm -vrf /var/cache/apk/*
 # set timezone to local time
 ENV TZ=Europe/Brussels
-RUN npm set progress=false && npm config set depth 0
+ENV NODE_ENV=production
 
-# ---- Dependencies ----
-FROM node AS dependencies
-WORKDIR /root/npm
-
+FROM base as build
+RUN apk add --update yarn
+WORKDIR /usr/src/app
 # copy project file
-COPY package.json .
-
+COPY package.json ./src ./
 # install node packages
-RUN npm i --only=production
-
-# copy production node_modules aside
-RUN cp -R node_modules prod_node_modules
+RUN yarn
 
 
 # from base image node
-FROM node AS release
+FROM base
 
 # set current user to node
 USER node
@@ -29,10 +25,7 @@ USER node
 WORKDIR /usr/src/app
 
 # copy production node_modules
-COPY --chown=node:node --from=dependencies /root/npm/prod_node_modules ./node_modules
-
-# copy other source files as well
-COPY --chown=node:node ./src .
+COPY --chown=node:node --from=build /usr/src/app ./
 
 # command to run when intantiate an image
 CMD ["node","index.js"]
