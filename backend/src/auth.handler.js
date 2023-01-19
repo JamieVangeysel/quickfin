@@ -17,9 +17,6 @@ module.exports = async function handle(request, reply, requiredPermissions) {
     requiredPermissions = [requiredPermissions]
   }
 
-  // check if bearer token is set
-  let token
-
   try {
     if (request.headers.authorization) {
       const bearer_token = request.headers.authorization.substring(7)
@@ -36,7 +33,7 @@ module.exports = async function handle(request, reply, requiredPermissions) {
 
         request.token = payload
 
-        if (+token.sub != NaN) {
+        if (+payload.sub != NaN) {
           request.log = request.log.child({ userId: +payload.sub })
         }
 
