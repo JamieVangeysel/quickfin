@@ -1,21 +1,32 @@
-# ---- Dependencies ----
-FROM alpine:latest  AS base
+# ---- Base ----
+FROM alpine:3.15 AS base
+
 # add nodejs, create group node, create user node, create folder to run app in and give exlusive rights to new node user
 RUN apk add --no-cache --update nodejs curl tzdata && addgroup -S node && adduser -S node -G node && mkdir -p /usr/src/app && chown node:node /usr/src/app && rm -vrf /var/cache/apk/*
+
 # set timezone to local time
 ENV TZ=Europe/Brussels
+# Set Node Environment to production (this will change the way yarn installs dependencies)
 ENV NODE_ENV=production
 
-FROM base as build
-RUN apk add --update yarn
+# set working directory
 WORKDIR /usr/src/app
+
+
+# ---- Build ----
+FROM base as build
+
+# install yarn
+RUN apk add --update yarn
+
 # copy project file
 COPY package.json ./src ./
+
 # install node packages
 RUN yarn
 
 
-# from base image node
+# ---- Final ----
 FROM base
 
 # set current user to node
