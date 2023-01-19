@@ -8,8 +8,8 @@ const Networth = require('../models/networth.model')
 
 /**
  * Get Overview
- * @param {FastifyRequest} request 
- * @param {FastifyReply} reply 
+ * @param {FastifyRequest} request
+ * @param {FastifyReply} reply
  */
 exports.getOverview = async (request, reply) => {
   try {
@@ -26,8 +26,8 @@ exports.getOverview = async (request, reply) => {
 
 /**
  * Get assets
- * @param {FastifyRequest} request 
- * @param {FastifyReply} reply 
+ * @param {FastifyRequest} request
+ * @param {FastifyReply} reply
  */
 exports.getAssets = async (request, reply) => {
   try {
@@ -44,8 +44,8 @@ exports.getAssets = async (request, reply) => {
 
 /**
  * Create asset
- * @param {FastifyRequest} request 
- * @param {FastifyReply} reply 
+ * @param {FastifyRequest} request
+ * @param {FastifyReply} reply
  */
 exports.postAsset = async (request, reply) => {
   try {
@@ -62,8 +62,8 @@ exports.postAsset = async (request, reply) => {
 
 /**
  * Update asset
- * @param {FastifyRequest} request 
- * @param {FastifyReply} reply 
+ * @param {FastifyRequest} request
+ * @param {FastifyReply} reply
  */
 exports.putAsset = async (request, reply) => {
   try {
@@ -82,8 +82,8 @@ exports.putAsset = async (request, reply) => {
 
 /**
  * Delete asset
- * @param {FastifyRequest} request 
- * @param {FastifyReply} reply 
+ * @param {FastifyRequest} request
+ * @param {FastifyReply} reply
  */
 exports.deleteAsset = async (request, reply) => {
   try {
@@ -102,8 +102,8 @@ exports.deleteAsset = async (request, reply) => {
 
 /**
  * Get Liabilities
- * @param {FastifyRequest} request 
- * @param {FastifyReply} reply 
+ * @param {FastifyRequest} request
+ * @param {FastifyReply} reply
  */
 exports.getLiabilities = async (request, reply) => {
   try {
@@ -120,8 +120,8 @@ exports.getLiabilities = async (request, reply) => {
 
 /**
  * Create liability
- * @param {FastifyRequest} request 
- * @param {FastifyReply} reply 
+ * @param {FastifyRequest} request
+ * @param {FastifyReply} reply
  */
 exports.postLiability = async (request, reply) => {
   try {
@@ -138,8 +138,8 @@ exports.postLiability = async (request, reply) => {
 
 /**
  * Update liability
- * @param {FastifyRequest} request 
- * @param {FastifyReply} reply 
+ * @param {FastifyRequest} request
+ * @param {FastifyReply} reply
  */
 exports.putLiability = async (request, reply) => {
   try {
@@ -158,8 +158,8 @@ exports.putLiability = async (request, reply) => {
 
 /**
  * Delete liability
- * @param {FastifyRequest} request 
- * @param {FastifyReply} reply 
+ * @param {FastifyRequest} request
+ * @param {FastifyReply} reply
  */
 exports.deleteLiability = async (request, reply) => {
   try {

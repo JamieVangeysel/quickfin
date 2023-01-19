@@ -1,4 +1,4 @@
-FROM node:18-alpine as node
+FROM node:lts-alpine as node
 # add nodejs, create group node, create user node, create folder to run app in and give exlusive rights to new node user
 RUN apk add --no-cache --update tzdata && mkdir -p /usr/src/app && chown node:node /usr/src/app && rm -vrf /var/cache/apk/*
 # set timezone to local time

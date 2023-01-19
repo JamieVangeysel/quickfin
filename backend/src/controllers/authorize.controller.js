@@ -10,7 +10,7 @@ const config = require('../config')
 
 // https://quickfin.be/api/v1/authorize?response_type=code&scope=openid&redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
 /**
- * 
+ *
  * @param {FastifyRequest} request
  * @param {FastifyReply} reply
  */

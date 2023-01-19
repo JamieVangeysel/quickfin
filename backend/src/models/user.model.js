@@ -12,9 +12,9 @@ const expiresIn = 900
 const DB_NAME = 'quickfin'
 
 /**
- * 
- * @param {{ user_id: number, scope: string}} authorization_code 
- * @returns 
+ *
+ * @param {{ user_id: number, scope: string}} authorization_code
+ * @returns
  */
 exports.getIdToken = async (authorization_code) => {
   const { audience, subject } = await getAudSub(authorization_code.user_id)
@@ -57,9 +57,9 @@ exports.getAccessToken = async (authorization_code) => {
 
 /**
  * Create a new refresh token for user_id
- * @param {number} user_id 
- * @param {string} code 
- * @param {string} access_token 
+ * @param {number} user_id
+ * @param {string} code
+ * @param {string} access_token
  * @returns {Promise<any>}
  */
 exports.getRefreshToken = (user_id, code, access_token) => {
@@ -74,16 +74,16 @@ exports.getRefreshToken = (user_id, code, access_token) => {
  * Update `password` for id: `user_id`
  * @param {number} user_id to update
  * @param {string} password to use for authentication
- * @returns 
+ * @returns
  */
 exports.updatePassword = (id, password) => SSO.updatePassword(id, password)
 
 /**
- * 
+ *
  * @param {string} username
  * @param {string} email
  * @param {string} password
- * @returns 
+ * @returns
  */
 exports.create = async (email, password, given_name, family_name) => {
   const request = new sql.Request(await db.get(DB_NAME))

@@ -10,8 +10,8 @@ const User = require('../models/user.model')
 
 /**
  * Create new user if it exists in azure
- * @param {FastifyRequest} request 
- * @param {FastifyReply} reply 
+ * @param {FastifyRequest} request
+ * @param {FastifyReply} reply
  */
 exports.postSignUp = async (request, reply) => {
   try {
@@ -43,8 +43,8 @@ exports.postSignUp = async (request, reply) => {
 
 /**
  * Revoke current or supplied refreshToken
- * @param {FastifyRequest} request 
- * @param {FastifyReply} reply 
+ * @param {FastifyRequest} request
+ * @param {FastifyReply} reply
  */
 exports.postRevokeToken = async (request, reply) => {
 
@@ -52,8 +52,8 @@ exports.postRevokeToken = async (request, reply) => {
 
 /**
  * Renew current refreshToken
- * @param {FastifyRequest} request 
- * @param {FastifyReply} reply 
+ * @param {FastifyRequest} request
+ * @param {FastifyReply} reply
  */
 exports.postRefreshToken = async (request, reply) => {
   try {
@@ -109,8 +109,8 @@ exports.postRefreshToken = async (request, reply) => {
 
 /**
  * Update user password
- * @param {FastifyRequest} request 
- * @param {FastifyReply} reply 
+ * @param {FastifyRequest} request
+ * @param {FastifyReply} reply
  */
 exports.postUpdatePassword = async (request, reply) => {
   try {

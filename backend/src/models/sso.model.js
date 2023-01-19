@@ -8,7 +8,7 @@ const DB_NAME = 'quickfin'
 
 /**
  * Get user information
- * @param {string} username 
+ * @param {string} username
  * @returns {Promise<null | {
  *   id: number,
  *   username: string,
@@ -42,9 +42,9 @@ exports.getUserInfo = async (user_id) => {
 }
 
 /**
- * 
- * @param {number} user_id 
- * @param {string} password 
+ *
+ * @param {number} user_id
+ * @param {string} password
  * @returns boolean
  */
 exports.updatePassword = async (user_id, password) => {
@@ -62,7 +62,7 @@ exports.updatePassword = async (user_id, password) => {
 
 /**
  * Check if refresh token exists in DB
- * @param {string} token 
+ * @param {string} token
  * @returns boolean | null
  */
 exports.refreshTokenExists = async (token) => {
@@ -217,9 +217,9 @@ exports.addAuthLog = async (user_id = null, success = false, result = 0, reason 
 }
 
 /**
- * 
- * @param {number} user_id 
- * @param {string} ip 
+ *
+ * @param {number} user_id
+ * @param {string} ip
  * @returns {Promise<{user: any[], ip: any[]}>}
  */
 exports.getFailedAuthAttempts = async (user_id = null, ip = null) => {

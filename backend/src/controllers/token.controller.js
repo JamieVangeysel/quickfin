@@ -8,9 +8,9 @@ const User = require('../models/user.model')
 
 // GET https://quickfin.be/api/v1/token?grant_type=authorization_code&code=SplxlOBeZQQYbYS6WxSbIA&redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb=
 /**
- * Get 
- * @param {FastifyRequest} request 
- * @param {FastifyReply} reply 
+ * Get
+ * @param {FastifyRequest} request
+ * @param {FastifyReply} reply
  */
 exports.get = async (request, reply) => {
   try {

@@ -198,7 +198,7 @@ AS BEGIN
   -- Check if the token exists
   IF NOT EXISTS (SELECT [token] FROM [sso].[refreshTokens] WHERE [token] = @token) BEGIN
     RETURN 0
-  END 
+  END
 
   -- Check if the token is revoked
   IF EXISTS (SELECT [token] FROM [sso].[refreshTokens] WHERE [token] = @token AND [revoked] < GETUTCDATE()) BEGIN
@@ -396,6 +396,13 @@ CREATE TABLE [networth].[liabilityGroups](
   [name] VARCHAR(40) NOT NULL
 )
 
+CREATE TABLE [networth].[snapshots](
+  [user_id] INT NOT NULL,
+  [value] MONEY NOT NULL,
+  [date] DATETIME NOT NULL DEFAULT DATEADD(dd, DATEDIFF(dd, 0, GETDATE()) - 1, 0),
+  PRIMARY KEY ([user_id], [date])
+)
+
 ALTER TABLE [networth].[assets]
   ADD CONSTRAINT [FK_usersAssets] FOREIGN KEY (user_id) REFERENCES [sso].[users] (id),
       CONSTRAINT [FK_assetGroupsAssets] FOREIGN KEY (group_id) REFERENCES [sso].[assetGroups] (id);
@@ -404,6 +411,10 @@ GO
 ALTER TABLE [networth].[liabilities]
   ADD CONSTRAINT [FK_usersLiabilities] FOREIGN KEY (user_id) REFERENCES [sso].[users] (id),
       CONSTRAINT [FK_liabilityGroupsLiabilities] FOREIGN KEY (group_id) REFERENCES [sso].[liabilityGroups] (id);
+GO
+
+ALTER TABLE [networth].[snapshots]
+  ADD CONSTRAINT [FK_usersSnapshots] FOREIGN KEY (user_id) REFERENCES [sso].[users] (id);
 GO
 
 INSERT INTO [networth].[assetGroups] ([name])
@@ -584,6 +595,25 @@ AS BEGIN
 END
 GO
 
+CREATE PROCEDURE [networth].[usp_createSnapshots]
+WITH EXECUTE AS 'networth_agent'
+AS BEGIN
+  INSERT INTO [networth].[snapshots] ([user_id], [value])
+  SELECT [user_id] = [user].[id], [value] = (
+    (
+      SELECT SUM([value])
+      FROM [networth].[assets] [asset]
+      WHERE [asset].[user_id] = [user].[id]
+    ) - (
+      SELECT SUM([value])
+      FROM [networth].[liabilities] [liability]
+      WHERE [liability].[user_id] = [user].[id]
+    )
+  )
+  FROM [sso].[users] [user]
+END
+GO
+
 GRANT EXEC ON [networth].[usp_insertAsset] TO [sso] -- TEMPORARY ACTION
 GRANT EXEC ON [networth].[usp_updateAsset] TO [sso] -- TEMPORARY ACTION
 GRANT EXEC ON [networth].[usp_deleteAsset] TO [sso] -- TEMPORARY ACTION
@@ -591,7 +621,7 @@ GRANT EXEC ON [networth].[usp_insertLiability] TO [sso] -- TEMPORARY ACTION
 GRANT EXEC ON [networth].[usp_updateLiability] TO [sso] -- TEMPORARY ACTION
 GRANT EXEC ON [networth].[usp_deleteLiability] TO [sso] -- TEMPORARY ACTION
 
--- 
+--
 CREATE SCHEMA [budget]
 GO
 
@@ -631,11 +661,12 @@ ALTER TABLE [budget].[expenses]
   ADD CONSTRAINT [FK_usersExpenses] FOREIGN KEY (user_id) REFERENCES [sso].[users] (id);
 GO
 
-CREATE PROCEDURE [budget].[usp_getOverview]
-  @user_id INT
+ALTER PROCEDURE [budget].[usp_getOverview]
+  @user_id INT,
+  @year SMALLINT = NULL
 WITH EXECUTE AS 'budget_agent'
 AS BEGIN
-  DECLARE @year SMALLINT = YEAR(GETUTCDATE())
+  IF @year IS NULL SET @year = YEAR(GETUTCDATE())
   DECLARE @years TABLE (
     [year] SMALLINT
   )
@@ -692,7 +723,7 @@ AS BEGIN
       SET @investedAssets = @investedAssets + @balance + ((@investedAssets + @balance) * .015)
       -- @investment is the sum of all investments
       SET @investment = @investment + @balance
-      
+
       SET @months = @months - 1
     END
 
@@ -708,7 +739,7 @@ AS BEGIN
       SET @investedAssets = @investedAssets + @balance + ((@investedAssets + @balance) * .02)
       -- @investment is the sum of all investments
       SET @investment = @investment + @balance
-      
+
       SET @months = @months - 1
     END
 
@@ -747,18 +778,138 @@ AS BEGIN
         AND [year] = @year
       FOR JSON PATH
     ),
+    [estimated_asset_growth] = (
+      SELECT *
+      FROM [budget].[udf_estimateAssetGrowth](0, @balance, 4, 120)
+      FOR JSON PATH
+    ),
     [total_incomes] = @totalIncomes,
     [total_expenses] = @totalExpenses,
-    [balance] = @balance,
-    [balance_precent] = @balance / @totalIncomes,
-    [investment] = @investment,
-    [investment_assets] = @investedAssets,
-    [investment_return] = @investedAssets - @investment,
-    [investment_return_percent] = (@investedAssets - @investment) / @investedAssets
-    -- [roe] = @balance / @totalIncomes
+    [balance] = @balance
   FOR JSON PATH, INCLUDE_NULL_VALUES
 END
 GO
+
+ALTER FUNCTION [budget].[udf_estimateAssetGrowth](
+  @starting_capital MONEY = 0.00, -- starting capital
+  @period_investment MONEY = 0.00, -- periodic investment amount
+  @period_interval TINYINT = 1, -- periodic investment interval, in months
+  @term SMALLINT = 12 -- term of how log to invest, in months
+) RETURNS @asset_growth TABLE (
+  total_assets_value MONEY,
+  total_assets_invested_value MONEY,
+  total_return_on_assets MONEY,
+  total_return_on_assets_percent DECIMAL,
+  total_return_on_investment MONEY,
+  total_return_on_investment_percent DECIMAL
+)
+AS BEGIN
+  DECLARE @intrest_rates TABLE (
+    min_value MONEY, -- minimum asset value required
+    max_value MONEY, -- maximum asset value
+    rate DECIMAL, -- rate precentage
+    rate_interval TINYINT -- rate interval (quarterly or yearly)
+  )
+  DECLARE @total_assets_value MONEY = 0.00
+  DECLARE @total_assets_invested_value MONEY = 0.00
+  DECLARE @total_return_on_assets MONEY = 0.00
+  DECLARE @total_return_on_assets_percent DECIMAL = 0.00
+  DECLARE @total_return_on_investment MONEY = 0.00
+  DECLARE @total_return_on_investment_percent DECIMAL = 0.00
+
+  -- RATE 1
+  INSERT INTO @intrest_rates (min_value, max_value, rate, rate_interval)
+  VALUES (0, 75000, .005, 4)
+  INSERT INTO @intrest_rates (min_value, max_value, rate, rate_interval)
+  VALUES (0, 75000, .01, 12)
+  -- RATE 2
+  INSERT INTO @intrest_rates (min_value, max_value, rate, rate_interval)
+  VALUES (75000, 200000, .005, 4)
+  INSERT INTO @intrest_rates (min_value, max_value, rate, rate_interval)
+  VALUES (75000, 200000, .02, 12)
+  -- RATE 3
+  INSERT INTO @intrest_rates (min_value, max_value, rate, rate_interval)
+  VALUES (200000, 922337203685477.58, .01, 4)
+  INSERT INTO @intrest_rates (min_value, max_value, rate, rate_interval)
+  VALUES (200000, 922337203685477.58, .03, 12)
+
+  SET @total_assets_value = @starting_capital
+
+  DECLARE @rate DECIMAL
+  DECLARE @ci INT = 1
+  -- Loop over months
+  WHILE @ci <= @term
+  BEGIN
+    SET @rate = 0.00
+    DECLARE @intrest MONEY = 0.00
+
+    -- get applicable intrest rates (max 2)
+    SELECT TOP(1) @rate = MIN(rate)
+    FROM @intrest_rates
+    WHERE @total_assets_value > min_value
+      AND @total_assets_value <= max_value
+      AND @ci > rate_interval
+      AND @ci % rate_interval = 0
+    GROUP BY rate
+
+    IF (@rate > 0) BEGIN
+      SET @intrest = @total_assets_value * @rate
+    END
+
+    IF (
+      (SELECT COUNT(*)
+      FROM @intrest_rates
+      WHERE @total_assets_value > min_value
+        AND @total_assets_value <= max_value
+        AND @ci > rate_interval
+        AND @ci % rate_interval = 0
+      GROUP BY rate
+      ) > 1
+    ) BEGIN
+      SELECT TOP(1) @rate = MAX(rate)
+      FROM @intrest_rates
+      WHERE @total_assets_value > min_value
+        AND @total_assets_value <= max_value
+        AND @ci > rate_interval
+        AND @ci % rate_interval = 0
+      GROUP BY rate
+      SET @intrest = @intrest + (@total_assets_value * @rate)
+    END
+
+    SET @total_assets_value = @total_assets_value + @intrest
+
+    IF (@ci % @period_interval = 0) BEGIN
+      SET @total_assets_value = @total_assets_value + @period_investment
+      SET @total_assets_invested_value = @total_assets_invested_value + @period_investment
+    END
+
+    SET @ci = @ci + 1
+  END
+
+  SET @total_return_on_assets = @total_assets_value - @starting_capital
+  SET @total_return_on_investment = @total_assets_value - @starting_capital - @total_assets_invested_value
+
+  SET @total_return_on_assets_percent = @total_return_on_assets / @total_assets_value
+  SET @total_return_on_investment_percent = @total_return_on_investment / @total_assets_value
+
+  INSERT INTO @asset_growth (
+    total_assets_value,
+    total_assets_invested_value,
+    total_return_on_assets,
+    total_return_on_assets_percent,
+    total_return_on_investment,
+    total_return_on_investment_percent
+  ) VALUES (
+    @total_assets_value,
+    @total_assets_invested_value,
+    @total_return_on_assets,
+    @total_return_on_assets_percent,
+    @total_return_on_investment,
+    @total_return_on_investment_percent
+  )
+
+  RETURN
+END
 
 CREATE PROCEDURE [budget].[usp_insertIncome]
   @user_id INT,
@@ -857,16 +1008,31 @@ GRANT EXEC ON [budget].[usp_deleteExpense] TO [sso] -- TEMPORARY ACTION
 CREATE SCHEMA [journal]
 GO
 
+CREATE USER [journal_agent] WITHOUT LOGIN
+  WITH DEFAULT_SCHEMA = [guest]
+GO
+
 CREATE TABLE [journal].[entries](
   [id] INT PRIMARY KEY IDENTITY(1, 1),
   [user_id] INT NOT NULL,
   [date] DATETIME NOT NULL,
   [name] VARCHAR(40) NOT NULL,
   [category] VARCHAR(40) NOT NULL,
-  [value] MONEY NOT NULL DEFAULT 0.00,
-  [direction] BIT NOT NULL DEFAULT 0, -- 0 for debit, 1 for credit
+  [amount] MONEY NOT NULL DEFAULT 0.00,
+  [direction] BIT NOT NULL DEFAULT 0, -- 1 for debit, 0 for credit
   [created] DATETIME NOT NULL DEFAULT GETUTCDATE(),
   [modified] DATETIME NULL
+)
+GO
+
+CREATE TABLE [journal].[entryDetails](
+  [entry_id] INT NOT NULL,
+  [line] TINYINT NOT NULL,
+  [name] VARCHAR(40) NOT NULL,
+  [amount] MONEY NOT NULL DEFAULT 0.00,
+  [created] DATETIME NOT NULL DEFAULT GETUTCDATE(),
+  [modified] DATETIME NULL,
+  PRIMARY KEY ([entry_id], [line])
 )
 GO
 
@@ -874,8 +1040,106 @@ ALTER TABLE [journal].[entries]
   ADD CONSTRAINT [FK_usersEntries] FOREIGN KEY (user_id) REFERENCES [sso].[users] (id);
 GO
 
-CREATE TABLE [journal].[]
+ALTER TABLE [journal].[entryDetails]
+  ADD CONSTRAINT [FK_entriesEntryDetails] FOREIGN KEY (entry_id) REFERENCES [journal].[entries] (id);
+GO
 
--- in order to calculate total return on liquidity
+CREATE PROCEDURE [journal].[usp_getEntries]
+  @user_id INT,
+  @direction BIT = NULL
+WITH EXECUTE AS 'journal_agent'
+AS BEGIN
+  SELECT [date],
+    [name],
+    [category],
+    [amount],
+    [direction]
+  FROM [journal].[entries]
+  WHERE [User_id] = @user_id AND (
+    @direction IS NULL OR
+    direction = @direction
+  )
+  ORDER BY [date] DESC
+END
+GO
 
--- CREATE TABLE [journal].[]
+CREATE PROCEDURE [journal].[usp_insertEntry]
+  @user_id INT,
+  @date DATETIME,
+  @name VARCHAR(40),
+  @category VARCHAR(40),
+  @amount MONEY
+WITH EXECUTE AS 'journal_agent'
+AS BEGIN
+  INSERT INTO [journal].[entries] ([user_id], [date], [name], [category], [amount], [direction])
+  VALUES (@user_id, @date, @name, @category, @amount, CASE WHEN @amount >= 0 THEN 1 ELSE 0 END)
+
+  SELECT [id] = SCOPE_IDENTITY()
+END
+GO
+
+CREATE PROCEDURE [journal].[usp_updateEntry]
+  @user_id INT,
+  @id INT,
+  @date DATETIME,
+  @name VARCHAR(40),
+  @category VARCHAR(40),
+  @amount MONEY
+WITH EXECUTE AS 'journal_agent'
+AS BEGIN
+  UPDATE [journal].[entries]
+  SET [date] = @date,
+    [name] = @name,
+    [category] = @category,
+    [amount] = @amount,
+    [direction] = CASE WHEN @amount >= 0 THEN 1 ELSE 0 END,
+    [modified] = GETUTCDATE()
+  WHERE [id] = @id
+    AND [user_id] = @user_id
+END
+GO
+
+CREATE PROCEDURE [journal].[usp_deleteEntry]
+  @user_id INT,
+  @id INT
+WITH EXECUTE AS 'journal_agent'
+AS BEGIN
+  DELETE FROM [journal].[entries]
+  WHERE [id] = @id
+    AND [user_id] = @user_id
+END
+GO
+
+GRANT EXEC ON [journal].[usp_getEntries]  TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [journal].[usp_insertEntry] TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [journal].[usp_updateEntry] TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [journal].[usp_deleteEntry] TO [sso] -- TEMPORARY ACTION
+
+-- Create sql server agent job
+USE msdb;
+GO
+EXEC dbo.sp_add_job
+  @job_name = N'DailyQuickfinSnapshot';
+GO
+EXEC sp_add_jobstep
+  @job_name = N'DailyQuickfinSnapshot',
+  @step_name = N'Create networth snaphot for all users',
+  @subsystem = N'TSQL',
+  @command = N'EXEC [quickfin].[networth].[usp_createSnapshots]',
+  @retry_attempts = 5,
+  @retry_interval = 5 ;
+GO
+EXEC dbo.sp_add_schedule
+  @schedule_name = N'NightlyJobs',
+  @freq_type = 4,
+  @freq_interval = 1,
+  @active_start_time = 010000;
+USE msdb ;
+GO
+EXEC sp_attach_schedule
+  @job_name = N'DailyQuickfinSnapshot',
+  @schedule_name = N'NightlyJobs';
+GO
+EXEC dbo.sp_add_jobserver
+   @job_name = N'DailyQuickfinSnapshot',
+GO
