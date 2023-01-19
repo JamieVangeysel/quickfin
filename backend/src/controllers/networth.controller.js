@@ -1,6 +1,7 @@
 'use strict'
 
 // External dependencies
+const { JwtPayload } = require('jose')
 const { FastifyRequest, FastifyReply } = require('fastify')
 
 const Networth = require('../models/networth.model')
@@ -12,7 +13,10 @@ const Networth = require('../models/networth.model')
  */
 exports.getOverview = async (request, reply) => {
   try {
-    return Networth.getOverview(request.token.sub)
+    /** @type {JwtPayload} */
+    const token = request.token
+
+    return Networth.getOverview(token.sub)
   } catch (err) {
     return reply
       .status(500)
@@ -27,7 +31,10 @@ exports.getOverview = async (request, reply) => {
  */
 exports.getAssets = async (request, reply) => {
   try {
-    return Networth.getAssets(request.token.sub)
+    /** @type {JwtPayload} */
+    const token = request.token
+
+    return Networth.getAssets(token.sub)
   } catch (err) {
     return reply
       .status(500)
@@ -42,7 +49,10 @@ exports.getAssets = async (request, reply) => {
  */
 exports.postAsset = async (request, reply) => {
   try {
-    return Networth.insertAsset(request.token.sub, request.body)
+    /** @type {JwtPayload} */
+    const token = request.token
+
+    return Networth.insertAsset(token.sub, request.body)
   } catch (err) {
     return reply
       .status(500)
@@ -57,9 +67,11 @@ exports.postAsset = async (request, reply) => {
  */
 exports.putAsset = async (request, reply) => {
   try {
+    /** @type {JwtPayload} */
+    const token = request.token
     const id = +request.params.id
 
-    return Networth.updateAsset(request.token.sub, id, request.body)
+    return Networth.updateAsset(token.sub, id, request.body)
   } catch (err) {
     return reply
       .status(500)
@@ -74,9 +86,11 @@ exports.putAsset = async (request, reply) => {
  */
 exports.deleteAsset = async (request, reply) => {
   try {
+    /** @type {JwtPayload} */
+    const token = request.token
     const id = +request.params.id
 
-    return Networth.deleteAsset(request.token.sub, id)
+    return Networth.deleteAsset(token.sub, id)
   } catch (err) {
     return reply
       .status(500)
@@ -91,7 +105,10 @@ exports.deleteAsset = async (request, reply) => {
  */
 exports.getLiabilities = async (request, reply) => {
   try {
-    return Networth.getLiabilities(request.token.sub)
+    /** @type {JwtPayload} */
+    const token = request.token
+
+    return Networth.getLiabilities(token.sub)
   } catch (err) {
     return reply
       .status(500)
@@ -106,7 +123,10 @@ exports.getLiabilities = async (request, reply) => {
  */
 exports.postLiability = async (request, reply) => {
   try {
-    return Networth.insertLiability(request.token.sub, request.body)
+    /** @type {JwtPayload} */
+    const token = request.token
+
+    return Networth.insertLiability(token.sub, request.body)
   } catch (err) {
     return reply
       .status(500)
@@ -121,9 +141,11 @@ exports.postLiability = async (request, reply) => {
  */
 exports.putLiability = async (request, reply) => {
   try {
+    /** @type {JwtPayload} */
+    const token = request.token
     const id = +request.params.id
 
-    return Networth.updateLiability(request.token.sub, id, request.body)
+    return Networth.updateLiability(token.sub, id, request.body)
   } catch (err) {
     return reply
       .status(500)
@@ -138,9 +160,11 @@ exports.putLiability = async (request, reply) => {
  */
 exports.deleteLiability = async (request, reply) => {
   try {
+    /** @type {JwtPayload} */
+    const token = request.token
     const id = +request.params.id
 
-    return Networth.deleteLiability(request.token.sub, id)
+    return Networth.deleteLiability(token.sub, id)
   } catch (err) {
     return reply
       .status(500)

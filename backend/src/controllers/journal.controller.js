@@ -1,6 +1,7 @@
 'use strict'
 
 // External dependencies
+const { JwtPayload } = require('jose')
 const { FastifyRequest, FastifyReply } = require('fastify')
 
 const Journal = require('../models/journal.model')
@@ -12,13 +13,16 @@ const Journal = require('../models/journal.model')
  */
 exports.getEntries = async (request, reply) => {
   try {
+    /** @type {JwtPayload} */
+    const token = request.token
+
     let direction
 
     if (request.query.direction != undefined) {
       direction = request.query.direction === 'true'
     }
 
-    return Journal.getEntries(request.token.sub, direction)
+    return Journal.getEntries(token.sub, direction)
   } catch (err) {
     return reply
       .status(500)
@@ -33,7 +37,10 @@ exports.getEntries = async (request, reply) => {
  */
 exports.postEntry = async (request, reply) => {
   try {
-    return Journal.insertEntry(request.token.sub, request.body)
+    /** @type {JwtPayload} */
+    const token = request.token
+
+    return Journal.insertEntry(token.sub, request.body)
   } catch (err) {
     return reply
       .status(500)
@@ -48,9 +55,11 @@ exports.postEntry = async (request, reply) => {
  */
 exports.putEntry = async (request, reply) => {
   try {
+    /** @type {JwtPayload} */
+    const token = request.token
     const id = +request.params.id
 
-    return Journal.updateEntry(request.token.sub, id, request.body)
+    return Journal.updateEntry(token.sub, id, request.body)
   } catch (err) {
     return reply
       .status(500)
@@ -65,9 +74,11 @@ exports.putEntry = async (request, reply) => {
  */
 exports.deleteEntry = async (request, reply) => {
   try {
+    /** @type {JwtPayload} */
+    const token = request.token
     const id = +request.params.id
 
-    return Journal.deleteEntry(request.token.sub, id)
+    return Journal.deleteEntry(token.sub, id)
   } catch (err) {
     return reply
       .status(500)

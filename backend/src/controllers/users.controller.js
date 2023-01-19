@@ -1,6 +1,7 @@
 'use strict'
 
 const bcrypt = require('bcrypt')
+const { JwtPayload } = require('jose')
 const { FastifyRequest, FastifyReply } = require('fastify')
 
 const config = require('../config')
@@ -112,11 +113,14 @@ exports.postRefreshToken = async (request, reply) => {
  */
 exports.postUpdatePassword = async (request, reply) => {
   try {
+    /** @type {JwtPayload} */
+    const token = request.token
+
     const body = request.body
     let _pass = body.password
 
     _pass = bcrypt.hashSync(_pass, config.bcrypt.cost)
-    return await User.updatePassword(request.token.sub, _pass)
+    return await User.updatePassword(token.sub, _pass)
   } catch (err) {
     throw err
   }
