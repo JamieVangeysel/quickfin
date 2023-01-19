@@ -3,21 +3,19 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon src/index.js"
+    "start": "node src/index.js --watch ./src"
   },
   "author": {
     "name": "Jamie Vangeysel",
     "email": "vangeysel-jamie@hotmail.com",
     "url": "https://jamievangeysel.be"
   },
-  "devDependencies": {
-    "nodemon": "^2.0.20"
-  },
   "dependencies": {
     "@fastify/cors": "^8.2.0",
+    "@fastify/static": "^6.6.1",
     "bcrypt": "^5.1.0",
     "fastify": "^4.10.2",
-    "jsonwebtoken": "^9.0.0",
-    "mssql": "^9.0.1"
+    "jose": "^4.11.2",
+    "mssql": "^7.3.5"
   }
 }
