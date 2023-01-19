@@ -37,7 +37,7 @@ module.exports = async function handle(request, reply, requiredPermissions) {
         request.token = payload
 
         if (+token.sub != NaN) {
-          request.log = request.log.child({ userId: +token.sub })
+          request.log = request.log.child({ userId: +payload.sub })
         }
 
         return
