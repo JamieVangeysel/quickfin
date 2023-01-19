@@ -23,7 +23,6 @@ module.exports = async function handle(request, reply, requiredPermissions) {
 
       if (bearer_token) {
         const protectedHeader = jose.decodeProtectedHeader(bearer_token)
-        console.log(protectedHeader)
         const JWKS = jose.createRemoteJWKSet(new URL(protectedHeader.jku))
 
         const { payload } = await jose.jwtVerify(bearer_token, JWKS, {
