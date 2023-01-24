@@ -1151,18 +1151,18 @@ CREATE USER [analytics_agent] WITHOUT LOGIN
   WITH DEFAULT_SCHEMA = [guest]
 GO
 
-CREATE PROCEDURE [analytics].[usp_getAnalytics]
+ALTER PROCEDURE [analytics].[usp_getAnalytics]
   @user_id INT
 WITH EXECUTE AS 'analytics_agent'
 AS BEGIN
   -- Get net worth records for running year
   SELECT [date] = cast([date] as DATE), [value] = [value]
-  FROM [Statistics]
+  FROM [networth].[snapshots]
   WHERE cast([date] as DATE) > cast((getdate()-365) as date) AND [user_id] = @user_id
 
   -- Get net worth records for previous running year
   SELECT [date] = cast([date] as DATE), [value] = [value]
-  FROM [Statistics]
+  FROM [networth].[snapshots]
   WHERE (cast([date] as DATE) < cast((getdate()-365) as date) AND cast([date] as DATE) > cast((getdate()-730) as date)) AND [user_id] = @user_id
 END
 GO

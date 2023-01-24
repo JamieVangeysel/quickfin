@@ -18,7 +18,8 @@ export class AuthGuard implements CanActivate {
       return true
     }
 
-    if (await firstValueFrom(this.auth.refresh())) {
+    const token = await firstValueFrom(this.auth.refresh())
+    if (token) {
       return true
     }
 

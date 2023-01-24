@@ -137,7 +137,7 @@ module.exports.routes = [{
   requiredPermissions: []
 }, {
   method: 'GET',
-  url: '/budget/analytics',
+  url: '/analytics',
   handler: analyticsController.get,
   requiredPermissions: []
 }]
