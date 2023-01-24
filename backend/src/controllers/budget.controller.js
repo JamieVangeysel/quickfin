@@ -1,7 +1,7 @@
 'use strict'
 
 // External dependencies
-const { JwtPayload } = require('jsonwebtoken')
+const { JwtPayload } = require('jose')
 const { FastifyRequest, FastifyReply } = require('fastify')
 
 const Budget = require('../models/budget.model')

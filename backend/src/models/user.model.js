@@ -1,13 +1,12 @@
 'use strict'
 
-const jwt = require('jsonwebtoken')
+const jose = require('jose')
 const sql = require('mssql')
 
 const db = require('../db')
 const config = require('../config')
 const SSO = require('./sso.model')
 
-const issuer = 'https://quickfin.be'
 const expiresIn = 900
 const DB_NAME = 'quickfin'
 
@@ -34,25 +33,27 @@ exports.getIdToken = async (authorization_code) => {
   if (!payload)
     throw new Error('Invalid payload')
 
-  return jwt.sign(payload, config.keys[0].secret, {
-    issuer,
-    audience,
-    expiresIn,
-    subject
-  })
+  const privateKey = await jose.importJWK(config.key)
+  return await new jose.SignJWT(payload)
+    .setProtectedHeader({ alg: config.key.alg, kid: config.key.kid, jku: config.key.jku })
+    .setIssuer(config.key.iss)
+    .setAudience(audience)
+    .setExpirationTime(expiresIn + 's')
+    .setSubject(subject)
+    .sign(privateKey)
 }
 
 exports.getAccessToken = async (authorization_code) => {
   const { audience, subject } = await getAudSub(authorization_code.user_id)
 
-  return jwt.sign({
-    roles: ['*']
-  }, config.keys[0].secret, {
-    issuer,
-    audience,
-    expiresIn,
-    subject
-  })
+  const privateKey = await jose.importJWK(config.key)
+  return await new jose.SignJWT({ roles: ['*'] })
+    .setProtectedHeader({ alg: config.key.alg, kid: config.key.kid, jku: config.key.jku })
+    .setIssuer(config.key.iss)
+    .setAudience(audience)
+    .setExpirationTime(expiresIn + 's')
+    .setSubject(subject)
+    .sign(privateKey)
 }
 
 /**
@@ -103,7 +104,7 @@ exports.create = async (email, password, given_name, family_name) => {
 const getAudSub = async (user_id) => {
   return {
     audience: [
-      issuer
+      config.key.iss
     ],
     subject: user_id.toString()
   }

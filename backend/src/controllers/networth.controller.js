@@ -1,7 +1,7 @@
 'use strict'
 
 // External dependencies
-const { JwtPayload } = require('jsonwebtoken')
+const { JwtPayload } = require('jose')
 const { FastifyRequest, FastifyReply } = require('fastify')
 
 const Networth = require('../models/networth.model')
@@ -69,7 +69,6 @@ exports.putAsset = async (request, reply) => {
   try {
     /** @type {JwtPayload} */
     const token = request.token
-
     const id = +request.params.id
 
     return Networth.updateAsset(token.sub, id, request.body)
@@ -89,7 +88,6 @@ exports.deleteAsset = async (request, reply) => {
   try {
     /** @type {JwtPayload} */
     const token = request.token
-
     const id = +request.params.id
 
     return Networth.deleteAsset(token.sub, id)
@@ -145,7 +143,6 @@ exports.putLiability = async (request, reply) => {
   try {
     /** @type {JwtPayload} */
     const token = request.token
-
     const id = +request.params.id
 
     return Networth.updateLiability(token.sub, id, request.body)
@@ -165,7 +162,6 @@ exports.deleteLiability = async (request, reply) => {
   try {
     /** @type {JwtPayload} */
     const token = request.token
-
     const id = +request.params.id
 
     return Networth.deleteLiability(token.sub, id)

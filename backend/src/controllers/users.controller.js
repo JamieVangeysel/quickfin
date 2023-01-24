@@ -1,7 +1,7 @@
 'use strict'
 
 const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
+const { JwtPayload } = require('jose')
 const { FastifyRequest, FastifyReply } = require('fastify')
 
 const config = require('../config')
@@ -78,8 +78,7 @@ exports.postRefreshToken = async (request, reply) => {
       access_token,
       token_type: 'Bearer',
       expires_in: 900, // 15 minutes
-      id_token_jwt: id_token,
-      id_token: jwt.decode(id_token)
+      id_token: id_token
     }
 
     const newToken = await SSO.updateRefreshToken(token)
@@ -114,23 +113,14 @@ exports.postRefreshToken = async (request, reply) => {
  */
 exports.postUpdatePassword = async (request, reply) => {
   try {
-    /** @type {jwt.JwtPayload} */
-    let token
-    if (request.headers.authorization != null) {
-      const bearer_token = request.headers.authorization.substring(7)
-      token = jwt.decode(bearer_token)
+    /** @type {JwtPayload} */
+    const token = request.token
 
-      const body = request.body
-      let _pass = body.password
+    const body = request.body
+    let _pass = body.password
 
-      _pass = bcrypt.hashSync(_pass, config.bcrypt.cost)
-      return await User.updatePassword(token.sub, _pass)
-    }
-    return reply
-      .code(401)
-      .send({
-        error: `No token supplied!`
-      })
+    _pass = bcrypt.hashSync(_pass, config.bcrypt.cost)
+    return await User.updatePassword(token.sub, _pass)
   } catch (err) {
     throw err
   }
