@@ -1143,3 +1143,28 @@ GO
 EXEC dbo.sp_add_jobserver
    @job_name = N'DailyQuickfinSnapshot',
 GO
+
+CREATE SCHEMA [analytics]
+GO
+
+CREATE USER [analytics_agent] WITHOUT LOGIN
+  WITH DEFAULT_SCHEMA = [guest]
+GO
+
+ALTER PROCEDURE [analytics].[usp_getAnalytics]
+  @user_id INT
+WITH EXECUTE AS 'analytics_agent'
+AS BEGIN
+  -- Get net worth records for running year
+  SELECT [date] = cast([date] as DATE), [value] = [value]
+  FROM [networth].[snapshots]
+  WHERE cast([date] as DATE) > cast((getdate()-365) as date) AND [user_id] = @user_id
+
+  -- Get net worth records for previous running year
+  SELECT [date] = cast([date] as DATE), [value] = [value]
+  FROM [networth].[snapshots]
+  WHERE (cast([date] as DATE) < cast((getdate()-365) as date) AND cast([date] as DATE) > cast((getdate()-730) as date)) AND [user_id] = @user_id
+END
+GO
+
+GRANT EXEC ON [analytics].[usp_getAnalytics] TO [sso] -- TEMPORARY ACTION

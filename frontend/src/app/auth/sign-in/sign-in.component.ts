@@ -25,7 +25,7 @@ export class SignInComponent implements OnInit, OnDestroy {
     this.signInForm = fb.group({
       username: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(12)]],
-      remmeber_me: [false, []]
+      remember_me: [false, []]
     })
   }
 
@@ -46,7 +46,7 @@ export class SignInComponent implements OnInit, OnDestroy {
       const authorizeResponse = await firstValueFrom(this.auth.authorize(this.signInForm.value))
       let authorization_code = authorizeResponse.authorization_code
 
-      await firstValueFrom(this.auth.getToken(authorization_code))
+      await firstValueFrom(this.auth.getToken(authorization_code, this.signInForm.value.remember_me))
       if (this.hasError(authorizeResponse)) {
         console.error(authorizeResponse.errors)
       }

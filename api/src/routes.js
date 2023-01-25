@@ -9,6 +9,7 @@ const usersController = require('./controllers/users.controller')
 const journalController = require('./controllers/journal.controller')
 const networthController = require('./controllers/networth.controller')
 const budgetController = require('./controllers/budget.controller')
+const analyticsController = require('./controllers/analytics.controller')
 
 module.exports.routes = [{
   method: 'POST',
@@ -133,5 +134,10 @@ module.exports.routes = [{
   method: 'DELETE',
   url: '/budget/expenses/:id',
   handler: budgetController.deleteExpense,
+  requiredPermissions: []
+}, {
+  method: 'GET',
+  url: '/analytics',
+  handler: analyticsController.get,
   requiredPermissions: []
 }]
