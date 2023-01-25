@@ -1,10 +1,357 @@
-<div class="w-full p-8">
-  <div class="flex flex-col flex-auto space-y-8">
-    <blockquote class="p-4 border-l-4 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-800">
-      <p class="text-xl italic font-medium leading-relaxed text-gray-900 dark:text-gray-200">
-        Op deze pagina krijg je overzicht van al je uitgaven, inkomens, gemiddeldes, maandelijkse vergelijking,
-        voorspellingen en waarschuwingen indien je over je budget gaat.
-      </p>
-    </blockquote>
+<div class="flex flex-wrap w-full max-w-screen-xl mx-auto p-6 md:p-8">
+  <div class="flex items-center justify-between w-full">
+    <div>
+      <div class="text-3xl font-semibold tracking-tight leading-8">
+        Dashboard
+      </div>
+      <div class="font-medium tracking-tight text-secondary">
+        Monitor metrics, check reports and review performance
+      </div>
+    </div>
+    <div class="flex items-center ml-6">
+      <button
+        class="bg-lynch-500 text-white rounded-full px-1 px-5 h-10 disabled:bg-gray-300 border-none hover:bg-lynch-600"
+        tabindex="0" title="Exporteer">
+        <i class="far fa-file-export"></i>
+        <span class="hidden md:inline-flex">Exporteer</span>
+      </button>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full mt-8">
+    <div class="flex flex-col flex-auto bg-gray-800 dark text-white shadow rounded-2xl overflow-hidden
+          dark:shadow-none sm:col-span-2 lg:col-span-3" *ngIf="visitors">
+      <div class="flex items-center justify-between mt-10 ml-10 mr-6 sm:mr-10">
+        <div class="flex flex-col">
+          <div class="mr-4 text-2xl md:text-3xl font-semibold tracking-tight leading-7">Visitors Overview</div>
+          <div class="font-medium text-secondary">Number of unique visitors</div>
+        </div>
+        <div class="ml-2">
+          <div class="space-x-1 rounded-full overflow-hidden border-none font-medium">
+            <div class="inline-flex relative font-medium border-none">
+              <button class="text-gray-400 rounded-full px-6 h-10 border-none disabled:bg-gray-300 hover:bg-gray-700"
+                [ngClass]="{ 'text-gray-50 bg-gray-700': activeSegment === 'previous' }"
+                (click)="activateSegment('previous')">
+                Last year
+              </button>
+            </div>
+            <div class="inline-flex relative font-medium border-none">
+              <button class="text-gray-400 rounded-full px-6 h-10 border-none disabled:bg-gray-300 hover:bg-gray-700"
+                [ngClass]="{ 'text-gray-50 bg-gray-700': activeSegment === 'current' }"
+                (click)="activateSegment('current')">
+                This year
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-col flex-auto h-80 mt-6">
+        <apx-chart class="flex-auto w-full h-full" [series]="visitors.options.series" [xaxis]="visitors.options.xaxis"
+          [yaxis]="visitors.options.yaxis" [chart]="visitors.options.chart" [stroke]="visitors.options.stroke"
+          [dataLabels]="visitors.options.dataLabels" [colors]="visitors.options.colors" [grid]="visitors.options.grid"
+          [legend]="visitors.options.legend" [fill]="visitors.options.fill" [tooltip]="visitors.options.tooltip">
+        </apx-chart>
+      </div>
+    </div>
+
+    <div class="flex flex-col flex-auto bg-white shadow rounded-2xl overflow-hidden dark:bg-gray-800 dark:shadow-none
+          sm:col-span-2 lg:col-span-1" *ngIf="users">
+      <div class="flex items-start justify-between m-6 mb-0">
+        <div class="text-lg font-medium tracking-tight leading-6 truncate">Active users</div>
+        <div class="ml-2">
+          <div
+            class="h-6 min-h-6 px-2 rounded-full cursor-pointer bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
+            [matMenuTriggerFor]="activeusersTimespanSelection">
+            <span class="font-medium text-sm text-secondary">1 day</span>
+          </div>
+
+          <mat-menu class="shadow-2xl bg-white dark:bg-gray-900 rounded" #activeusersTimespanSelection>
+            <ng-template matMenuContent>
+              <button class="rounded dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600" mat-menu-item>
+                1 day
+              </button>
+              <button class="rounded dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600" mat-menu-item>
+                1 week
+              </button>
+              <button class="rounded dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600" mat-menu-item>
+                1 month
+              </button>
+            </ng-template>
+          </mat-menu>
+        </div>
+      </div>
+      <div class="flex flex-col lg:flex-row lg:items-center mx-6 mt-3">
+        <div class="text-7xl font-bold tracking-tighter leading-tight">
+          {{ users.current | number }}
+        </div>
+        <div class="flex lg:flex-col lg:ml-3">
+          <i class="far text-lg" [ngClass]="{ 'text-red-500 fa-chart-line-down': users.pos == 0, 'text-green-500 fa-chart-line': users.pos == 1
+                }"></i>
+          <div class="flex items-center ml-1 lg:ml-0 lg:mt-0.5 text-md leading-none whitespace-nowrap text-secondary">
+            <span class="font-medium"
+              [ngClass]="{ 'text-red-500': users.pos == 0, 'text-green-500': users.pos == 1 }">{{ users.result | percent
+              }}</span>
+            <span class="ml-1" *ngIf="users.pos == 0">below target</span>
+            <span class="ml-1" *ngIf="users.pos == 1">above target</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-col flex-auto h-20">
+        <!-- show 7 days excluding today in this chart when timespan is 1 day -->
+        <!-- show 4 weeks excluding this week in this chart when timespan is 1 week -->
+        <!-- show 6 months excluding this month in this chart when timespan is 1 month -->
+        <apx-chart class="flex-auto w-full h-full" [series]="users.options.series" [xaxis]="users.options.xaxis"
+          [yaxis]="users.options.yaxis" [chart]="users.options.chart" [stroke]="users.options.stroke"
+          [dataLabels]="users.options.dataLabels" [colors]="users.options.colors" [grid]="users.options.grid"
+          [legend]="users.options.legend" [tooltip]="users.options.tooltip">
+        </apx-chart>
+      </div>
+    </div>
+
+    <div class="flex flex-col flex-auto bg-white shadow rounded-2xl overflow-hidden dark:bg-gray-800 dark:shadow-none
+          sm:col-span-2 lg:col-span-1" *ngIf="impressions">
+      <div class="flex items-start justify-between m-6 mb-0">
+        <div class="text-lg font-medium tracking-tight leading-6 truncate">Impressions</div>
+        <div class="ml-2">
+          <div
+            class="h-6 min-h-6 px-2 rounded-full cursor-pointer bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
+            [matMenuTriggerFor]="impressionsTimespanSelection">
+            <span class="font-medium text-sm text-secondary">1 day</span>
+          </div>
+
+          <mat-menu class="shadow-2xl bg-white dark:bg-gray-900 rounded" #impressionsTimespanSelection>
+            <ng-template matMenuContent>
+              <button class="rounded dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600" mat-menu-item>
+                1 day
+              </button>
+              <button class="rounded dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600" mat-menu-item>
+                1 week
+              </button>
+              <button class="rounded dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600" mat-menu-item>
+                1 month
+              </button>
+            </ng-template>
+          </mat-menu>
+        </div>
+      </div>
+      <div class="flex flex-col lg:flex-row lg:items-center mx-6 mt-3">
+        <div class="text-7xl font-bold tracking-tighter leading-tight">
+          {{ impressions.current | number }}
+        </div>
+        <div class="flex lg:flex-col lg:ml-3">
+          <i class="far text-lg" [ngClass]="{ 'text-red-500 fa-chart-line-down': impressions.pos == 0, 'text-green-500 fa-chart-line':
+                impressions.pos == 1
+                }"></i>
+          <div class="flex items-center ml-1 lg:ml-0 lg:mt-0.5 text-md leading-none whitespace-nowrap text-secondary">
+            <span class="font-medium"
+              [ngClass]="{ 'text-red-500': impressions.pos == 0, 'text-green-500': impressions.pos == 1 }">{{
+              impressions.result | percent }}</span>
+            <span class="ml-1" *ngIf="impressions.pos == 0">below target</span>
+            <span class="ml-1" *ngIf="impressions.pos == 1">above target</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-col flex-auto h-20">
+        <apx-chart class="flex-auto w-full h-full" [series]="impressions.options.series"
+          [xaxis]="impressions.options.xaxis" [yaxis]="impressions.options.yaxis" [chart]="impressions.options.chart"
+          [stroke]="impressions.options.stroke" [dataLabels]="impressions.options.dataLabels"
+          [colors]="impressions.options.colors" [grid]="impressions.options.grid" [legend]="impressions.options.legend"
+          [tooltip]="impressions.options.tooltip">
+        </apx-chart>
+      </div>
+    </div>
+
+    <div class="flex flex-col flex-auto bg-white shadow rounded-2xl overflow-hidden dark:bg-gray-800 dark:shadow-none
+          sm:col-span-2 lg:col-span-1" *ngIf="registrations">
+      <div class="flex items-start justify-between m-6 mb-0">
+        <div class="text-lg font-medium tracking-tight leading-6 truncate">Registrations</div>
+        <div class="ml-2">
+          <div
+            class="h-6 min-h-6 px-2 rounded-full cursor-pointer bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
+            [matMenuTriggerFor]="registrationsTimespanSelection">
+            <span class="font-medium text-sm text-secondary">1 day</span>
+          </div>
+
+          <mat-menu class="shadow-2xl bg-white dark:bg-gray-900 rounded" #registrationsTimespanSelection>
+            <ng-template matMenuContent>
+              <button class="rounded dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600" mat-menu-item>
+                1 day
+              </button>
+              <button class="rounded dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600" mat-menu-item>
+                1 week
+              </button>
+              <button class="rounded dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600" mat-menu-item>
+                1 month
+              </button>
+            </ng-template>
+          </mat-menu>
+        </div>
+      </div>
+      <div class="flex flex-col lg:flex-row lg:items-center mx-6 mt-3">
+        <div class="text-7xl font-bold tracking-tighter leading-tight">
+          {{ registrations.current | number }}
+        </div>
+        <div class="flex lg:flex-col lg:ml-3">
+          <i class="far text-lg" [ngClass]="{ 'text-red-500 fa-chart-line-down': registrations.pos == 0, 'text-green-500 fa-chart-line':
+                registrations.pos
+                == 1 }"></i>
+          <div class="flex items-center ml-1 lg:ml-0 lg:mt-0.5 text-md leading-none whitespace-nowrap text-secondary">
+            <span class="font-medium"
+              [ngClass]="{ 'text-red-500': registrations.pos == 0, 'text-green-500': registrations.pos == 1 }">{{
+              registrations.result | percent }}</span>
+            <span class="ml-1" *ngIf="registrations.pos == 0">below target</span>
+            <span class="ml-1" *ngIf="registrations.pos == 1">above target</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-col flex-auto h-20">
+        <apx-chart class="flex-auto w-full h-full" [series]="registrations.options.series"
+          [xaxis]="registrations.options.xaxis" [yaxis]="registrations.options.yaxis"
+          [chart]="registrations.options.chart" [stroke]="registrations.options.stroke"
+          [dataLabels]="registrations.options.dataLabels" [colors]="registrations.options.colors"
+          [grid]="registrations.options.grid" [legend]="registrations.options.legend"
+          [tooltip]="registrations.options.tooltip">
+        </apx-chart>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="visitorsvsviews"
+    class="flex flex-col flex-auto mt-8 bg-white shadow rounded-2xl overflow-hidden dark:bg-gray-800 dark:shadow-none">
+    <div class="flex items-start justify-between m-6 mb-0">
+      <div class="text-lg font-medium tracking-tight leading-6 truncate">
+        Visitors vs. Product Views
+      </div>
+      <div class="ml-2">
+        <div
+          class="h-6 min-h-6 px-2 rounded-full cursor-pointer bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
+          [matMenuTriggerFor]="visitorsvsviewsTimespanSelection">
+          <span class="font-medium text-sm text-secondary">60 days</span>
+        </div>
+
+        <mat-menu class="shadow-2xl bg-white dark:bg-gray-900 rounded" #visitorsvsviewsTimespanSelection>
+          <ng-template matMenuContent>
+            <button class="rounded dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600" mat-menu-item>
+              60 days
+            </button>
+            <button class="rounded dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600" mat-menu-item>
+              120 days
+            </button>
+            <button class="rounded dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600" mat-menu-item>
+              180 days
+            </button>
+          </ng-template>
+        </mat-menu>
+      </div>
+    </div>
+    <div class="flex items-start mt-6 mx-6">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-12">
+        <div class="flex flex-col">
+          <div class="flex items-center">
+            <div class="font-medium text-secondary leading-5">
+              Overall Score
+            </div>
+            <i class="fas fa-info-circle text-md text-secondary ml-1.5" title="description"></i>
+          </div>
+          <div class="flex items-start mt-2">
+            <div class="text-4xl font-bold tracking-tight leading-none">
+              732
+            </div>
+            <div class="flex items-center ml-2">
+              <i class="fas fa-arrow-circle-up text-green-500 text-lg"></i>
+              <div class="ml-1 text-md font-medium text-green-500">
+                42.9%
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-col">
+          <div class="flex items-center">
+            <div class="font-medium text-secondary leading-5">
+              Average Ratio
+            </div>
+            <i class="fas fa-info-circle text-md text-secondary ml-1.5" title="description"></i>
+          </div>
+          <div class="flex items-start mt-2">
+            <div class="text-4xl font-bold tracking-tight leading-none">
+              42%
+            </div>
+            <div class="flex items-center ml-2">
+              <i class="fas fa-arrow-circle-down text-red-500 text-lg"></i>
+              <div class="ml-1 text-md font-medium text-red-500">
+                13.4%
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-col">
+          <div class="flex items-center">
+            <div class="font-medium text-secondary leading-5">
+              Predicted Ratio
+            </div>
+            <i class="fas fa-info-circle text-md text-secondary ml-1.5" title="description"></i>
+          </div>
+          <div class="flex items-start mt-2">
+            <div class="text-4xl font-bold tracking-tight leading-none">
+              53%
+            </div>
+            <div class="flex items-center ml-2">
+              <i class="fas fa-arrow-circle-up text-green-500 text-lg"></i>
+              <div class="ml-1 text-md font-medium text-green-500">
+                11.1%
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flex flex-col flex-auto h-80 mt-3">
+      <apx-chart class="flex-auto w-full h-full" [series]="visitorsvsviews.options.series"
+        [xaxis]="visitorsvsviews.options.xaxis" [yaxis]="visitorsvsviews.options.yaxis"
+        [chart]="visitorsvsviews.options.chart" [stroke]="visitorsvsviews.options.stroke"
+        [dataLabels]="visitorsvsviews.options.dataLabels" [colors]="visitorsvsviews.options.colors"
+        [grid]="visitorsvsviews.options.grid" [legend]="visitorsvsviews.options.legend"
+        [tooltip]="visitorsvsviews.options.tooltip"></apx-chart>
+    </div>
+  </div>
+
+  <div class="w-full mt-12 hidden">
+    <div class="text-2xl font-semibold tracking-tight leading-6">
+      Your Audience
+    </div>
+    <div class="font-medium tracking-tight text-secondary">
+      Demographic properties of your users
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 w-full mt-6 md:mt-8 hidden">
+    <div
+      class="flex flex-col flex-auto bg-white shadow rounded-2xl overflow-hidden p-6 dark:bg-gray-800 dark:shadow-none"
+      *ngFor="let item of demoGraphics">
+      <div class="flex items-start justify-between">
+        <div class="text-lg font-medium tracking-tight leading-6 truncate">
+          {{ item.name }}
+        </div>
+      </div>
+      <div class="flex flex-col flex-auto mt-6 h-44">
+        <apx-chart class="flex flex-auto items-center justify-center w-full h-full" [series]="item.options.series"
+          [chart]="item.options.chart" [dataLabels]="item.options.dataLabels" [colors]="item.options.colors"
+          [labels]="item.options.labels" [states]="item.options.states" [plotOptions]="item.options.plotOptions"
+          [legend]="item.options.legend" [fill]="item.options.fill" [stroke]="item.options.stroke"
+          [tooltip]="item.options.tooltip">
+        </apx-chart>
+      </div>
+      <div class="mt-8">
+        <div class="-my-3 divide-y">
+          <div class="grid grid-cols-3 py-3" *ngFor="let group of item.groups">
+            <div class="flex items-center">
+              <div class="flex-0 w-2 h-2 rounded-full" [style.background]="group.color"></div>
+              <div class="ml-3 truncate">{{ group.label }}</div>
+            </div>
+            <div class="font-medium text-right">{{ group.value }}</div>
+            <div class="text-right text-secondary">{{ group.percentage | percent }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
