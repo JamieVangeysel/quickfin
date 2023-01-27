@@ -114,7 +114,7 @@ export class AssetsPageComponent implements OnInit {
     if (confirmed === true) {
       // try to update item !
       try {
-        const resp = await this.networthApi.deleteLiability(asset.id)
+        const resp = await this.networthApi.deleteAsset(asset.id)
 
         if (resp.success) {
           // alert('Verwijderd!')

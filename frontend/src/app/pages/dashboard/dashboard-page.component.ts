@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core'
-import { ApexChart, ApexDataLabels, ApexFill, ApexGrid, ApexLegend, ApexStroke, ApexTooltip, ApexXAxis, ApexYAxis, ChartType } from 'ng-apexcharts'
+import { ChartType } from 'ng-apexcharts'
+import { AnalyticsApiService, IGetAnalytics } from 'src/app/api/analytics-api.service'
 import { AuthService } from 'src/app/auth/auth.service'
 
 const areaChartType: ChartType = 'area'
@@ -58,7 +59,7 @@ const visitorsChart: any = {
       inverseColors: true,
       opacityFrom: 1,
       opacityTo: 0.5,
-      stops: [0, 50, 100],
+      stops: [0, 35, 100],
       colorStops: []
     },
   },
@@ -69,6 +70,11 @@ const visitorsChart: any = {
     followCursor: true,
     onDatasetHover: {
       highlightDataSeries: false,
+    },
+    y: {
+      formatter: function (value: number) {
+        return '€ ' + value.toFixed(2)
+      }
     }
   },
   xaxis: {
@@ -84,14 +90,20 @@ const visitorsChart: any = {
     }
   },
   yaxis: {
+    show: true,
+    showAlways: true,
+    floating: true,
+    forceNiceScale: true,
+    min: 0,
     labels: {
-      show: false
+      show: true,
+      // offsetX: -116
     },
     axisBorder: {
-      show: false
+      show: true
     },
     axisTicks: {
-      show: false
+      show: true
     }
   }
 }
@@ -262,21 +274,135 @@ export class DashboardPageComponent implements OnInit {
   ]
 
   activeSegment: 'current' | 'previous' = 'current'
-  visitors: any | undefined
-  users: any | undefined
-  impressions: any | undefined
-  registrations: any | undefined
+  networth_history: any | undefined
+  incomeVsBudget: any | undefined
+  expensesVsBudget: any | undefined
+  balanceVsNetworthDiff: any | undefined
   visitorsvsviews: any | undefined
+
+  analytics: IGetAnalytics | undefined
 
   constructor(
     private ref: ChangeDetectorRef,
     private auth: AuthService,
-    // private analytics: AnalyticsApiService
+    private analyticsApi: AnalyticsApiService
   ) {
   }
   async ngOnInit() {
     try {
-      //const analytics = await this.analytics.getDashboard()
+      const analytics = await this.analyticsApi.get()
+      this.analytics = analytics
+
+      if (analytics) {
+        console.log(analytics)
+
+        const networth_history = analytics.collections.find(e => e.name === 'networth-history')
+        const indicators = analytics.collections.find(e => e.name === 'indicators')
+
+        console.log(networth_history)
+
+        if (this.hasCurrentSegment && this.hasPreviousSegment) {
+
+        } else if (this.hasCurrentSegment) {
+          this.networth_history = {
+            options: {
+              ...visitorsChart,
+              series: [{
+                name: 'Netto-waarde historiek',
+                data: networth_history?.datasets.find(e => e.name === 'current')?.rows.map(e => ({
+                  x: new Date(e.date).getTime(),
+                  y: e.value
+                }))
+              }]
+            }
+          }
+        } else if (this.hasPreviousSegment) {
+
+        } else {
+          console.debug('There are segments, but none equal current or previous. Someone definetly made an oopsie.')
+        }
+
+        if (indicators) {
+          const incomesCard = indicators.datasets.find(e => e.name === 'incomes-vs-budget')
+          const expensesCard = indicators.datasets.find(e => e.name === 'expenses-vs-budget')
+          const balanceCard = indicators.datasets.find(e => e.name === 'balance-vs-networth-diff')
+          if (incomesCard) {
+            const lastValue = incomesCard.rows[incomesCard.rows.length - 1]
+            this.incomeVsBudget = {
+              current: lastValue.value,
+              result: 1 - (lastValue.value / lastValue.budget),
+              pos: lastValue.value > lastValue.budget,
+              options: {
+                ...demoTriChart,
+                colors: ['#34d399', '#ffffff00'],
+                series: [{
+                  name: 'Inkomen',
+                  data: incomesCard.rows.map(e => ({
+                    x: new Date(e.date).getTime(),
+                    y: e.value
+                  }))
+                }, {
+                  name: 'Budget',
+                  data: incomesCard.rows.map(e => ({
+                    x: new Date(e.date).getTime(),
+                    y: e.budget
+                  }))
+                }],
+              }
+            }
+          }
+          if (expensesCard) {
+            const lastValue = expensesCard.rows[expensesCard.rows.length - 1]
+            this.expensesVsBudget = {
+              current: lastValue.value,
+              result: 1 - (lastValue.value / lastValue.budget),
+              pos: lastValue.value > lastValue.budget,
+              options: {
+                ...demoTriChart,
+                colors: ['#fb7185', '#ffffff00'],
+                series: [{
+                  name: 'Uitgaven',
+                  data: expensesCard.rows.map(e => ({
+                    x: new Date(e.date).getTime(),
+                    y: e.value
+                  }))
+                }, {
+                  name: 'Budget',
+                  data: expensesCard.rows.map(e => ({
+                    x: new Date(e.date).getTime(),
+                    y: e.budget
+                  }))
+                }],
+              }
+            }
+          }
+          if (balanceCard) {
+            const lastValue = balanceCard.rows[balanceCard.rows.length - 1]
+            this.balanceVsNetworthDiff = {
+              current: lastValue.value,
+              result: lastValue.value,
+              pos: 1,
+              options: {
+                ...demoTriChart,
+                colors: ['#38bdf8', '#ffffff00'],
+                series: [{
+                  name: 'Balans',
+                  data: balanceCard.rows.map(e => ({
+                    x: new Date(e.date).getTime(),
+                    y: e.value
+                  }))
+                }, {
+                  name: 'Nettowaarde verschil',
+                  data: balanceCard.rows.map(e => ({
+                    x: new Date(e.date).getTime(),
+                    y: e.budget
+                  }))
+                }],
+              }
+            }
+          }
+        }
+      }
     } catch (err: any) {
       console.error(err)
       alert(err.message)
@@ -298,5 +424,21 @@ export class DashboardPageComponent implements OnInit {
 
   get profile(): any {
     return this.auth.id_token
+  }
+
+  get hasCurrentSegment(): boolean {
+    const networth_history = this.analytics?.collections.find(e => e.name === 'networth-history')
+    const segments = networth_history?.datasets.map(e => e.name)
+    return segments?.includes('current') || false
+  }
+
+  get hasPreviousSegment(): boolean {
+    const networth_history = this.analytics?.collections.find(e => e.name === 'networth-history')
+    const segments = networth_history?.datasets.map(e => e.name)
+    return segments?.includes('previous') || false
+  }
+
+  get culture(): string {
+    return 'nl-BE'
   }
 }

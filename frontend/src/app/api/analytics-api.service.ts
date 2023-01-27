@@ -9,7 +9,21 @@ import { environment } from 'src/environments/environment'
 export class AnalyticsApiService {
   constructor(private http: HttpClient) { }
 
-  get(): Promise<any> {
-    return firstValueFrom(this.http.get<any>(`${environment.api}analytics`))
+  get(): Promise<IGetAnalytics> {
+    return firstValueFrom(this.http.get<IGetAnalytics>(`${environment.api}analytics`))
   }
+}
+
+export interface IGetAnalytics {
+  collections: IGetAnalyticsCollection[]
+}
+
+export interface IGetAnalyticsCollection {
+  name: string
+  datasets: IGetAnalyticsDataset[]
+}
+
+export interface IGetAnalyticsDataset {
+  name: string
+  rows: any[]
 }

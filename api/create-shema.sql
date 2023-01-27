@@ -1164,6 +1164,40 @@ AS BEGIN
   SELECT [date] = cast([date] as DATE), [value] = [value]
   FROM [networth].[snapshots]
   WHERE (cast([date] as DATE) < cast((getdate()-365) as date) AND cast([date] as DATE) > cast((getdate()-730) as date)) AND [user_id] = @user_id
+
+  -- monthly income vs budget (last 6 months) (group by month)
+  DECLARE @budget_income MONEY
+  SELECT @budget_income = SUM([income].[value])
+  FROM [budget].[incomes] [income]
+  WHERE [income].[year] = YEAR(GETUTCDATE()) AND [income].[user_id] = @user_id
+
+  SELECT [value] = SUM([entry].[amount]),
+    [budget] = @budget_income,
+    [date] = DATEADD(DAY, 1, EOMONTH([entry].[date], -1))
+  FROM [journal].[entries] [entry]
+  WHERE [entry].[user_id] = @user_id
+    AND [entry].[direction] = 1
+    AND [entry].[date] > cast((getdate()-182.5) as date)
+  GROUP BY DATEADD(DAY, 1, EOMONTH([entry].[date], -1))
+
+  -- monthly expense vs budget (last 6 months) (group by month)
+  DECLARE @budget_expense MONEY
+  SELECT @budget_expense = SUM([expense].[value])
+  FROM [budget].[expenses] [expense]
+  WHERE [expense].[year] = YEAR(GETUTCDATE()) AND [expense].[user_id] = @user_id
+
+  SELECT [value] = ABS(SUM([entry].[amount])),
+    [budget] = @budget_expense,
+    [date] = DATEADD(DAY, 1, EOMONTH([entry].[date], -1))
+  FROM [journal].[entries] [entry]
+  WHERE [entry].[user_id] = @user_id
+    AND [entry].[direction] = 0
+    AND [entry].[date] > cast((getdate()-182.5) as date)
+  GROUP BY DATEADD(DAY, 1, EOMONTH([entry].[date], -1))
+
+  -- budget balance vs actual net worth growth / decline
+  select [value] = 1,
+    [date] = GETUTCDATE()
 END
 GO
 

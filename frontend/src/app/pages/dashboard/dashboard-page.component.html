@@ -1,11 +1,17 @@
 <div class="flex flex-wrap w-full max-w-screen-xl mx-auto p-6 md:p-8">
+  <!-- <blockquote class="p-4 border-l-4 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-800">
+    <p class="text-xl italic font-medium leading-relaxed text-gray-900 dark:text-gray-200">
+      Op deze pagina krijg je overzicht van al je uitgaven, inkomens, gemiddeldes, maandelijkse vergelijking,
+      voorspellingen en waarschuwingen indien je over je budget gaat.
+    </p>
+  </blockquote> -->
   <div class="flex items-center justify-between w-full">
     <div>
       <div class="text-3xl font-semibold tracking-tight leading-8">
-        Dashboard
+        Overzicht
       </div>
       <div class="font-medium tracking-tight text-secondary">
-        Monitor metrics, check reports and review performance
+        Monitor je netto-waarde, check de gezondheid van je potefeuille and volg de loop van je budget op
       </div>
     </div>
     <div class="flex items-center ml-6">
@@ -19,25 +25,25 @@
   </div>
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full mt-8">
     <div class="flex flex-col flex-auto bg-gray-800 dark text-white shadow rounded-2xl overflow-hidden
-          dark:shadow-none sm:col-span-2 lg:col-span-3" *ngIf="visitors">
+          dark:shadow-none sm:col-span-2 lg:col-span-3" *ngIf="networth_history">
       <div class="flex items-center justify-between mt-10 ml-10 mr-6 sm:mr-10">
         <div class="flex flex-col">
-          <div class="mr-4 text-2xl md:text-3xl font-semibold tracking-tight leading-7">Visitors Overview</div>
-          <div class="font-medium text-secondary">Number of unique visitors</div>
+          <div class="mr-4 text-2xl md:text-3xl font-semibold tracking-tight leading-7">Nettowaarde historie</div>
+          <div class="font-medium text-secondary">Nettowaarde evolutie over een periode van 1 jaar</div>
         </div>
         <div class="ml-2">
           <div class="space-x-1 rounded-full overflow-hidden border-none font-medium">
             <div class="inline-flex relative font-medium border-none">
               <button class="text-gray-400 rounded-full px-6 h-10 border-none disabled:bg-gray-300 hover:bg-gray-700"
                 [ngClass]="{ 'text-gray-50 bg-gray-700': activeSegment === 'previous' }"
-                (click)="activateSegment('previous')">
+                (click)="activateSegment('previous')" *ngIf="hasPreviousSegment">
                 Last year
               </button>
             </div>
             <div class="inline-flex relative font-medium border-none">
               <button class="text-gray-400 rounded-full px-6 h-10 border-none disabled:bg-gray-300 hover:bg-gray-700"
                 [ngClass]="{ 'text-gray-50 bg-gray-700': activeSegment === 'current' }"
-                (click)="activateSegment('current')">
+                (click)="activateSegment('current')" *ngIf="hasCurrentSegment">
                 This year
               </button>
             </div>
@@ -45,18 +51,20 @@
         </div>
       </div>
       <div class="flex flex-col flex-auto h-80 mt-6">
-        <apx-chart class="flex-auto w-full h-full" [series]="visitors.options.series" [xaxis]="visitors.options.xaxis"
-          [yaxis]="visitors.options.yaxis" [chart]="visitors.options.chart" [stroke]="visitors.options.stroke"
-          [dataLabels]="visitors.options.dataLabels" [colors]="visitors.options.colors" [grid]="visitors.options.grid"
-          [legend]="visitors.options.legend" [fill]="visitors.options.fill" [tooltip]="visitors.options.tooltip">
+        <apx-chart class="flex-auto w-full h-full" [series]="networth_history.options.series"
+          [xaxis]="networth_history.options.xaxis" [yaxis]="networth_history.options.yaxis"
+          [stroke]="networth_history.options.stroke" [dataLabels]="networth_history.options.dataLabels"
+          [colors]="networth_history.options.colors" [grid]="networth_history.options.grid"
+          [legend]="networth_history.options.legend" [fill]="networth_history.options.fill"
+          [tooltip]="networth_history.options.tooltip" [chart]="networth_history.options.chart">
         </apx-chart>
       </div>
     </div>
 
     <div class="flex flex-col flex-auto bg-white shadow rounded-2xl overflow-hidden dark:bg-gray-800 dark:shadow-none
-          sm:col-span-2 lg:col-span-1" *ngIf="users">
+          sm:col-span-2 lg:col-span-1" *ngIf="incomeVsBudget">
       <div class="flex items-start justify-between m-6 mb-0">
-        <div class="text-lg font-medium tracking-tight leading-6 truncate">Active users</div>
+        <div class="text-lg font-medium tracking-tight leading-6 truncate">Inkomen reël vs budget</div>
         <div class="ml-2">
           <div
             class="h-6 min-h-6 px-2 rounded-full cursor-pointer bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
@@ -81,17 +89,18 @@
       </div>
       <div class="flex flex-col lg:flex-row lg:items-center mx-6 mt-3">
         <div class="text-7xl font-bold tracking-tighter leading-tight">
-          {{ users.current | number }}
+          {{ incomeVsBudget.current | currency:'EUR':'symbol-narrow':'1.2-2':culture }}
         </div>
         <div class="flex lg:flex-col lg:ml-3">
-          <i class="far text-lg" [ngClass]="{ 'text-red-500 fa-chart-line-down': users.pos == 0, 'text-green-500 fa-chart-line': users.pos == 1
+          <i class="far text-lg" [ngClass]="{ 'text-red-500 fa-chart-line-down': incomeVsBudget.pos == 0, 'text-green-500 fa-chart-line': incomeVsBudget.pos == 1
                 }"></i>
           <div class="flex items-center ml-1 lg:ml-0 lg:mt-0.5 text-md leading-none whitespace-nowrap text-secondary">
             <span class="font-medium"
-              [ngClass]="{ 'text-red-500': users.pos == 0, 'text-green-500': users.pos == 1 }">{{ users.result | percent
+              [ngClass]="{ 'text-red-500': incomeVsBudget.pos == 0, 'text-green-500': incomeVsBudget.pos == 1 }">{{
+              incomeVsBudget.result | percent
               }}</span>
-            <span class="ml-1" *ngIf="users.pos == 0">below target</span>
-            <span class="ml-1" *ngIf="users.pos == 1">above target</span>
+            <span class="ml-1" *ngIf="incomeVsBudget.pos == 0">below target</span>
+            <span class="ml-1" *ngIf="incomeVsBudget.pos == 1">above target</span>
           </div>
         </div>
       </div>
@@ -99,26 +108,28 @@
         <!-- show 7 days excluding today in this chart when timespan is 1 day -->
         <!-- show 4 weeks excluding this week in this chart when timespan is 1 week -->
         <!-- show 6 months excluding this month in this chart when timespan is 1 month -->
-        <apx-chart class="flex-auto w-full h-full" [series]="users.options.series" [xaxis]="users.options.xaxis"
-          [yaxis]="users.options.yaxis" [chart]="users.options.chart" [stroke]="users.options.stroke"
-          [dataLabels]="users.options.dataLabels" [colors]="users.options.colors" [grid]="users.options.grid"
-          [legend]="users.options.legend" [tooltip]="users.options.tooltip">
+        <apx-chart class="flex-auto w-full h-full" [series]="incomeVsBudget.options.series"
+          [xaxis]="incomeVsBudget.options.xaxis" [yaxis]="incomeVsBudget.options.yaxis"
+          [chart]="incomeVsBudget.options.chart" [stroke]="incomeVsBudget.options.stroke"
+          [dataLabels]="incomeVsBudget.options.dataLabels" [colors]="incomeVsBudget.options.colors"
+          [grid]="incomeVsBudget.options.grid" [legend]="incomeVsBudget.options.legend"
+          [tooltip]="incomeVsBudget.options.tooltip">
         </apx-chart>
       </div>
     </div>
 
     <div class="flex flex-col flex-auto bg-white shadow rounded-2xl overflow-hidden dark:bg-gray-800 dark:shadow-none
-          sm:col-span-2 lg:col-span-1" *ngIf="impressions">
+          sm:col-span-2 lg:col-span-1" *ngIf="expensesVsBudget">
       <div class="flex items-start justify-between m-6 mb-0">
-        <div class="text-lg font-medium tracking-tight leading-6 truncate">Impressions</div>
+        <div class="text-lg font-medium tracking-tight leading-6 truncate">Uitgaven reël vs budget</div>
         <div class="ml-2">
           <div
             class="h-6 min-h-6 px-2 rounded-full cursor-pointer bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
-            [matMenuTriggerFor]="impressionsTimespanSelection">
+            [matMenuTriggerFor]="expensesVsBudgetTimespanSelection">
             <span class="font-medium text-sm text-secondary">1 day</span>
           </div>
 
-          <mat-menu class="shadow-2xl bg-white dark:bg-gray-900 rounded" #impressionsTimespanSelection>
+          <mat-menu class="shadow-2xl bg-white dark:bg-gray-900 rounded" #expensesVsBudgetTimespanSelection>
             <ng-template matMenuContent>
               <button class="rounded dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600" mat-menu-item>
                 1 day
@@ -135,35 +146,37 @@
       </div>
       <div class="flex flex-col lg:flex-row lg:items-center mx-6 mt-3">
         <div class="text-7xl font-bold tracking-tighter leading-tight">
-          {{ impressions.current | number }}
+          {{ expensesVsBudget.current | currency:'EUR':'symbol-narrow':'1.2-2':culture }}
         </div>
         <div class="flex lg:flex-col lg:ml-3">
-          <i class="far text-lg" [ngClass]="{ 'text-red-500 fa-chart-line-down': impressions.pos == 0, 'text-green-500 fa-chart-line':
-                impressions.pos == 1
+          <i class="far text-lg" [ngClass]="{ 'text-red-500 fa-chart-line-down': expensesVsBudget.pos == 0, 'text-green-500 fa-chart-line':
+                expensesVsBudget.pos == 1
                 }"></i>
           <div class="flex items-center ml-1 lg:ml-0 lg:mt-0.5 text-md leading-none whitespace-nowrap text-secondary">
             <span class="font-medium"
-              [ngClass]="{ 'text-red-500': impressions.pos == 0, 'text-green-500': impressions.pos == 1 }">{{
-              impressions.result | percent }}</span>
-            <span class="ml-1" *ngIf="impressions.pos == 0">below target</span>
-            <span class="ml-1" *ngIf="impressions.pos == 1">above target</span>
+              [ngClass]="{ 'text-red-500': expensesVsBudget.pos == 0, 'text-green-500': expensesVsBudget.pos == 1 }">
+              {{ expensesVsBudget.result | percent }}
+            </span>
+            <span class="ml-1" *ngIf="expensesVsBudget.pos == 0">below target</span>
+            <span class="ml-1" *ngIf="expensesVsBudget.pos == 1">above target</span>
           </div>
         </div>
       </div>
       <div class="flex flex-col flex-auto h-20">
-        <apx-chart class="flex-auto w-full h-full" [series]="impressions.options.series"
-          [xaxis]="impressions.options.xaxis" [yaxis]="impressions.options.yaxis" [chart]="impressions.options.chart"
-          [stroke]="impressions.options.stroke" [dataLabels]="impressions.options.dataLabels"
-          [colors]="impressions.options.colors" [grid]="impressions.options.grid" [legend]="impressions.options.legend"
-          [tooltip]="impressions.options.tooltip">
+        <apx-chart class="flex-auto w-full h-full" [series]="expensesVsBudget.options.series"
+          [xaxis]="expensesVsBudget.options.xaxis" [yaxis]="expensesVsBudget.options.yaxis"
+          [chart]="expensesVsBudget.options.chart" [stroke]="expensesVsBudget.options.stroke"
+          [dataLabels]="expensesVsBudget.options.dataLabels" [colors]="expensesVsBudget.options.colors"
+          [grid]="expensesVsBudget.options.grid" [legend]="expensesVsBudget.options.legend"
+          [tooltip]="expensesVsBudget.options.tooltip">
         </apx-chart>
       </div>
     </div>
 
     <div class="flex flex-col flex-auto bg-white shadow rounded-2xl overflow-hidden dark:bg-gray-800 dark:shadow-none
-          sm:col-span-2 lg:col-span-1" *ngIf="registrations">
+          sm:col-span-2 lg:col-span-1" *ngIf="balanceVsNetworthDiff">
       <div class="flex items-start justify-between m-6 mb-0">
-        <div class="text-lg font-medium tracking-tight leading-6 truncate">Registrations</div>
+        <div class="text-lg font-medium tracking-tight leading-6 truncate">Yee</div>
         <div class="ml-2">
           <div
             class="h-6 min-h-6 px-2 rounded-full cursor-pointer bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
@@ -188,28 +201,28 @@
       </div>
       <div class="flex flex-col lg:flex-row lg:items-center mx-6 mt-3">
         <div class="text-7xl font-bold tracking-tighter leading-tight">
-          {{ registrations.current | number }}
+          {{ balanceVsNetworthDiff.current | currency:'EUR':'symbol-narrow':'1.2-2':culture }}
         </div>
         <div class="flex lg:flex-col lg:ml-3">
-          <i class="far text-lg" [ngClass]="{ 'text-red-500 fa-chart-line-down': registrations.pos == 0, 'text-green-500 fa-chart-line':
-                registrations.pos
+          <i class="far text-lg" [ngClass]="{ 'text-red-500 fa-chart-line-down': balanceVsNetworthDiff.pos == 0, 'text-green-500 fa-chart-line':
+                balanceVsNetworthDiff.pos
                 == 1 }"></i>
           <div class="flex items-center ml-1 lg:ml-0 lg:mt-0.5 text-md leading-none whitespace-nowrap text-secondary">
             <span class="font-medium"
-              [ngClass]="{ 'text-red-500': registrations.pos == 0, 'text-green-500': registrations.pos == 1 }">{{
-              registrations.result | percent }}</span>
-            <span class="ml-1" *ngIf="registrations.pos == 0">below target</span>
-            <span class="ml-1" *ngIf="registrations.pos == 1">above target</span>
+              [ngClass]="{ 'text-red-500': balanceVsNetworthDiff.pos == 0, 'text-green-500': balanceVsNetworthDiff.pos == 1 }">{{
+              balanceVsNetworthDiff.result | percent }}</span>
+            <span class="ml-1" *ngIf="balanceVsNetworthDiff.pos == 0">below target</span>
+            <span class="ml-1" *ngIf="balanceVsNetworthDiff.pos == 1">above target</span>
           </div>
         </div>
       </div>
       <div class="flex flex-col flex-auto h-20">
-        <apx-chart class="flex-auto w-full h-full" [series]="registrations.options.series"
-          [xaxis]="registrations.options.xaxis" [yaxis]="registrations.options.yaxis"
-          [chart]="registrations.options.chart" [stroke]="registrations.options.stroke"
-          [dataLabels]="registrations.options.dataLabels" [colors]="registrations.options.colors"
-          [grid]="registrations.options.grid" [legend]="registrations.options.legend"
-          [tooltip]="registrations.options.tooltip">
+        <apx-chart class="flex-auto w-full h-full" [series]="balanceVsNetworthDiff.options.series"
+          [xaxis]="balanceVsNetworthDiff.options.xaxis" [yaxis]="balanceVsNetworthDiff.options.yaxis"
+          [chart]="balanceVsNetworthDiff.options.chart" [stroke]="balanceVsNetworthDiff.options.stroke"
+          [dataLabels]="balanceVsNetworthDiff.options.dataLabels" [colors]="balanceVsNetworthDiff.options.colors"
+          [grid]="balanceVsNetworthDiff.options.grid" [legend]="balanceVsNetworthDiff.options.legend"
+          [tooltip]="balanceVsNetworthDiff.options.tooltip">
         </apx-chart>
       </div>
     </div>
