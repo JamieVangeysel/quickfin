@@ -334,18 +334,12 @@ export class DashboardPageComponent implements OnInit {
               pos: lastValue.value > lastValue.budget,
               options: {
                 ...demoTriChart,
-                colors: ['#34d399', '#ffffff00'],
+                colors: ['#34d399'],
                 series: [{
                   name: 'Inkomen',
                   data: incomesCard.rows.map(e => ({
                     x: new Date(e.date).getTime(),
                     y: e.value
-                  }))
-                }, {
-                  name: 'Budget',
-                  data: incomesCard.rows.map(e => ({
-                    x: new Date(e.date).getTime(),
-                    y: e.budget
                   }))
                 }],
               }
@@ -359,18 +353,12 @@ export class DashboardPageComponent implements OnInit {
               pos: lastValue.value > lastValue.budget,
               options: {
                 ...demoTriChart,
-                colors: ['#fb7185', '#ffffff00'],
+                colors: ['#fb7185'],
                 series: [{
                   name: 'Uitgaven',
                   data: expensesCard.rows.map(e => ({
                     x: new Date(e.date).getTime(),
                     y: e.value
-                  }))
-                }, {
-                  name: 'Budget',
-                  data: expensesCard.rows.map(e => ({
-                    x: new Date(e.date).getTime(),
-                    y: e.budget
                   }))
                 }],
               }
@@ -384,14 +372,8 @@ export class DashboardPageComponent implements OnInit {
               pos: 1,
               options: {
                 ...demoTriChart,
-                colors: ['#38bdf8', '#ffffff00'],
+                colors: ['#38bdf8'],
                 series: [{
-                  name: 'Balans',
-                  data: balanceCard.rows.map(e => ({
-                    x: new Date(e.date).getTime(),
-                    y: e.value
-                  }))
-                }, {
                   name: 'Nettowaarde verschil',
                   data: balanceCard.rows.map(e => ({
                     x: new Date(e.date).getTime(),

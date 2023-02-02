@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core'
 import { IJournalEntry, JournalApiService } from 'src/app/api/journal-api.service'
+import { AuthService } from 'src/app/auth/auth.service'
 
 @Component({
   selector: 'qf-expenses-page',
@@ -14,6 +15,7 @@ export class ExpensesPageComponent {
 
   constructor(
     private ref: ChangeDetectorRef,
+    private auth: AuthService,
     private journalApi: JournalApiService
   ) { }
 
@@ -142,6 +144,10 @@ export class ExpensesPageComponent {
 
   get expenses(): IJournalEntry[] {
     return this._expenses
+  }
+
+  get id(): any {
+    return this.auth.id_token
   }
 
   get culture(): string {

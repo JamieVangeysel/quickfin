@@ -47,6 +47,10 @@ body {
   --border-color: #d2d8e0
 }
 
+.dark * {
+  --border-color: #4b5563 !important
+}
+
 @media (prefers-color-scheme: dark) {
   * {
     --border-color: #4b5563

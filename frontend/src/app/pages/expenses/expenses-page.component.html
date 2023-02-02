@@ -1,12 +1,24 @@
-<div class="w-full pt-4">
+<div class="w-full py-10 px-5">
   <div class="flex flex-col flex-auto space-y-4">
     <div class="flex flex-col px-2 md:flex-row mb-4 gap-4">
       <div id="expenses" class="w-full">
-        <div class="text-4xl font-medium text-center mb-2" (dblclick)="create()"
-          (contextmenu)="create();$event.preventDefault()">Uitgaven
+        <div class="justify-between md:flex min-h-[40px]">
+          <div class="flex justify-between items-center">
+            <div class="text-4xl font-medium">
+              Uitgaven
+            </div>
+          </div>
+          <div class="mt-4 md:mt-0 flex flex-col items-start sm:flex-row sm:space-x-4 shrink-0">
+            <button
+              class="bg-lynch-500 text-white rounded-full px-1 px-5 h-10 disabled:bg-gray-300 border-none hover:bg-lynch-600"
+              tabindex="0" title="Uitgave aanmaken" (click)="create()">
+              <i class="far fa-plus"></i>&nbsp;
+              <span class="hidden md:inline-flex">Uitgave toevoegen</span>
+            </button>
+          </div>
         </div>
-        <div class="">
-          <div class="flex flex-row px-3 py-2 bg-gray-300 dark:bg-gray-600">
+        <div class="mt-12">
+          <div class="flex flex-row px-4 py-3 font-bold bg-gray-200 dark:text-gray-300 dark:bg-gray-700 rounded-t-xl">
             <div class="w-32">
               Datum
             </div>
@@ -16,29 +28,56 @@
             <div class="w-24 text-right">
               Bedrag
             </div>
+            <div class="w-12">
+              &nbsp;
+            </div>
           </div>
 
-          <div class="flex flex-row px-3 py-2 bg-white dark:bg-gray-800" *ngFor="let expense of expenses"
-            (click)="edit(expense)" (dblclick)="delete(expense)"
-            (contextmenu)="delete(expense);$event.preventDefault()">
+          <div
+            class="flex flex-row items-center px-4 py-2 bg-white dark:text-gray-400 dark:bg-gray-800 dark:border-b last:rounded-b-xl last:border-0"
+            *ngFor="let expense of expenses">
             <div class="w-32">
               {{ expense.date | date:'d MMMM YYYY':undefined:culture }}
             </div>
             <div class="flex-auto">
-              {{ expense.name }} ({{ expense.category }})
+              <span class="text-black dark:text-white">{{ expense.name }}</span>
+              <br>
+              <span>{{ expense.category }}</span>
             </div>
             <div class="w-24 text-right">
               {{ expense.amount | currency:'EUR':'symbol-narrow':'1.2-2':culture }}
+            </div>
+            <div class="w-12">
+              <div
+                class="flex justify-center items-center ml-2 w-10 h-10 rounded-full cursor-pointer bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
+                [matMenuTriggerFor]="actions">
+                <span class="font-medium text-sm dark:text-white">
+                  <i class="far text-lg fa-ellipsis-v"></i>
+                </span>
+              </div>
+
+              <mat-menu class="shadow-2xl bg-white dark:bg-gray-900 rounded" #actions>
+                <ng-template matMenuContent>
+                  <button (click)="edit(expense)"
+                    class="rounded dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600" mat-menu-item>
+                    Bewerken
+                  </button>
+                  <button (click)="delete(expense)"
+                    class="rounded dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600" mat-menu-item>
+                    Verwijderen
+                  </button>
+                </ng-template>
+              </mat-menu>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <blockquote class="p-4 border-l-4 mx-2 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-800">
+    <!-- <blockquote class="p-4 border-l-4 mx-2 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-800">
       <p class="text-xl italic font-medium leading-relaxed text-gray-900 dark:text-gray-200">
         Op deze pagina krijg je een lijst van al je uitgaande gelden.
       </p>
-    </blockquote>
+    </blockquote> -->
   </div>
 </div>
