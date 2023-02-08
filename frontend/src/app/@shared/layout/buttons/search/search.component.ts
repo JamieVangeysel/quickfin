@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core'
 
 @Component({
   selector: 'qf-search',
@@ -6,5 +6,18 @@ import { ChangeDetectionStrategy, Component } from '@angular/core'
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SearchComponent {
-  constructor() { }
+  public active: boolean = false
+
+  constructor(
+    private ref: ChangeDetectorRef
+  ) { }
+
+  close(): void {
+    this.active = false
+    this.ref.markForCheck()
+  }
+
+  toggle(): void {
+    this.active = !this.active
+  }
 }
