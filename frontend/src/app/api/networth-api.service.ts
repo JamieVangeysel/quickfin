@@ -9,6 +9,10 @@ import { environment } from 'src/environments/environment'
 export class NetworthApiService {
   constructor(private http: HttpClient) { }
 
+  get(): Promise<IGetNetworthResponse> {
+    return firstValueFrom(this.http.get<IGetNetworthResponse>(`${environment.api}networth`))
+  }
+
   getOverview(): Promise<IGetNetworthOverviewResponse> {
     return firstValueFrom(this.http.get<IGetNetworthOverviewResponse>(`${environment.api}networth/overview`))
   }
@@ -44,6 +48,10 @@ export class NetworthApiService {
   deleteLiability(id: number): Promise<IPostResponse> {
     return firstValueFrom(this.http.delete<IPostResponse>(`${environment.api}networth/liabilities/${id}`))
   }
+}
+
+export interface IGetNetworthResponse {
+  value: number
 }
 
 export interface IGetNetworthOverviewResponse {

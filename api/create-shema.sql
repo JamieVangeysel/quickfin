@@ -426,6 +426,26 @@ VALUES ('Langlopende schulden'), ('Kortlopende schulden') -- change to english l
 -- DBCC CHECKIDENT ('[networth].[assetGroups]')
 -- DBCC CHECKIDENT ('[networth].[liabilityGroups]')
 
+CREATE PROCEDURE [networth].[usp_get]
+  @user_id INT
+WITH EXECUTE AS 'networth_agent'
+AS BEGIN
+  SELECT [value] = (
+    (
+      SELECT SUM([value])
+      FROM [networth].[assets] [asset]
+      WHERE [asset].[user_id] = [user].[id]
+    ) - (
+      SELECT SUM([value])
+      FROM [networth].[liabilities] [liability]
+      WHERE [liability].[user_id] = [user].[id]
+    )
+  )
+  FROM [sso].[users] [user]
+  FOR JSON PATH
+END
+GO
+
 CREATE PROCEDURE [networth].[usp_getOverview]
   @user_id INT
 WITH EXECUTE AS 'networth_agent'
@@ -505,6 +525,7 @@ AS BEGIN
 END
 GO
 
+GRANT EXEC ON [networth].[usp_get] TO [sso] -- TEMPORARY ACTION
 GRANT EXEC ON [networth].[usp_getOverview] TO [sso] -- TEMPORARY ACTION
 GRANT EXEC ON [networth].[usp_getAssets] TO [sso] -- TEMPORARY ACTION
 GRANT EXEC ON [networth].[usp_getLiabilities] TO [sso] -- TEMPORARY ACTION
