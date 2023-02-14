@@ -10,7 +10,7 @@ import { AuthService } from './auth/auth.service'
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'flex flex-auto w-full h-full',
-    'emp-version': pck.version
+    'qf-version': pck.version
   }
 })
 export class AppComponent {
