@@ -54,6 +54,29 @@ exports.get = async (user_id) => {
       })
     }
 
+    if (result.recordsets.length > 5 && result.recordsets[5].length && /* for JSON responses we get an extra array, so we use an extra [0] */
+      result.recordsets.length > 6 && result.recordsets[6].length && /* for JSON responses we get an extra array, so we use an extra [0] */
+      result.recordsets.length > 7 && result.recordsets[7].length && /* for JSON responses we get an extra array, so we use an extra [0] */
+      result.recordsets.length > 8 && result.recordsets[8].length) { /* for JSON responses we get an extra array, so we use an extra [0] */
+      // create collection for 3 by 1 grid
+      resp.collections.push({
+        name: 'donuts',
+        datasets: [{
+          name: 'expenses-now',
+          rows: result.recordsets[5]
+        }, {
+          name: 'expenses-prev',
+          rows: result.recordsets[6]
+        }, {
+          name: 'incomes-now',
+          rows: result.recordsets[7]
+        }, {
+          name: 'incomes-prev',
+          rows: result.recordsets[8]
+        }]
+      })
+    }
+
     return resp
   }
   return null

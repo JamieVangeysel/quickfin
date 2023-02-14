@@ -1219,6 +1219,75 @@ AS BEGIN
   -- budget balance vs actual net worth growth / decline
   select [value] = 1,
     [date] = GETUTCDATE()
+
+  -- get expenses value/% per category feb, jan
+  -- get incomes  value/% per category feb, jan
+  DECLARE @expensesValueNow  MONEY = 0.00
+  DECLARE @expensesValuePrev MONEY = 0.00
+  DECLARE @incomesValueNow   MONEY = 0.00
+  DECLARE @incomesValuePrev  MONEY = 0.00
+
+  SELECT @expensesValueNow = ABS(SUM([entry].[amount]))
+  FROM [journal].[entries] [entry]
+  WHERE [entry].[user_id] = @user_id
+    AND [entry].[direction] = 0
+    AND DATEADD(DAY, 1, EOMONTH([entry].[date], -1)) = DATEADD(DAY, 1, EOMONTH(GETUTCDATE(), -1))
+
+  SELECT @expensesValuePrev = ABS(SUM([entry].[amount]))
+  FROM [journal].[entries] [entry]
+  WHERE [entry].[user_id] = @user_id
+    AND [entry].[direction] = 0
+    AND DATEADD(DAY, 1, EOMONTH([entry].[date], -1)) = DATEADD(DAY, 1, EOMONTH(GETUTCDATE()-1, -1))
+
+  SELECT @incomesValueNow = ABS(SUM([entry].[amount]))
+  FROM [journal].[entries] [entry]
+  WHERE [entry].[user_id] = @user_id
+    AND [entry].[direction] = 1
+    AND DATEADD(DAY, 1, EOMONTH([entry].[date], -1)) = DATEADD(DAY, 1, EOMONTH(GETUTCDATE(), -1))
+
+  SELECT @incomesValuePrev = ABS(SUM([entry].[amount]))
+  FROM [journal].[entries] [entry]
+  WHERE [entry].[user_id] = @user_id
+    AND [entry].[direction] = 1
+    AND DATEADD(DAY, 1, EOMONTH([entry].[date], -1)) = DATEADD(DAY, 1, EOMONTH(GETUTCDATE()-1, -1))
+
+  -- expenses
+  SELECT [value] = ABS(SUM([entry].[amount])),
+    [category] = [entry].[category],
+    [percent] = ABS(SUM([entry].[amount])) / @expensesValueNow
+  FROM [journal].[entries] [entry]
+  WHERE [entry].[user_id] = @user_id
+    AND [entry].[direction] = 0
+    AND DATEADD(DAY, 1, EOMONTH([entry].[date], -1)) = DATEADD(DAY, 1, EOMONTH(GETUTCDATE(), 1))
+  GROUP BY [entry].[category]
+
+  SELECT [value] = ABS(SUM([entry].[amount])),
+    [category] = [entry].[category],
+    [percent] = ABS(SUM([entry].[amount])) / @expensesValuePrev
+  FROM [journal].[entries] [entry]
+  WHERE [entry].[user_id] = @user_id
+    AND [entry].[direction] = 0
+    AND DATEADD(DAY, 1, EOMONTH([entry].[date], -1)) = DATEADD(DAY, 1, EOMONTH(GETUTCDATE(), -1))
+  GROUP BY [entry].[category]
+
+  -- incomes
+  SELECT [value] = ABS(SUM([entry].[amount])),
+    [category] = [entry].[category],
+    [percent] = ABS(SUM([entry].[amount])) / @incomesValueNow
+  FROM [journal].[entries] [entry]
+  WHERE [entry].[user_id] = @user_id
+    AND [entry].[direction] = 1
+    AND DATEADD(DAY, 1, EOMONTH([entry].[date], -1)) = DATEADD(DAY, 1, EOMONTH(GETUTCDATE(), 1))
+  GROUP BY [entry].[category]
+
+  SELECT [value] = ABS(SUM([entry].[amount])),
+    [category] = [entry].[category],
+    [percent] = ABS(SUM([entry].[amount])) / @incomesValuePrev
+  FROM [journal].[entries] [entry]
+  WHERE [entry].[user_id] = @user_id
+    AND [entry].[direction] = 1
+    AND DATEADD(DAY, 1, EOMONTH([entry].[date], -1)) = DATEADD(DAY, 1, EOMONTH(GETUTCDATE(), -1))
+  GROUP BY [entry].[category]
 END
 GO
 
