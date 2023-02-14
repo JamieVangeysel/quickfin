@@ -13,32 +13,35 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(private auth: AuthService) { }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    return next.handle(this.addAuthToken(request)).pipe(
-      catchError((requestError: HttpErrorResponse) => {
-        if (requestError && requestError.status === 401) {
-          if (this.refreshTokenInProgress) {
-            return this.refreshTokenSubject.pipe(
-              filter((result) => result !== undefined),
-              take(1),
-              switchMap(() => next.handle(this.addAuthToken(request)))
-            );
-          } else {
-            this.refreshTokenInProgress = true
-            this.refreshTokenSubject.next(undefined)
+    console.log(request.url)
+    if (request.url.includes('quickfin.be/api'))
+      return next.handle(this.addAuthToken(request)).pipe(
+        catchError((requestError: HttpErrorResponse) => {
+          if (requestError && requestError.status === 401) {
+            if (this.refreshTokenInProgress) {
+              return this.refreshTokenSubject.pipe(
+                filter((result) => result !== undefined),
+                take(1),
+                switchMap(() => next.handle(this.addAuthToken(request)))
+              );
+            } else {
+              this.refreshTokenInProgress = true
+              this.refreshTokenSubject.next(undefined)
 
-            return this.auth.refresh().pipe(
-              switchMap((token) => {
-                this.refreshTokenSubject.next(token)
-                return next.handle(this.addAuthToken(request))
-              }),
-              finalize(() => (this.refreshTokenInProgress = false))
-            );
+              return this.auth.refresh().pipe(
+                switchMap((token) => {
+                  this.refreshTokenSubject.next(token)
+                  return next.handle(this.addAuthToken(request))
+                }),
+                finalize(() => (this.refreshTokenInProgress = false))
+              );
+            }
+          } else {
+            return throwError(() => requestError)
           }
-        } else {
-          return throwError(() => new Error(requestError.message))
-        }
-      })
-    )
+        })
+      )
+    return next.handle(request)
   }
 
   addAuthToken(request: HttpRequest<any>) {

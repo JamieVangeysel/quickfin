@@ -14,16 +14,18 @@ export class AuthGuard implements CanActivate {
   }
 
   async canActivate(): Promise<boolean> {
-    if (this.auth.isAuthenticated()) {
-      return true
-    }
+    try {
+      if (this.auth.isAuthenticated()) {
+        return true
+      }
 
-    const token = await firstValueFrom(this.auth.refresh())
-    if (token) {
-      return true
+      const token = await firstValueFrom(this.auth.refresh())
+      if (token) {
+        return true
+      }
+    } catch (err) {
+      this.router.navigate(['/auth/sign-in'])
     }
-
-    this.router.navigate(['/auth/sign-in'])
     return false
   }
 }
