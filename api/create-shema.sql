@@ -1231,62 +1231,66 @@ AS BEGIN
   FROM [journal].[entries] [entry]
   WHERE [entry].[user_id] = @user_id
     AND [entry].[direction] = 0
-    AND DATEADD(DAY, 1, EOMONTH([entry].[date], -1)) = DATEADD(DAY, 1, EOMONTH(GETUTCDATE(), -1))
+    AND DATEADD(DAY, 1, EOMONTH([entry].[date], -1)) = DATEADD(MONTH, 0, DATEADD(DAY, 1, EOMONTH(GETUTCDATE(), -1)))
 
   SELECT @expensesValuePrev = ABS(SUM([entry].[amount]))
   FROM [journal].[entries] [entry]
   WHERE [entry].[user_id] = @user_id
     AND [entry].[direction] = 0
-    AND DATEADD(DAY, 1, EOMONTH([entry].[date], -1)) = DATEADD(DAY, 1, EOMONTH(GETUTCDATE()-1, -1))
+    AND DATEADD(DAY, 1, EOMONTH([entry].[date], -1)) = DATEADD(MONTH, -1, DATEADD(DAY, 1, EOMONTH(GETUTCDATE(), -1)))
 
   SELECT @incomesValueNow = ABS(SUM([entry].[amount]))
   FROM [journal].[entries] [entry]
   WHERE [entry].[user_id] = @user_id
     AND [entry].[direction] = 1
-    AND DATEADD(DAY, 1, EOMONTH([entry].[date], -1)) = DATEADD(DAY, 1, EOMONTH(GETUTCDATE(), -1))
+    AND DATEADD(DAY, 1, EOMONTH([entry].[date], -1)) = DATEADD(MONTH, 0, DATEADD(DAY, 1, EOMONTH(GETUTCDATE(), -1)))
 
   SELECT @incomesValuePrev = ABS(SUM([entry].[amount]))
   FROM [journal].[entries] [entry]
   WHERE [entry].[user_id] = @user_id
     AND [entry].[direction] = 1
-    AND DATEADD(DAY, 1, EOMONTH([entry].[date], -1)) = DATEADD(DAY, 1, EOMONTH(GETUTCDATE()-1, -1))
+    AND DATEADD(DAY, 1, EOMONTH([entry].[date], -1)) = DATEADD(MONTH, -1, DATEADD(DAY, 1, EOMONTH(GETUTCDATE(), -1)))
 
   -- expenses
   SELECT [value] = ABS(SUM([entry].[amount])),
     [category] = [entry].[category],
-    [percent] = ABS(SUM([entry].[amount])) / @expensesValueNow
+    [percent] = ABS(SUM([entry].[amount])) / @expensesValueNow,
+    [date] = DATEADD(DAY, 1, EOMONTH(min([entry].[date]), -1))
   FROM [journal].[entries] [entry]
   WHERE [entry].[user_id] = @user_id
     AND [entry].[direction] = 0
-    AND DATEADD(DAY, 1, EOMONTH([entry].[date], -1)) = DATEADD(DAY, 1, EOMONTH(GETUTCDATE(), 1))
+    AND DATEADD(DAY, 1, EOMONTH([entry].[date], -1)) = DATEADD(MONTH, 0, DATEADD(DAY, 1, EOMONTH(GETUTCDATE(), -1)))
   GROUP BY [entry].[category]
 
   SELECT [value] = ABS(SUM([entry].[amount])),
     [category] = [entry].[category],
-    [percent] = ABS(SUM([entry].[amount])) / @expensesValuePrev
+    [percent] = ABS(SUM([entry].[amount])) / @expensesValuePrev,
+    [date] = DATEADD(DAY, 1, EOMONTH(min([entry].[date]), -1))
   FROM [journal].[entries] [entry]
   WHERE [entry].[user_id] = @user_id
     AND [entry].[direction] = 0
-    AND DATEADD(DAY, 1, EOMONTH([entry].[date], -1)) = DATEADD(DAY, 1, EOMONTH(GETUTCDATE(), -1))
+    AND DATEADD(DAY, 1, EOMONTH([entry].[date], -1)) = DATEADD(MONTH, -1, DATEADD(DAY, 1, EOMONTH(GETUTCDATE(), -1)))
   GROUP BY [entry].[category]
 
   -- incomes
   SELECT [value] = ABS(SUM([entry].[amount])),
     [category] = [entry].[category],
-    [percent] = ABS(SUM([entry].[amount])) / @incomesValueNow
+    [percent] = ABS(SUM([entry].[amount])) / @incomesValueNow,
+    [date] = DATEADD(DAY, 1, EOMONTH(min([entry].[date]), -1))
   FROM [journal].[entries] [entry]
   WHERE [entry].[user_id] = @user_id
     AND [entry].[direction] = 1
-    AND DATEADD(DAY, 1, EOMONTH([entry].[date], -1)) = DATEADD(DAY, 1, EOMONTH(GETUTCDATE(), 1))
+    AND DATEADD(DAY, 1, EOMONTH([entry].[date], -1)) = DATEADD(MONTH, 0, DATEADD(DAY, 1, EOMONTH(GETUTCDATE(), -1)))
   GROUP BY [entry].[category]
 
   SELECT [value] = ABS(SUM([entry].[amount])),
     [category] = [entry].[category],
-    [percent] = ABS(SUM([entry].[amount])) / @incomesValuePrev
+    [percent] = ABS(SUM([entry].[amount])) / @incomesValuePrev,
+    [date] = DATEADD(DAY, 1, EOMONTH(min([entry].[date]), -1))
   FROM [journal].[entries] [entry]
   WHERE [entry].[user_id] = @user_id
     AND [entry].[direction] = 1
-    AND DATEADD(DAY, 1, EOMONTH([entry].[date], -1)) = DATEADD(DAY, 1, EOMONTH(GETUTCDATE(), -1))
+    AND DATEADD(DAY, 1, EOMONTH([entry].[date], -1)) = DATEADD(MONTH, -1, DATEADD(DAY, 1, EOMONTH(GETUTCDATE(), -1)))
   GROUP BY [entry].[category]
 END
 GO
