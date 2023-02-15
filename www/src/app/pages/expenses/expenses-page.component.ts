@@ -75,7 +75,7 @@ export class ExpensesPageComponent {
       formValue.id = expense.id
       formValue.amount = formValue.amount * -1
 
-      const response = expense.id > 0 ? await this.journalApi.updateEntry(formValue) : await this.journalApi.createEntry(expense)
+      const response = expense.id > 0 ? await this.journalApi.updateEntry(formValue) : await this.journalApi.createEntry(formValue)
       console.log(response)
 
       if (!response.success) {
