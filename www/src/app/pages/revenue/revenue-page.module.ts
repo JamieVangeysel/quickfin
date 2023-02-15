@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { RouterModule } from '@angular/router'
 import { RevenuePageComponent } from './revenue-page.component'
-import { MatMenuModule } from '@angular/material/menu'
+import { ReactiveFormsModule } from '@angular/forms'
 
 @NgModule({
   declarations: [
@@ -10,7 +10,7 @@ import { MatMenuModule } from '@angular/material/menu'
   ],
   imports: [
     CommonModule,
-    MatMenuModule,
+    ReactiveFormsModule,
     RouterModule.forChild([{
       path: '',
       component: RevenuePageComponent

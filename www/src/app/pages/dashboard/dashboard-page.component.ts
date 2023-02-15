@@ -294,7 +294,7 @@ export class DashboardPageComponent implements OnInit {
             options: {
               ...visitorsChart,
               series: [{
-                name: 'Netto-waarde historiek',
+                name: 'Netto-waarde',
                 data: networth_history?.datasets.find(e => e.name === 'current')?.rows.map(e => ({
                   x: new Date(e.date).getTime(),
                   y: e.value

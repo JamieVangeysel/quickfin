@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core'
+import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { IJournalEntry, JournalApiService } from 'src/app/api/journal-api.service'
 
 @Component({
@@ -10,10 +11,12 @@ import { IJournalEntry, JournalApiService } from 'src/app/api/journal-api.servic
   }
 })
 export class RevenuePageComponent {
-  private _revenues: IJournalEntry[] = []
+  private _forms: { [key: string]: FormGroup } = {}
+  private _revenues: ListItem[] = []
 
   constructor(
     private ref: ChangeDetectorRef,
+    private fb: FormBuilder,
     private journalApi: JournalApiService
   ) { }
 
@@ -21,9 +24,10 @@ export class RevenuePageComponent {
     try {
       const journal = await this.journalApi.getEntries(true)
       if (journal) {
-        this._revenues = journal ?? []
+        journal.forEach(e => e.amount = Math.abs(e.amount))
+        this._revenues = journal as ListItem[]
+        this._revenues.forEach(e => e.editing = false)
       }
-      console.log(this.revenues)
     } catch (err) {
       console.log(err)
     } finally {
@@ -31,95 +35,67 @@ export class RevenuePageComponent {
     }
   }
 
-  async create() {
-    const newLabel = prompt('Label: ')
-    if (!newLabel) return
-    const newCategory = prompt('Categorie: ')
-    if (!newCategory) return
-    const newDate = prompt('Datum: ')
-    if (!newDate) return
-    const newAmount = prompt('Waarde: ')
-    if (!newAmount) return
+  edit(item: ListItem) {
+    item.editing = !item.editing
+    if (!this._forms[item.id]) {
+      let date = item.date.toString().split('T')[0]
+      if (item.date instanceof Date) {
+        date = item.date.toISOString().split('T')[0]
+      }
+      this._forms[item.id] = this.fb.group({
+        name: [item.name, [Validators.required]],
+        category: [item.category, [Validators.required]],
+        date: [date, [Validators.required, Validators.pattern('[0-9]{4}-[0-9]{2}-[0-9]{2}')]],
+        amount: [item.amount, [Validators.required]]
+      })
+    }
+    this.ref.markForCheck()
+  }
 
-    if (+newAmount >= 0 && newDate.length > 0 && newLabel.length > 0 && newCategory.length > 0 && newDate.match('[0-9]{4}-[0-9]{2}-[0-9]{2}')) {
-      // try to create item !
-      try {
-        const resp = await this.journalApi.createEntry({
-          name: newLabel,
-          category: newCategory,
-          amount: +newAmount,
-          date: new Date(Date.parse(newDate))
-        })
+  beginCreate() {
+    if (this.isCreating) return
 
-        if (resp.success) {
-          // alert('Aangemaakt!')
+    const item: ListItem = {
+      id: 0,
+      name: '',
+      category: '',
+      date: new Date(),
+      amount: 0,
+      editing: false
 
-          if (!this._revenues) this._revenues = []
-          if (this._revenues) {
-            this._revenues.push({
-              id: resp.id,
-              name: newLabel,
-              category: newCategory,
-              amount: +newAmount,
-              date: new Date(Date.parse(newDate))
-            })
-          }
+    }
+    this._revenues.unshift(item)
+    this.edit(item)
+  }
+
+  async save(expense: ListItem) {
+    if (this._forms[expense.id].valid) {
+      const application = this._forms[expense.id].value
+
+      const response = expense.id > 0 ? await this.journalApi.updateEntry(expense) : await this.journalApi.createEntry(expense)
+      console.log(response)
+
+      if (!response.success) {
+        alert('Uitgave niet opgeslagen !')
+      } else {
+        // success
+        alert(expense.id > 0 ? 'Uitgave bijgewerkt !' : 'Uitgave aangemaakt !')
+        if (expense.id > 0) {
+          expense.name = application.name
+          expense.category = application.category
+          expense.date = application.date
+          expense.amount = application.amount
+        } else {
+          this._revenues = this._revenues.filter(exp => exp.id !== 0)
         }
-      } catch (err) {
-        console.log(err)
-        alert('Er is een onbekende fout opgetreden tijdens het behandelen van je verzoek!')
-      } finally {
         this.ref.markForCheck()
       }
     } else {
-      alert('De ingevoerde waardes bevatten een fout!')
+      console.warn('form is invallid', this._forms[expense.id].value)
     }
   }
 
-  async edit(revenue: IJournalEntry) {
-    const newLabel = prompt('Nieuwe label: ', revenue.name)
-    if (!newLabel) return
-    const newCategory = prompt('Nieuwe categorie: ', revenue.category)
-    if (!newCategory) return
-    const newDate = prompt('Nieuwe datum: ', `${revenue.date.toString().split('T')[0]}`)
-    if (!newDate) return
-    const newAmount = prompt('Nieuwe waarde: ', revenue.amount.toString())
-    if (!newAmount) return
-
-    if (+newAmount >= 0) {
-      if (newLabel === revenue.name && newCategory === revenue.category && +newAmount === revenue.amount && newDate.match('[0-9]{4}-[0-9]{2}-[0-9]{2}')) {
-        alert('Er zijn geen wijzigingen opgeslagen!')
-      } else {
-        // try to update item !
-        try {
-          const resp = await this.journalApi.updateEntry({
-            id: revenue.id,
-            name: newLabel,
-            category: newCategory,
-            amount: +newAmount,
-            date: new Date(Date.parse(newDate))
-          })
-
-          if (resp.success) {
-            // alert('Opgeslagen!')
-            revenue.name = newLabel
-            revenue.category = newCategory
-            revenue.amount = +newAmount
-            revenue.date = new Date(Date.parse(newDate))
-          }
-        } catch (err) {
-          console.log(err)
-          alert('Er is een onbekende fout opgetreden tijdens het behandelen van je verzoek!')
-        } finally {
-          this.ref.markForCheck()
-        }
-      }
-    } else {
-      alert('Er is een fout opgetreden tijdens het verwerken van je ingegeven waardes, waarde moet een getal groter of gelijk aan 0 zijn!')
-    }
-  }
-
-  async delete(revenue: IJournalEntry) {
+  async delete(revenue: ListItem) {
     const confirmed = confirm(`Weet je zeker dat je '${revenue.name}' wilt verwijderen?`)
     if (confirmed === true) {
       // try to update item !
@@ -139,11 +115,25 @@ export class RevenuePageComponent {
     }
   }
 
-  get revenues(): IJournalEntry[] {
+  get isCreating(): boolean {
+    return this._revenues.some(e => e.id === 0)
+  }
+
+  get revenues(): ListItem[] {
     return this._revenues
+  }
+
+  get revenueForm(): { [key: string]: FormGroup } {
+    return this._forms
   }
 
   get culture(): string {
     return 'nl-BE'
   }
 }
+
+export interface IEditableRow {
+  editing: boolean
+}
+
+interface ListItem extends IJournalEntry, IEditableRow { }
