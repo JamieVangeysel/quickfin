@@ -12,19 +12,19 @@ export class JournalApiService {
   getEntries(direction: boolean | null): Promise<IJournalEntry[]> {
     let params = {}
     if (direction != null) params = { direction }
-    return firstValueFrom(this.http.get<IJournalEntry[]>(`${environment.api}journal/entries`, { params }))
+    return firstValueFrom(this.http.get<IJournalEntry[]>(`${environment.api}journal/entries`, { params, headers: { 'Authorization': 'yes' } }))
   }
 
   createEntry(income: IWJournalEntry): Promise<IPostResponse> {
-    return firstValueFrom(this.http.post<IPostResponse>(`${environment.api}journal/entries`, income))
+    return firstValueFrom(this.http.post<IPostResponse>(`${environment.api}journal/entries`, income, { headers: { 'Authorization': 'yes' } }))
   }
 
   updateEntry(income: IJournalEntry): Promise<IPostResponse> {
-    return firstValueFrom(this.http.put<IPostResponse>(`${environment.api}journal/entries/${income.id}`, income))
+    return firstValueFrom(this.http.put<IPostResponse>(`${environment.api}journal/entries/${income.id}`, income, { headers: { 'Authorization': 'yes' } }))
   }
 
   deleteEntry(id: number): Promise<IPostResponse> {
-    return firstValueFrom(this.http.delete<IPostResponse>(`${environment.api}journal/entries/${id}`))
+    return firstValueFrom(this.http.delete<IPostResponse>(`${environment.api}journal/entries/${id}`, { headers: { 'Authorization': 'yes' } }))
   }
 }
 

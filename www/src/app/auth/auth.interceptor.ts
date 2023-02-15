@@ -1,6 +1,6 @@
-import { BehaviorSubject, catchError, filter, finalize, firstValueFrom, from, mergeMap, Observable, switchMap, take, throwError } from 'rxjs'
+import { BehaviorSubject, catchError, filter, finalize, NEVER, Observable, switchMap, take, throwError } from 'rxjs'
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http'
-import { Injectable, Injector } from '@angular/core'
+import { Injectable } from '@angular/core'
 import { AuthService } from './auth.service'
 
 const API_URL = 'quickfin.be/api'
@@ -14,7 +14,8 @@ export class AuthInterceptor implements HttpInterceptor {
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     console.log(request.url)
-    if (request.url.includes('quickfin.be/api'))
+    if (request.url.includes(API_URL)) {
+      console.log('adding intercept header')
       return next.handle(this.addAuthToken(request)).pipe(
         catchError((requestError: HttpErrorResponse) => {
           if (requestError && requestError.status === 401) {
@@ -24,7 +25,7 @@ export class AuthInterceptor implements HttpInterceptor {
                 take(1),
                 switchMap(() => next.handle(this.addAuthToken(request)))
               );
-            } else {
+            } else if (this.auth.isAuthenticated()) {
               this.refreshTokenInProgress = true
               this.refreshTokenSubject.next(undefined)
 
@@ -35,26 +36,34 @@ export class AuthInterceptor implements HttpInterceptor {
                 }),
                 finalize(() => (this.refreshTokenInProgress = false))
               );
+            } else {
+              return NEVER
             }
           } else {
             return throwError(() => requestError)
           }
         })
       )
+    }
+    console.log('removing intercept header')
     return next.handle(request)
   }
 
   addAuthToken(request: HttpRequest<any>) {
     const token = this.auth.access_token
 
-    if (!token) {
-      return request
+    if (request.headers.has('Authorization')) {
+      if (!token) {
+        console.warn('There is no token, but this is required for this request to work!')
+      }
+
+      return request.clone({
+        setHeaders: {
+          Authorization: `Bearer ${token ?? 'no token available'}`,
+        }
+      })
     }
 
-    return request.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}`,
-      }
-    })
+    return request
   }
 }

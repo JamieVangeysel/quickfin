@@ -10,31 +10,31 @@ export class BudgetApiService {
   constructor(private http: HttpClient) { }
 
   getOverview(): Promise<IGetBudgetOverviewResponse> {
-    return firstValueFrom(this.http.get<IGetBudgetOverviewResponse>(`${environment.api}budget/overview`))
+    return firstValueFrom(this.http.get<IGetBudgetOverviewResponse>(`${environment.api}budget/overview`, { headers: { 'Authorization': 'yes' } }))
   }
 
   createIncome(income: IWBudgetEntry): Promise<IPostResponse> {
-    return firstValueFrom(this.http.post<IPostResponse>(`${environment.api}budget/incomes`, income))
+    return firstValueFrom(this.http.post<IPostResponse>(`${environment.api}budget/incomes`, income, { headers: { 'Authorization': 'yes' } }))
   }
 
   updateIncome(income: IBudgetEntry): Promise<IPostResponse> {
-    return firstValueFrom(this.http.put<IPostResponse>(`${environment.api}budget/incomes/${income.id}`, income))
+    return firstValueFrom(this.http.put<IPostResponse>(`${environment.api}budget/incomes/${income.id}`, income, { headers: { 'Authorization': 'yes' } }))
   }
 
   deleteIncome(id: number): Promise<IPostResponse> {
-    return firstValueFrom(this.http.delete<IPostResponse>(`${environment.api}budget/incomes/${id}`))
+    return firstValueFrom(this.http.delete<IPostResponse>(`${environment.api}budget/incomes/${id}`, { headers: { 'Authorization': 'yes' } }))
   }
 
   createExpense(expense: IWBudgetEntry): Promise<IPostResponse> {
-    return firstValueFrom(this.http.post<IPostResponse>(`${environment.api}budget/expenses`, expense))
+    return firstValueFrom(this.http.post<IPostResponse>(`${environment.api}budget/expenses`, expense, { headers: { 'Authorization': 'yes' } }))
   }
 
   updateExpense(expense: IBudgetEntry): Promise<IPostResponse> {
-    return firstValueFrom(this.http.put<IPostResponse>(`${environment.api}budget/expenses/${expense.id}`, expense))
+    return firstValueFrom(this.http.put<IPostResponse>(`${environment.api}budget/expenses/${expense.id}`, expense, { headers: { 'Authorization': 'yes' } }))
   }
 
   deleteExpense(id: number): Promise<IPostResponse> {
-    return firstValueFrom(this.http.delete<IPostResponse>(`${environment.api}budget/expenses/${id}`))
+    return firstValueFrom(this.http.delete<IPostResponse>(`${environment.api}budget/expenses/${id}`, { headers: { 'Authorization': 'yes' } }))
   }
 }
 

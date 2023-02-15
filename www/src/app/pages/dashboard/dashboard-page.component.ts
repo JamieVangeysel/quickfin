@@ -108,86 +108,72 @@ const visitorsChart: any = {
   }
 }
 const demoGraphicTemplate = {
-  name: 'Language',
-  options: {
-    series: [.8, .2],
-    labels: ['Dutch', 'French'],
-    chart: {
-      type: donutChartType,
-      width: '100%',
-      height: 200,
-      parentHeightOffset: 0,
-      animations: {
-        enabled: false
-      },
-      selection: {
-        enabled: false
-      }
-    },
-    legend: {
-      show: false
-    },
-    dataLabels: {
+  series: [.8, .2],
+  labels: ['Dutch', 'French'],
+  chart: {
+    type: donutChartType,
+    width: '100%',
+    height: 200,
+    parentHeightOffset: 0,
+    animations: {
       enabled: false
     },
-    states: {
-      hover: {
-        filter: {
-          type: 'none'
-        }
-      }
-    },
-    plotOptions: {
-      pie: {
-        expandOnClick: false,
-        donut: {
-          size: '70%'
-        }
-      }
-    },
-    fill: {
-      type: 'solid',
-      colors: ['rgb(49, 130, 206)', 'rgb(99, 179, 237)']
-    },
-    stroke: {
-      width: 2,
-      colors: ['var(--bg-card)']
-    },
-    colors: ['rgb(49, 130, 206)', 'rgb(99, 179, 237)'],
-    responsive: [
-      {
-        breakpoint: 480,
-        options: {
-          chart: {
-            width: 200
-          }
-        }
-      }
-    ],
-    tooltip: {
-      enabled: true,
-      fillSeriesColor: false,
-      onDatasetHover: {
-        highlightDataSeries: false,
-      },
-      y: {
-        formatter: function (value: number) {
-          return value * 100 + "%"
-        }
-      }
-    },
+    selection: {
+      enabled: false
+    }
   },
-  groups: [{
-    label: 'Dutch',
-    color: 'rgb(49, 130, 206)',
-    value: '36,868',
-    percentage: .8
-  }, {
-    label: 'French',
-    color: 'rgb(99, 179, 237)',
-    value: '9,217',
-    percentage: .2,
-  }]
+  legend: {
+    show: false
+  },
+  dataLabels: {
+    enabled: false
+  },
+  states: {
+    hover: {
+      filter: {
+        type: 'none'
+      }
+    }
+  },
+  plotOptions: {
+    pie: {
+      expandOnClick: false,
+      donut: {
+        size: '70%'
+      }
+    }
+  },
+  fill: {
+    type: 'solid',
+    // colors: ['rgb(49, 130, 206)', 'rgb(99, 179, 237)']
+  },
+  stroke: {
+    width: 2,
+    colors: ['var(--bg-card)']
+  },
+  // colors: ['rgb(49, 130, 206)', 'rgb(99, 179, 237)'],
+  responsive: [
+    {
+      breakpoint: 480,
+      options: {
+        chart: {
+          width: 200
+        }
+      }
+    }
+  ],
+  tooltip: {
+    enabled: true,
+    fillSeriesColor: false,
+    onDatasetHover: {
+      highlightDataSeries: false,
+    },
+    y: {
+      formatter: function (value: number) {
+        return (value * 100).toFixed(2) + "%"
+      }
+    }
+  }
 }
 const demoTriChart = {
   chart: {
@@ -266,12 +252,11 @@ export class DashboardPageComponent implements OnInit {
   statistics: any[] = []
   loading = true
 
-  demoGraphics = [
-    demoGraphicTemplate,
-    demoGraphicTemplate,
-    demoGraphicTemplate,
-    demoGraphicTemplate
-  ]
+  demoGraphics: {
+    name: string,
+    options: any,
+    groups: any[]
+  }[] = []
 
   activeSegment: 'current' | 'previous' = 'current'
   networth_history: any | undefined
@@ -298,6 +283,7 @@ export class DashboardPageComponent implements OnInit {
 
         const networth_history = analytics.collections.find(e => e.name === 'networth-history')
         const indicators = analytics.collections.find(e => e.name === 'indicators')
+        const donuts = analytics.collections.find(e => e.name === 'donuts')
 
         console.log(networth_history)
 
@@ -382,6 +368,82 @@ export class DashboardPageComponent implements OnInit {
                 }],
               }
             }
+          }
+        }
+
+        if (donuts) {
+          // expenses-now
+          const expensesNowCard = donuts.datasets.find(e => e.name === 'expenses-now')
+          const expensesPrevCard = donuts.datasets.find(e => e.name === 'expenses-prev')
+          const incomesNowCard = donuts.datasets.find(e => e.name === 'incomes-now')
+          const incomesPrevCard = donuts.datasets.find(e => e.name === 'incomes-prev')
+          if (expensesNowCard && expensesPrevCard && incomesNowCard && incomesPrevCard) {
+            this.demoGraphics = [
+              {
+                // name: expensesNowCard.name,
+                name: 'Uitgaven deze maand (mtd)',
+                options: {
+                  ...demoGraphicTemplate,
+                  labels: expensesNowCard.rows.map(e => e.category),
+                  series: expensesNowCard.rows.map(e => e.percent),
+                  colors: ["#9B1816", "#EB4E49", "#cc444b", "#da5552", "#df7373"]
+                },
+                groups: expensesNowCard.rows.map((e, i) => ({
+                  label: e.category,
+                  color: ["#9B1816", "#EB4E49", "#cc444b", "#da5552", "#df7373"][i],
+                  value: e.value,
+                  percentage: e.percent
+                }))
+              },
+              {
+                // name: incomesNowCard.name,
+                name: 'Inkomen deze maand (mtd)',
+                options: {
+                  ...demoGraphicTemplate,
+                  labels: incomesNowCard.rows.map(e => e.category),
+                  series: incomesNowCard.rows.map(e => e.percent),
+                  colors: ["#a6c36f", "#828c51", "#335145", "#beef9e", "#1e352f"]
+                },
+                groups: incomesNowCard.rows.map((e, i) => ({
+                  label: e.category,
+                  color: ["#a6c36f", "#828c51", "#335145", "#beef9e", "#1e352f"][i],
+                  value: e.value,
+                  percentage: e.percent
+                }))
+              },
+              {
+                // name: expensesPrevCard.name,
+                name: 'Uitgaven vorige maand',
+                options: {
+                  ...demoGraphicTemplate,
+                  labels: expensesPrevCard.rows.map(e => e.category),
+                  series: expensesPrevCard.rows.map(e => e.percent),
+                  colors: ["#9B1816", "#EB4E49", "#cc444b", "#da5552", "#df7373"]
+                },
+                groups: expensesPrevCard.rows.map((e, i) => ({
+                  label: e.category,
+                  color: ["#9B1816", "#EB4E49", "#cc444b", "#da5552", "#df7373"][i],
+                  value: e.value,
+                  percentage: e.percent
+                }))
+              },
+              {
+                // name: incomesPrevCard.name,
+                name: 'Inkomen vorige maand',
+                options: {
+                  ...demoGraphicTemplate,
+                  labels: incomesPrevCard.rows.map(e => e.category),
+                  series: incomesPrevCard.rows.map(e => e.percent),
+                  colors: ["#a6c36f", "#828c51", "#335145", "#beef9e", "#1e352f"]
+                },
+                groups: incomesPrevCard.rows.map((e, i) => ({
+                  label: e.category,
+                  color: ["#a6c36f", "#828c51", "#335145", "#beef9e", "#1e352f"][i],
+                  value: e.value,
+                  percentage: e.percent
+                }))
+              }
+            ]
           }
         }
       }

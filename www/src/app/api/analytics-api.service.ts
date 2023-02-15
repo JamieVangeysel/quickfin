@@ -10,7 +10,7 @@ export class AnalyticsApiService {
   constructor(private http: HttpClient) { }
 
   get(): Promise<IGetAnalytics> {
-    return firstValueFrom(this.http.get<IGetAnalytics>(`${environment.api}analytics`))
+    return firstValueFrom(this.http.get<IGetAnalytics>(`${environment.api}analytics`, { headers: { 'Authorization': 'yes' } }))
   }
 }
 
