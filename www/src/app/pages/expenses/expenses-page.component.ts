@@ -70,9 +70,12 @@ export class ExpensesPageComponent {
 
   async save(expense: ListItem) {
     if (this._forms[expense.id].valid) {
-      const application = this._forms[expense.id].value
+      const formValue = this._forms[expense.id].value
 
-      const response = expense.id > 0 ? await this.journalApi.updateEntry(expense) : await this.journalApi.createEntry(expense)
+      formValue.id = expense.id
+      formValue.amount = formValue.amount * -1
+
+      const response = expense.id > 0 ? await this.journalApi.updateEntry(formValue) : await this.journalApi.createEntry(expense)
       console.log(response)
 
       if (!response.success) {
@@ -81,10 +84,10 @@ export class ExpensesPageComponent {
         // success
         alert(expense.id > 0 ? 'Uitgave bijgewerkt !' : 'Uitgave aangemaakt !')
         if (expense.id > 0) {
-          expense.name = application.name
-          expense.category = application.category
-          expense.date = application.date
-          expense.amount = application.amount
+          expense.name = formValue.name
+          expense.category = formValue.category
+          expense.date = formValue.date
+          expense.amount = formValue.amount
         } else {
           this._expenses = this._expenses.filter(exp => exp.id !== 0)
         }

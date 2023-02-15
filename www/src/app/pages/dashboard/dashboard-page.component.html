@@ -99,8 +99,8 @@
               [ngClass]="{ 'text-red-500': incomeVsBudget.pos == 0, 'text-green-500': incomeVsBudget.pos == 1 }">{{
               incomeVsBudget.result | percent
               }}</span>
-            <span class="ml-1" *ngIf="incomeVsBudget.pos == 0">below target</span>
-            <span class="ml-1" *ngIf="incomeVsBudget.pos == 1">above target</span>
+            <span class="ml-1" *ngIf="incomeVsBudget.pos == 0">onder doelstelling</span>
+            <span class="ml-1" *ngIf="incomeVsBudget.pos == 1">boven doelstelling</span>
           </div>
         </div>
       </div>
@@ -157,8 +157,8 @@
               [ngClass]="{ 'text-red-500': expensesVsBudget.pos == 0, 'text-green-500': expensesVsBudget.pos == 1 }">
               {{ expensesVsBudget.result | percent }}
             </span>
-            <span class="ml-1" *ngIf="expensesVsBudget.pos == 0">below target</span>
-            <span class="ml-1" *ngIf="expensesVsBudget.pos == 1">above target</span>
+            <span class="ml-1" *ngIf="expensesVsBudget.pos == 0">onder doelstelling</span>
+            <span class="ml-1" *ngIf="expensesVsBudget.pos == 1">boven doelstelling</span>
           </div>
         </div>
       </div>
@@ -211,8 +211,8 @@
             <span class="font-medium"
               [ngClass]="{ 'text-red-500': balanceVsNetworthDiff.pos == 0, 'text-green-500': balanceVsNetworthDiff.pos == 1 }">{{
               balanceVsNetworthDiff.result | percent }}</span>
-            <span class="ml-1" *ngIf="balanceVsNetworthDiff.pos == 0">below target</span>
-            <span class="ml-1" *ngIf="balanceVsNetworthDiff.pos == 1">above target</span>
+            <span class="ml-1" *ngIf="balanceVsNetworthDiff.pos == 0">onder doelstelling</span>
+            <span class="ml-1" *ngIf="balanceVsNetworthDiff.pos == 1">boven doelstelling</span>
           </div>
         </div>
       </div>

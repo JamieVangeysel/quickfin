@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core'
-import { CommonModule } from '@angular/common'
+import { CommonModule, DatePipe } from '@angular/common'
 import { RouterModule } from '@angular/router'
 import { DashboardPageComponent } from './dashboard-page.component'
 import { NgApexchartsModule } from 'ng-apexcharts'
@@ -17,6 +17,9 @@ import { MatMenuModule } from '@angular/material/menu'
       path: '',
       component: DashboardPageComponent
     }])
+  ],
+  providers: [
+    DatePipe
   ]
 })
 export class DashboardPageModule { }

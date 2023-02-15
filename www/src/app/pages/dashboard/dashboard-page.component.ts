@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common'
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { ChartType } from 'ng-apexcharts'
 import { AnalyticsApiService, IGetAnalytics } from 'src/app/api/analytics-api.service'
@@ -270,6 +271,7 @@ export class DashboardPageComponent implements OnInit {
   constructor(
     private ref: ChangeDetectorRef,
     private auth: AuthService,
+    private datePipe: DatePipe,
     private analyticsApi: AnalyticsApiService
   ) {
   }
@@ -381,7 +383,7 @@ export class DashboardPageComponent implements OnInit {
             this.demoGraphics = [
               {
                 // name: expensesNowCard.name,
-                name: 'Uitgaven deze maand (mtd)',
+                name: `Uitgaven ${this.datePipe.transform(expensesNowCard.rows[0].date, 'MMMM', undefined, this.culture)} (mtd)`,
                 options: {
                   ...demoGraphicTemplate,
                   labels: expensesNowCard.rows.map(e => e.category),
@@ -397,7 +399,7 @@ export class DashboardPageComponent implements OnInit {
               },
               {
                 // name: incomesNowCard.name,
-                name: 'Inkomen deze maand (mtd)',
+                name: `Inkomen ${this.datePipe.transform(incomesNowCard.rows[0].date, 'MMMM', undefined, this.culture)} (mtd)`,
                 options: {
                   ...demoGraphicTemplate,
                   labels: incomesNowCard.rows.map(e => e.category),
@@ -413,7 +415,7 @@ export class DashboardPageComponent implements OnInit {
               },
               {
                 // name: expensesPrevCard.name,
-                name: 'Uitgaven vorige maand',
+                name: `Uitgaven ${this.datePipe.transform(expensesPrevCard.rows[0].date, 'MMMM', undefined, this.culture)}`,
                 options: {
                   ...demoGraphicTemplate,
                   labels: expensesPrevCard.rows.map(e => e.category),
@@ -429,7 +431,7 @@ export class DashboardPageComponent implements OnInit {
               },
               {
                 // name: incomesPrevCard.name,
-                name: 'Inkomen vorige maand',
+                name: `Inkomen ${this.datePipe.transform(incomesPrevCard.rows[0].date, 'MMMM', undefined, this.culture)}`,
                 options: {
                   ...demoGraphicTemplate,
                   labels: incomesPrevCard.rows.map(e => e.category),

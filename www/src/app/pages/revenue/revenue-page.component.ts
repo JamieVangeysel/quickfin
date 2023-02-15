@@ -70,10 +70,12 @@ export class RevenuePageComponent {
 
   async save(expense: ListItem) {
     if (this._forms[expense.id].valid) {
-      const application = this._forms[expense.id].value
+      const formValue = this._forms[expense.id].value
+
+      formValue.id = expense.id
+      // formValue.amount = formValue.amount * -1
 
       const response = expense.id > 0 ? await this.journalApi.updateEntry(expense) : await this.journalApi.createEntry(expense)
-      console.log(response)
 
       if (!response.success) {
         alert('Inkomen niet opgeslagen !')
@@ -81,10 +83,10 @@ export class RevenuePageComponent {
         // success
         alert(expense.id > 0 ? 'Inkomen bijgewerkt !' : 'Inkomen aangemaakt !')
         if (expense.id > 0) {
-          expense.name = application.name
-          expense.category = application.category
-          expense.date = application.date
-          expense.amount = application.amount
+          expense.name = formValue.name
+          expense.category = formValue.category
+          expense.date = formValue.date
+          expense.amount = formValue.amount
         } else {
           this._revenues = this._revenues.filter(exp => exp.id !== 0)
         }
