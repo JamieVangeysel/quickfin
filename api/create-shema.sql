@@ -1261,6 +1261,7 @@ AS BEGIN
     AND [entry].[direction] = 0
     AND DATEADD(DAY, 1, EOMONTH([entry].[date], -1)) = DATEADD(MONTH, 0, DATEADD(DAY, 1, EOMONTH(GETUTCDATE(), -1)))
   GROUP BY [entry].[category]
+  ORDER BY ABS(SUM([entry].[amount])) DESC
 
   SELECT [value] = ABS(SUM([entry].[amount])),
     [category] = [entry].[category],
@@ -1271,6 +1272,7 @@ AS BEGIN
     AND [entry].[direction] = 0
     AND DATEADD(DAY, 1, EOMONTH([entry].[date], -1)) = DATEADD(MONTH, -1, DATEADD(DAY, 1, EOMONTH(GETUTCDATE(), -1)))
   GROUP BY [entry].[category]
+  ORDER BY ABS(SUM([entry].[amount])) DESC
 
   -- incomes
   SELECT [value] = ABS(SUM([entry].[amount])),
@@ -1282,6 +1284,7 @@ AS BEGIN
     AND [entry].[direction] = 1
     AND DATEADD(DAY, 1, EOMONTH([entry].[date], -1)) = DATEADD(MONTH, 0, DATEADD(DAY, 1, EOMONTH(GETUTCDATE(), -1)))
   GROUP BY [entry].[category]
+  ORDER BY ABS(SUM([entry].[amount])) DESC
 
   SELECT [value] = ABS(SUM([entry].[amount])),
     [category] = [entry].[category],
@@ -1292,6 +1295,7 @@ AS BEGIN
     AND [entry].[direction] = 1
     AND DATEADD(DAY, 1, EOMONTH([entry].[date], -1)) = DATEADD(MONTH, -1, DATEADD(DAY, 1, EOMONTH(GETUTCDATE(), -1)))
   GROUP BY [entry].[category]
+  ORDER BY ABS(SUM([entry].[amount])) DESC
 END
 GO
 
