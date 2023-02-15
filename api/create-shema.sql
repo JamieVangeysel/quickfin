@@ -1041,6 +1041,9 @@ CREATE TABLE [journal].[entries](
   [category] VARCHAR(40) NOT NULL,
   [amount] MONEY NOT NULL DEFAULT 0.00,
   [direction] BIT NOT NULL DEFAULT 0, -- 1 for debit, 0 for credit
+  [note] VARCHAR(200) NULL, -- add descriptive note to entry
+  [documentBytes] VARBINARY(MAX) NULL, -- document bytes (add image of recept or incoice)
+  [documentMimeType] VARCHAR(40) NULL, -- document mimetype (image/png, application/pdf)
   [created] DATETIME NOT NULL DEFAULT GETUTCDATE(),
   [modified] DATETIME NULL
 )
@@ -1074,7 +1077,8 @@ AS BEGIN
     [name],
     [category],
     [amount],
-    [direction]
+    [direction],
+    [note]
   FROM [journal].[entries]
   WHERE [User_id] = @user_id AND (
     @direction IS NULL OR
@@ -1089,11 +1093,12 @@ CREATE PROCEDURE [journal].[usp_insertEntry]
   @date DATETIME,
   @name VARCHAR(40),
   @category VARCHAR(40),
-  @amount MONEY
+  @amount MONEY,
+  @note VARCHAR(200) = NULL
 WITH EXECUTE AS 'journal_agent'
 AS BEGIN
-  INSERT INTO [journal].[entries] ([user_id], [date], [name], [category], [amount], [direction])
-  VALUES (@user_id, @date, @name, @category, @amount, CASE WHEN @amount >= 0 THEN 1 ELSE 0 END)
+  INSERT INTO [journal].[entries] ([user_id], [date], [name], [category], [amount], [direction], [note])
+  VALUES (@user_id, @date, @name, @category, @amount, CASE WHEN @amount >= 0 THEN 1 ELSE 0 END, @note)
 
   SELECT [id] = SCOPE_IDENTITY()
 END
@@ -1105,7 +1110,8 @@ CREATE PROCEDURE [journal].[usp_updateEntry]
   @date DATETIME,
   @name VARCHAR(40),
   @category VARCHAR(40),
-  @amount MONEY
+  @amount MONEY,
+  @note VARCHAR(200) = NULL
 WITH EXECUTE AS 'journal_agent'
 AS BEGIN
   UPDATE [journal].[entries]
@@ -1114,6 +1120,7 @@ AS BEGIN
     [category] = @category,
     [amount] = @amount,
     [direction] = CASE WHEN @amount >= 0 THEN 1 ELSE 0 END,
+    [note] = @note
     [modified] = GETUTCDATE()
   WHERE [id] = @id
     AND [user_id] = @user_id
