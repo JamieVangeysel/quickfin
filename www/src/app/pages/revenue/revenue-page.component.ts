@@ -73,7 +73,8 @@ export class RevenuePageComponent {
       const formValue = this._forms[expense.id].value
 
       formValue.id = expense.id
-      // formValue.amount = formValue.amount * -1
+      // make sure value is positive number
+      formValue.amount = Math.abs(formValue.amount)
 
       const response = expense.id > 0 ? await this.journalApi.updateEntry(formValue) : await this.journalApi.createEntry(formValue)
 
