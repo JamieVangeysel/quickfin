@@ -87,7 +87,7 @@ export class RevenuePageComponent {
           expense.name = formValue.name
           expense.category = formValue.category
           expense.date = formValue.date
-          expense.amount = formValue.amount
+          expense.amount = Math.abs(formValue.amount) // revert to positive/absolute value
         } else {
           this._revenues = this._revenues.filter(exp => exp.id !== 0)
         }
