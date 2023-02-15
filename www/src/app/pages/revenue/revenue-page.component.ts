@@ -76,10 +76,10 @@ export class RevenuePageComponent {
       console.log(response)
 
       if (!response.success) {
-        alert('Uitgave niet opgeslagen !')
+        alert('Inkomen niet opgeslagen !')
       } else {
         // success
-        alert(expense.id > 0 ? 'Uitgave bijgewerkt !' : 'Uitgave aangemaakt !')
+        alert(expense.id > 0 ? 'Inkomen bijgewerkt !' : 'Inkomen aangemaakt !')
         if (expense.id > 0) {
           expense.name = application.name
           expense.category = application.category
