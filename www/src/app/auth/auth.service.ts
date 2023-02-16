@@ -144,6 +144,10 @@ export class AuthService {
     return false
   }
 
+  public get expired(): boolean {
+    return this.id_token && new Date(this.id_token.exp * 1000) < new Date()
+  }
+
   public get refresh_token(): string | undefined {
     return window.localStorage.getItem(REFRESH_TOKEN_KEY) ?? window.sessionStorage.getItem(REFRESH_TOKEN_KEY) ?? undefined
   }
