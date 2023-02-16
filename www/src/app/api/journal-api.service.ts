@@ -33,6 +33,7 @@ export interface IWJournalEntry {
   category: string
   amount: number
   date: Date
+  note?: string
 }
 
 export interface IJournalEntry extends IWJournalEntry {

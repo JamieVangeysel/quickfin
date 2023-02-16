@@ -1073,7 +1073,8 @@ CREATE PROCEDURE [journal].[usp_getEntries]
   @direction BIT = NULL
 WITH EXECUTE AS 'journal_agent'
 AS BEGIN
-  SELECT [date],
+  SELECT [id],
+    [date],
     [name],
     [category],
     [amount],

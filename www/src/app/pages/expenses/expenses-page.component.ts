@@ -1,3 +1,4 @@
+import { ThisReceiver } from '@angular/compiler'
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { IJournalEntry, JournalApiService } from 'src/app/api/journal-api.service'
@@ -46,7 +47,8 @@ export class ExpensesPageComponent {
         name: [item.name, [Validators.required]],
         category: [item.category, [Validators.required]],
         date: [date, [Validators.required, Validators.pattern('[0-9]{4}-[0-9]{2}-[0-9]{2}')]],
-        amount: [item.amount, [Validators.required]]
+        amount: [item.amount, [Validators.required]],
+        note: [item.note, []]
       })
     }
     this.ref.markForCheck()
@@ -61,8 +63,8 @@ export class ExpensesPageComponent {
       category: '',
       date: new Date(),
       amount: 0,
+      note: undefined,
       editing: false
-
     }
     this._expenses.unshift(item)
     this.edit(item)
@@ -84,14 +86,16 @@ export class ExpensesPageComponent {
       } else {
         // success
         alert(expense.id > 0 ? 'Uitgave bijgewerkt !' : 'Uitgave aangemaakt !')
-        if (expense.id > 0) {
-          expense.name = formValue.name
-          expense.category = formValue.category
-          expense.date = formValue.date
-          expense.amount = Math.abs(formValue.amount) // revert to positive/absolute value
-        } else {
-          this._expenses = this._expenses.filter(exp => exp.id !== 0)
+
+        if (expense.id === 0) {
+          expense.id = response.id
         }
+        expense.name = formValue.name
+        expense.category = formValue.category
+        expense.date = formValue.date
+        expense.amount = Math.abs(formValue.amount) // revert to positive/absolute value
+        expense.note = formValue.note.length > 0 ? formValue.note : undefined
+
         this.ref.markForCheck()
       }
     } else {

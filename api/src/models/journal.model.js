@@ -26,8 +26,9 @@ exports.insertEntry = async (user_id, entry) => {
   request.input('name', sql.VarChar(40), entry.name)
   request.input('category', sql.VarChar(40), entry.category)
   request.input('amount', sql.Money, entry.amount)
+  request.input('note', sql.VarChar(200), entry.note)
 
-  const result = await request.query(`EXEC [journal].[usp_insertEntry] @user_id, @date, @name, @category, @amount`)
+  const result = await request.query(`EXEC [journal].[usp_insertEntry] @user_id, @date, @name, @category, @amount, @note`)
 
   if (result.rowsAffected.length > 0) {
     return {
@@ -47,8 +48,9 @@ exports.updateEntry = async (user_id, id, entry) => {
   request.input('name', sql.VarChar(40), entry.name)
   request.input('category', sql.VarChar(40), entry.category)
   request.input('amount', sql.Money, entry.amount)
+  request.input('note', sql.VarChar(200), entry.note)
 
-  const result = await request.query(`EXEC [journal].[usp_updateEntry] @user_id, @id, @date, @name, @category, @amount`)
+  const result = await request.query(`EXEC [journal].[usp_updateEntry] @user_id, @id, @date, @name, @category, @amount, @note`)
 
   if (result.rowsAffected.length > 0) {
     return {

@@ -46,7 +46,8 @@ export class RevenuePageComponent {
         name: [item.name, [Validators.required]],
         category: [item.category, [Validators.required]],
         date: [date, [Validators.required, Validators.pattern('[0-9]{4}-[0-9]{2}-[0-9]{2}')]],
-        amount: [item.amount, [Validators.required]]
+        amount: [item.amount, [Validators.required]],
+        note: [item.note, []]
       })
     }
     this.ref.markForCheck()
@@ -61,40 +62,42 @@ export class RevenuePageComponent {
       category: '',
       date: new Date(),
       amount: 0,
+      note: undefined,
       editing: false
-
     }
     this._revenues.unshift(item)
     this.edit(item)
   }
 
-  async save(expense: ListItem) {
-    if (this._forms[expense.id].valid) {
-      const formValue = this._forms[expense.id].value
+  async save(revenue: ListItem) {
+    if (this._forms[revenue.id].valid) {
+      const formValue = this._forms[revenue.id].value
 
-      formValue.id = expense.id
+      formValue.id = revenue.id
       // make sure value is positive number
       formValue.amount = Math.abs(formValue.amount)
 
-      const response = expense.id > 0 ? await this.journalApi.updateEntry(formValue) : await this.journalApi.createEntry(formValue)
+      const response = revenue.id > 0 ? await this.journalApi.updateEntry(formValue) : await this.journalApi.createEntry(formValue)
 
       if (!response.success) {
         alert('Inkomen niet opgeslagen !')
       } else {
         // success
-        alert(expense.id > 0 ? 'Inkomen bijgewerkt !' : 'Inkomen aangemaakt !')
-        if (expense.id > 0) {
-          expense.name = formValue.name
-          expense.category = formValue.category
-          expense.date = formValue.date
-          expense.amount = Math.abs(formValue.amount) // revert to positive/absolute value
-        } else {
-          this._revenues = this._revenues.filter(exp => exp.id !== 0)
+        alert(revenue.id > 0 ? 'Inkomen bijgewerkt !' : 'Inkomen aangemaakt !')
+
+        if (revenue.id === 0) {
+          revenue.id = response.id
         }
+        revenue.name = formValue.name
+        revenue.category = formValue.category
+        revenue.date = formValue.date
+        revenue.amount = Math.abs(formValue.amount) // revert to positive/absolute value
+        revenue.note = formValue.note.length > 0 ? formValue.note : undefined
+
         this.ref.markForCheck()
       }
     } else {
-      console.warn('form is invallid', this._forms[expense.id].value)
+      console.warn('form is invallid', this._forms[revenue.id].value)
     }
   }
 
