@@ -8,6 +8,12 @@ const areaChartType: ChartType = 'area'
 const donutChartType: ChartType = 'donut'
 const barChartType: ChartType = 'bar'
 
+// const revenueColors = ['#a6c36f', '#828c51', '#335145', '#beef9e', '#1e352f']
+const revenueColors = ['#a6c36f', '#cadba9', '#859c59', '#b8cf8c', '#647543']
+// https://imagecolorpicker.com/color-code/a6c36f
+// const expenseColors = ['#c4141b', '#f13a37', '#8e060f', '#fb8684', '#b92429']
+const expenseColors = ['#bb121d', '#d67177', '#960e17', '#c9414a', '#700b11']
+// https://imagecolorpicker.com/color-code/bb121d
 
 const visitorsChart: any = {
   chart: {
@@ -318,7 +324,7 @@ export class DashboardPageComponent implements OnInit {
             const lastValue = incomesCard.rows[incomesCard.rows.length - 1]
             this.incomeVsBudget = {
               current: lastValue.value,
-              result: 1 - (lastValue.value / lastValue.budget),
+              result: Math.abs(1 - (lastValue.value / lastValue.budget)),
               pos: lastValue.value > lastValue.budget,
               options: {
                 ...demoTriChart,
@@ -337,7 +343,7 @@ export class DashboardPageComponent implements OnInit {
             const lastValue = expensesCard.rows[expensesCard.rows.length - 1]
             this.expensesVsBudget = {
               current: lastValue.value,
-              result: 1 - (lastValue.value / lastValue.budget),
+              result: Math.abs(1 - (lastValue.value / lastValue.budget)),
               pos: lastValue.value > lastValue.budget,
               options: {
                 ...demoTriChart,
@@ -356,7 +362,7 @@ export class DashboardPageComponent implements OnInit {
             const lastValue = balanceCard.rows[balanceCard.rows.length - 1]
             this.balanceVsNetworthDiff = {
               current: lastValue.value,
-              result: lastValue.value,
+              result: Math.abs(lastValue.value),
               pos: 1,
               options: {
                 ...demoTriChart,
@@ -383,32 +389,32 @@ export class DashboardPageComponent implements OnInit {
             this.demoGraphics = [
               {
                 // name: expensesNowCard.name,
-                name: `Uitgaven ${this.datePipe.transform(expensesNowCard.rows[0].date, 'MMMM', undefined, this.culture)} (mtd)`,
+                name: `Uitgaven ${this.datePipe.transform(expensesNowCard.rows[0].date, 'MMMM', undefined, this.culture)} tot nu toe`,
                 options: {
                   ...demoGraphicTemplate,
                   labels: expensesNowCard.rows.map(e => e.category),
                   series: expensesNowCard.rows.map(e => e.percent),
-                  colors: ["#9B1816", "#EB4E49", "#cc444b", "#da5552", "#df7373"]
+                  colors: expenseColors
                 },
                 groups: expensesNowCard.rows.map((e, i) => ({
                   label: e.category,
-                  color: ["#9B1816", "#EB4E49", "#cc444b", "#da5552", "#df7373"][i],
+                  color: expenseColors[i],
                   value: e.value,
                   percentage: e.percent
                 }))
               },
               {
                 // name: incomesNowCard.name,
-                name: `Inkomen ${this.datePipe.transform(incomesNowCard.rows[0].date, 'MMMM', undefined, this.culture)} (mtd)`,
+                name: `Inkomen ${this.datePipe.transform(incomesNowCard.rows[0].date, 'MMMM', undefined, this.culture)} tot nu toe`,
                 options: {
                   ...demoGraphicTemplate,
                   labels: incomesNowCard.rows.map(e => e.category),
                   series: incomesNowCard.rows.map(e => e.percent),
-                  colors: ["#a6c36f", "#828c51", "#335145", "#beef9e", "#1e352f"]
+                  colors: revenueColors
                 },
                 groups: incomesNowCard.rows.map((e, i) => ({
                   label: e.category,
-                  color: ["#a6c36f", "#828c51", "#335145", "#beef9e", "#1e352f"][i],
+                  color: revenueColors[i],
                   value: e.value,
                   percentage: e.percent
                 }))
@@ -420,11 +426,11 @@ export class DashboardPageComponent implements OnInit {
                   ...demoGraphicTemplate,
                   labels: expensesPrevCard.rows.map(e => e.category),
                   series: expensesPrevCard.rows.map(e => e.percent),
-                  colors: ["#9B1816", "#EB4E49", "#cc444b", "#da5552", "#df7373"]
+                  colors: expenseColors
                 },
                 groups: expensesPrevCard.rows.map((e, i) => ({
                   label: e.category,
-                  color: ["#9B1816", "#EB4E49", "#cc444b", "#da5552", "#df7373"][i],
+                  color: expenseColors[i],
                   value: e.value,
                   percentage: e.percent
                 }))
@@ -436,11 +442,11 @@ export class DashboardPageComponent implements OnInit {
                   ...demoGraphicTemplate,
                   labels: incomesPrevCard.rows.map(e => e.category),
                   series: incomesPrevCard.rows.map(e => e.percent),
-                  colors: ["#a6c36f", "#828c51", "#335145", "#beef9e", "#1e352f"]
+                  colors: revenueColors
                 },
                 groups: incomesPrevCard.rows.map((e, i) => ({
                   label: e.category,
-                  color: ["#a6c36f", "#828c51", "#335145", "#beef9e", "#1e352f"][i],
+                  color: revenueColors[i],
                   value: e.value,
                   percentage: e.percent
                 }))
