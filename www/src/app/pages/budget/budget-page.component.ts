@@ -19,7 +19,6 @@ export class BudgetPageComponent implements OnInit {
     private budgetApi: BudgetApiService
   ) { }
 
-
   async ngOnInit() {
     try {
       const overview = await this.budgetApi.getOverview()
@@ -160,8 +159,12 @@ export class BudgetPageComponent implements OnInit {
     }
   }
 
-  get GeustimatedGrowth(): number {
-    return 0
+  get isCreatingIncome(): boolean {
+    return this._incomes.some(e => e.id === 0)
+  }
+
+  get isCreatingExpense(): boolean {
+    return this._expenses.some(e => e.id === 0)
   }
 
   get incomes(): IBudgetEntry[] {
