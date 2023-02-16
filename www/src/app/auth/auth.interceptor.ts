@@ -7,7 +7,7 @@ const API_URL = 'quickfin.be/api'
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  private refreshTokenInProgress = false;
+  private refreshTokenInProgress = false
   private refreshTokenSubject: BehaviorSubject<string | undefined> = new BehaviorSubject<string | undefined>(undefined)
 
   constructor(private auth: AuthService) { }
@@ -19,13 +19,14 @@ export class AuthInterceptor implements HttpInterceptor {
       return next.handle(this.addAuthToken(request)).pipe(
         catchError((requestError: HttpErrorResponse) => {
           if (requestError && requestError.status === 401) {
+            console.log('this.auth.expired', this.auth.expired)
             if (this.refreshTokenInProgress) {
               return this.refreshTokenSubject.pipe(
                 filter((result) => result !== undefined),
                 take(1),
                 switchMap(() => next.handle(this.addAuthToken(request)))
               );
-            } else if (this.auth.isAuthenticated()) {
+            } else /* if (this.auth.expired) */ {
               this.refreshTokenInProgress = true
               this.refreshTokenSubject.next(undefined)
 
@@ -36,9 +37,9 @@ export class AuthInterceptor implements HttpInterceptor {
                 }),
                 finalize(() => (this.refreshTokenInProgress = false))
               );
-            } else {
+            }/* else {
               return NEVER
-            }
+            } */
           } else {
             return throwError(() => requestError)
           }
