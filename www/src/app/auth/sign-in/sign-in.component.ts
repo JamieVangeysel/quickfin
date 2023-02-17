@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http'
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
-import { Router } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { firstValueFrom } from 'rxjs'
 import { AuthService } from '../auth.service'
 
@@ -18,6 +18,7 @@ export class SignInComponent implements OnInit, OnDestroy {
 
   constructor(
     fb: FormBuilder,
+    route: ActivatedRoute,
     private auth: AuthService,
     private router: Router,
     private ref: ChangeDetectorRef
@@ -26,6 +27,11 @@ export class SignInComponent implements OnInit, OnDestroy {
       username: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(12)]],
       remember_me: [false, []]
+    })
+
+    firstValueFrom(route.queryParams).then(params => {
+      if (params['login_hint'])
+        this.signInForm.controls['username'].setValue(params['login_hint'])
     })
   }
 

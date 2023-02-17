@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http'
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core'
 import { FormGroup, FormBuilder, Validators } from '@angular/forms'
-import { Router } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { firstValueFrom } from 'rxjs/internal/firstValueFrom'
 import { AuthService } from '../auth.service'
 
@@ -18,6 +18,7 @@ export class SignUpComponent {
 
   constructor(
     fb: FormBuilder,
+    route: ActivatedRoute,
     private auth: AuthService,
     private router: Router,
     private ref: ChangeDetectorRef
@@ -29,6 +30,11 @@ export class SignUpComponent {
       password: ['', [Validators.required, Validators.minLength(12)]],
       remmeber_me: [false, []]
     })
+
+    firstValueFrom(route.queryParams).then(params => {
+      if (params['login_hint'])
+        this.signUpForm.controls['username'].setValue(params['login_hint'])
+    })
   }
 
   async signUp() {
@@ -37,7 +43,8 @@ export class SignUpComponent {
     try {
       const response = await firstValueFrom(this.auth.register(this.signUpForm.value))
       if (response.success) {
-        this.goToDashboard()
+        alert('Jouw account is aangemaakt, je kan je nu inloggen.')
+        this.goToDashboard(this.signUpForm.value.username)
       }
     } catch (err: any) {
       if (err.status && err.message) {
@@ -54,7 +61,7 @@ export class SignUpComponent {
     }
   }
 
-  goToDashboard() {
-    this.router.navigate(['/auth/sign-in'])
+  goToDashboard(username: string) {
+    this.router.navigate([`/auth/sign-in?login_hint=${username}`])
   }
 }
