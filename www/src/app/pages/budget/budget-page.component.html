@@ -2,13 +2,13 @@
   <div class="flex flex-col flex-auto space-y-4">
     <div class="flex flex-col px-2 md:flex-row mb-4 gap-4">
       <div id="incomes" class="w-full">
-        <div class="justify-between md:flex min-h-[40px]">
+        <div class="flex justify-between min-h-[40px]">
           <div class="flex justify-between items-center">
             <div class="text-4xl font-medium">
               Inkomen
             </div>
           </div>
-          <div class="mt-4 md:mt-0 flex flex-col items-start sm:flex-row sm:space-x-4 shrink-0">
+          <div class="flex flex-col items-start sm:flex-row sm:space-x-4 shrink-0">
             <button
               class="bg-lynch-500 text-white rounded-full px-1 px-5 h-10 disabled:bg-gray-300 border-none hover:bg-lynch-600"
               tabindex="0" title="Inkomen aanmaken" (click)="beginCreate(0)" [disabled]="isCreatingIncome">
@@ -17,6 +17,7 @@
             </button>
           </div>
         </div>
+
         <div *ngIf="incomes.length > 0"
           class="flex flex-col flex-auto bg-white dark:bg-gray-800 overflow-hidden sm:overflow-y-auto mt-12 dark:text-white">
           <div class="flex flex-row px-4 py-3 font-bold bg-gray-200 dark:text-gray-300 dark:bg-gray-700">
@@ -122,13 +123,13 @@
         </div>
       </div>
       <div id="expenses" class="w-full">
-        <div class="justify-between md:flex min-h-[40px]">
+        <div class="flex justify-between min-h-[40px]">
           <div class="flex justify-between items-center">
             <div class="text-4xl font-medium">
               Uitgaven
             </div>
           </div>
-          <div class="mt-4 md:mt-0 flex flex-col items-start sm:flex-row sm:space-x-4 shrink-0">
+          <div class="flex flex-col items-start sm:flex-row sm:space-x-4 shrink-0">
             <button
               class="bg-lynch-500 text-white rounded-full px-1 px-5 h-10 disabled:bg-gray-300 border-none hover:bg-lynch-600"
               tabindex="0" title="Uitgave aanmaken" (click)="beginCreate(1)" [disabled]="isCreatingExpense">
@@ -137,6 +138,7 @@
             </button>
           </div>
         </div>
+
         <div *ngIf="expenses.length > 0"
           class="flex flex-col flex-auto bg-white dark:bg-gray-800 overflow-hidden sm:overflow-y-auto mt-12 dark:text-white">
           <div class="flex flex-row px-4 py-3 font-bold bg-gray-200 dark:text-gray-300 dark:bg-gray-700">

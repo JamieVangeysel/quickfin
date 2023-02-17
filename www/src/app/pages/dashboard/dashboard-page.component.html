@@ -1,4 +1,4 @@
-<div class="flex flex-wrap w-full max-w-screen-xl mx-auto p-6 md:p-8">
+<div class="flex flex-col w-full max-w-screen-xl mx-auto p-6 md:p-8">
   <!-- <blockquote class="p-4 border-l-4 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-800">
     <p class="text-xl italic font-medium leading-relaxed text-gray-900 dark:text-gray-200">
       Op deze pagina krijg je overzicht van al je uitgaven, inkomens, gemiddeldes, maandelijkse vergelijking,
@@ -327,12 +327,12 @@
     </div>
   </div>
 
-  <div class="w-full mt-12 hidden">
+  <div class="w-full mt-12" *ngIf="demoGraphics.length > 0">
     <div class="text-2xl font-semibold tracking-tight leading-6">
-      Your Audience
+      Jouw inkomen en uitgaven
     </div>
     <div class="font-medium tracking-tight text-secondary">
-      Demographic properties of your users
+      Demografische eigenschappen van jouw inkomen en uitgaven
     </div>
   </div>
 
