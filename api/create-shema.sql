@@ -442,7 +442,7 @@ AS BEGIN
     )
   )
   FROM [sso].[users] [user]
-  WHERE [user].[user_id] = @user_id
+  WHERE [user].[id] = @user_id
   FOR JSON PATH
 END
 GO
