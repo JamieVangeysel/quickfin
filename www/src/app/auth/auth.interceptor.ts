@@ -15,11 +15,11 @@ export class AuthInterceptor implements HttpInterceptor {
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     console.log(request.url)
     if (request.url.includes(API_URL)) {
-      console.log('adding intercept header')
       return next.handle(this.addAuthToken(request)).pipe(
         catchError((requestError: HttpErrorResponse) => {
           if (requestError && requestError.status === 401) {
             console.log('this.auth.expired', this.auth.expired)
+
             if (this.refreshTokenInProgress) {
               return this.refreshTokenSubject.pipe(
                 filter((result) => result !== undefined),
