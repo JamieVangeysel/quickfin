@@ -1308,3 +1308,6 @@ END
 GO
 
 GRANT EXEC ON [analytics].[usp_getAnalytics] TO [sso] -- TEMPORARY ACTION
+
+-- To-Do: Add stocks schema and table for tracking stock values
+CREATE SCHEMA [stocks]
