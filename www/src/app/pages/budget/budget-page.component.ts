@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, OnInit, Component } from '@angular/core'
-import { BudgetApiService, IBudgetEntry, IPostResponse, IPutResponse, IYear } from 'src/app/api/budget-api.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms'
+import { BudgetApiService, IBudgetEntry, IPostResponse, IPutResponse, IYear } from 'src/app/api/budget-api.service'
 
 @Component({
   selector: 'qf-budget-page',
@@ -10,11 +11,15 @@ import { BudgetApiService, IBudgetEntry, IPostResponse, IPutResponse, IYear } fr
   }
 })
 export class BudgetPageComponent implements OnInit {
-  _years: IYear[] = [{ year: new Date().getFullYear() }]
-  _incomes: IBudgetEntry[] = []
-  _expenses: IBudgetEntry[] = []
+  private _years: IYear[] = [{ year: new Date().getFullYear() }]
+
+  private _forms: { [key: string]: FormGroup } = {}
+
+  private _incomes: ListItem[] = []
+  private _expenses: ListItem[] = []
 
   constructor(
+    private fb: FormBuilder,
     private ref: ChangeDetectorRef,
     private budgetApi: BudgetApiService
   ) { }
@@ -23,8 +28,12 @@ export class BudgetPageComponent implements OnInit {
     try {
       const overview = await this.budgetApi.getOverview()
       if (overview) {
-        this._incomes = overview.incomes ?? []
-        this._expenses = overview.expenses ?? []
+
+        this._incomes = overview.incomes as ListItem[]
+        this._incomes.forEach(e => e.editing = false)
+        this._expenses = overview.expenses as ListItem[]
+        this._expenses.forEach(e => e.editing = false)
+
         this._years = overview.years ?? []
       }
     } catch (err) {
@@ -34,104 +43,79 @@ export class BudgetPageComponent implements OnInit {
     }
   }
 
-  async create(type: 0 | 1) {
-    const newLabel = prompt('Label: ')
-    if (!newLabel) return
-    const newValue = prompt('Waarde: ')
-    if (!newValue) return
+  edit(type: 0 | 1, item: ListItem) {
+    item.editing = !item.editing
 
-    if (+newValue >= 0 && newLabel.length > 0) {
-      // try to create item !
-      try {
-        let resp: IPostResponse
+    if (!this._forms[`${type}-${item.id}`]) {
+      this._forms[`${type}-${item.id}`] = this.fb.group({
+        name: [item.name, [Validators.required]],
+        value: [item.value, [Validators.required]]
+      })
+    }
 
+    this.ref.markForCheck()
+  }
+
+  beginCreate(type: 0 | 1) {
+    if ((type === 0 && this.isCreatingIncome) || (type === 1 && this.isCreatingExpense)) return
+
+    const item: ListItem = {
+      id: 0,
+      name: '',
+      value: 0,
+      year: new Date().getFullYear(),
+      editing: false
+    }
+
+    if (type === 0)
+      this._incomes.unshift(item)
+    else
+      this._expenses.unshift(item)
+
+    this.edit(type, item)
+  }
+
+  async save(type: 0 | 1, item: ListItem) {
+    if (this._forms[`${type}-${item.id}`].valid) {
+      const formValue = this._forms[item.id].value
+
+      formValue.id = item.id
+      // make sure value is positive number
+      formValue.amount = Math.abs(formValue.amount)
+
+      let response: IPostResponse
+      if (type === 0)
+        response = item.id > 0 ?
+          await this.budgetApi.updateIncome(formValue) :
+          await this.budgetApi.createIncome(formValue)
+      else
+        response = item.id > 0 ?
+          await this.budgetApi.updateExpense(formValue) :
+          await this.budgetApi.createExpense(formValue)
+
+      if (!response.success) {
+        alert('Niet opgeslagen !')
+      } else {
+        // success
         if (type === 0)
-          resp = await this.budgetApi.createIncome({
-            name: newLabel,
-            value: +newValue,
-            year: new Date().getFullYear()
-          })
+          alert(item.id > 0 ? 'Inkomen bijgewerkt !' : 'Inkomen aangemaakt !')
         else
-          resp = await this.budgetApi.createExpense({
-            name: newLabel,
-            value: +newValue,
-            year: new Date().getFullYear()
-          })
+          alert(item.id > 0 ? 'Uitgave bijgewerkt !' : 'Uitgave aangemaakt !')
 
-        if (resp.success) {
-          // alert('Aangemaakt!')
-
-          const item = {
-            id: resp.id,
-            name: newLabel,
-            value: +newValue,
-            year: new Date().getFullYear()
-          }
-
-          if (type === 0)
-            this._incomes.push(item)
-          else
-            this._expenses.push(item)
+        if (item.id === 0) {
+          item.id = response.id
         }
-      } catch (err) {
-        console.log(err)
-        alert('Er is een onbekende fout opgetreden tijdens het behandelen van je verzoek!')
-      } finally {
+        item.name = formValue.name
+        item.value = formValue.value
+
         this.ref.markForCheck()
       }
     } else {
-      alert('De ingevoerde waardes bevatten een fout!')
+      console.warn('form is invallid', this._forms[item.id].value)
     }
   }
 
-  async edit(type: 0 | 1, item: IBudgetEntry) {
-    const newLabel = prompt('Nieuwe label: ', item.name)
-    if (!newLabel) return
-    const newValue = prompt('Nieuwe waarde: ', item.value.toString())
-    if (!newValue) return
-
-    if (+newValue >= 0) {
-      if (newLabel === item.name && +newValue === item.value) {
-        alert('Er zijn geen wijzigingen opgeslagen!')
-      } else {
-        // try to update item !
-        try {
-          let resp: IPutResponse
-
-          if (type === 0)
-            resp = await this.budgetApi.updateIncome({
-              id: item.id,
-              name: newLabel,
-              value: +newValue,
-              year: item.year
-            })
-          else
-            resp = await this.budgetApi.updateExpense({
-              id: item.id,
-              name: newLabel,
-              value: +newValue,
-              year: item.year
-            })
-
-          if (resp.success) {
-            // alert('Opgeslagen!')
-            item.name = newLabel
-            item.value = +newValue
-          }
-          console.log('Nieuwe waardes: ', newLabel, +newValue)
-        } catch (err) {
-          console.log(err)
-          alert('Er is een onbekende fout opgetreden tijdens het behandelen van je verzoek!')
-        } finally {
-          this.ref.markForCheck()
-        }
-      }
-    } else {
-      alert('Er is een fout opgetreden tijdens het verwerken van je ingegeven waardes, waarde moet een getal groter of gelijk aan 0 zijn!')
-    }
-  }
-
-  async delete(type: 0 | 1, item: IBudgetEntry) {
+  async delete(type: 0 | 1, item: ListItem) {
     const confirmed = confirm(`Weet je zeker dat je '${item.name}' wilt verwijderen?`)
     if (confirmed === true) {
       // try to update item !
@@ -167,11 +151,11 @@ export class BudgetPageComponent implements OnInit {
     return this._expenses.some(e => e.id === 0)
   }
 
-  get incomes(): IBudgetEntry[] {
+  get incomes(): ListItem[] {
     return this._incomes
   }
 
-  get expenses(): IBudgetEntry[] {
+  get expenses(): ListItem[] {
     return this._expenses
   }
 
@@ -183,6 +167,10 @@ export class BudgetPageComponent implements OnInit {
     return this._expenses.reduce((prev, curr) => prev + curr.value, 0)
   }
 
+  get form(): { [key: string]: FormGroup } {
+    return this._forms
+  }
+
   get balance(): number {
     return this.incomesValue - this.expensesValue
   }
@@ -191,3 +179,9 @@ export class BudgetPageComponent implements OnInit {
     return 'nl-BE'
   }
 }
+
+export interface IEditableRow {
+  editing: boolean
+}
+
+interface ListItem extends IBudgetEntry, IEditableRow { }
