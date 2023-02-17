@@ -17,7 +17,7 @@
             </button>
           </div>
         </div>
-        <div
+        <div *ngIf="incomes.length > 0"
           class="flex flex-col flex-auto bg-white dark:bg-gray-800 overflow-hidden sm:overflow-y-auto mt-12 dark:text-white">
           <div class="flex flex-row px-4 py-3 font-bold bg-gray-200 dark:text-gray-300 dark:bg-gray-700">
             <div class="flex-auto">
@@ -98,6 +98,7 @@
               </div>
             </div>
           </ng-container>
+
           <div class="flex flex-row items-center px-4 py-2 dark:text-gray-400">
             <div class="flex-auto">
               <span class="font-bold text-black dark:text-white">Totale Inkomsten</span>
@@ -109,6 +110,15 @@
               &nbsp;
             </div>
           </div>
+        </div>
+
+        <div class="mt-4" *ngIf="!incomes || incomes.length === 0">
+          <blockquote class="p-4 border-l-4 mx-2 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-800">
+            <p class="text-xl italic font-medium leading-relaxed text-gray-900 dark:text-gray-200">
+              Je hebt nog geen inkomen toegevoegd aan je budget, voeg een inkomen categorie toe door op de knop
+              'Inkomen toevoegen' te klikken.
+            </p>
+          </blockquote>
         </div>
       </div>
       <div id="expenses" class="w-full">
@@ -127,7 +137,7 @@
             </button>
           </div>
         </div>
-        <div
+        <div *ngIf="expenses.length > 0"
           class="flex flex-col flex-auto bg-white dark:bg-gray-800 overflow-hidden sm:overflow-y-auto mt-12 dark:text-white">
           <div class="flex flex-row px-4 py-3 font-bold bg-gray-200 dark:text-gray-300 dark:bg-gray-700">
             <div class="flex-auto">
@@ -208,6 +218,7 @@
               </div>
             </div>
           </ng-container>
+
           <div class="flex flex-row items-center px-4 py-2 dark:text-gray-400">
             <div class="flex-auto">
               <span class="font-bold text-black dark:text-white">Totale Uitgaven</span>
@@ -221,6 +232,15 @@
               </div>
             </div>
           </div>
+        </div>
+
+        <div class="mt-4" *ngIf="!expenses || expenses.length === 0">
+          <blockquote class="p-4 border-l-4 mx-2 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-800">
+            <p class="text-xl italic font-medium leading-relaxed text-gray-900 dark:text-gray-200">
+              Je hebt nog geen uitgaven toegevoegd aan je budget, voeg een uitgave categorie toe door op de knop
+              'Uitgave toevoegen' te klikken.
+            </p>
+          </blockquote>
         </div>
       </div>
     </div>

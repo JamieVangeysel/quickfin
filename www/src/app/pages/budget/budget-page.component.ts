@@ -29,9 +29,9 @@ export class BudgetPageComponent implements OnInit {
       const overview = await this.budgetApi.getOverview()
       if (overview) {
 
-        this._incomes = overview.incomes as ListItem[]
+        this._incomes = (overview.incomes ?? []) as ListItem[]
         this._incomes.forEach(e => e.editing = false)
-        this._expenses = overview.expenses as ListItem[]
+        this._expenses = (overview.expenses ?? []) as ListItem[]
         this._expenses.forEach(e => e.editing = false)
 
         this._years = overview.years ?? []
