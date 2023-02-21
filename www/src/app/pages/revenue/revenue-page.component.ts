@@ -14,6 +14,8 @@ export class RevenuePageComponent {
   private _forms: { [key: string]: FormGroup } = {}
   private _revenues: ListItem[] = []
 
+  loading: boolean = true
+
   constructor(
     private ref: ChangeDetectorRef,
     private fb: FormBuilder,
@@ -22,6 +24,9 @@ export class RevenuePageComponent {
 
   async ngOnInit() {
     try {
+      this.loading = true
+      this.ref.markForCheck()
+
       const journal = await this.journalApi.getEntries(true)
       if (journal) {
         journal.forEach(e => e.amount = Math.abs(e.amount))
@@ -31,6 +36,7 @@ export class RevenuePageComponent {
     } catch (err) {
       console.log(err)
     } finally {
+      this.loading = false
       this.ref.markForCheck()
     }
   }

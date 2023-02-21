@@ -283,6 +283,7 @@ export class DashboardPageComponent implements OnInit {
   }
   async ngOnInit() {
     try {
+      this.loading = true
       const analytics = await this.analyticsApi.get()
       this.analytics = analytics
 
@@ -472,6 +473,14 @@ export class DashboardPageComponent implements OnInit {
       this.activeSegment = segment
       this.ref.markForCheck()
     }
+  }
+
+  async export() {
+    if (!this.hasCurrentSegment || this.demoGraphics.length === 0) {
+      alert('Je gelooft het vast niet maar om deze gegevens te kunnen exporteren hebben wij wat historieken nodig, anders zou dit rapport heel saai zijn!')
+      return
+    }
+    alert('Je staat vast te springen om deze functie te gebruiken maar jammer genoeg kan je dit nog niet.')
   }
 
   get profile(): any {

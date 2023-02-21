@@ -5,7 +5,12 @@
       voorspellingen en waarschuwingen indien je over je budget gaat.
     </p>
   </blockquote> -->
-  <div class="flex items-center justify-between w-full">
+  <div class="flex flex-col item-center justify-center text-center" *ngIf="loading">
+    <div class="mx-auto">
+      <i class="fal fa-fw fa-2x fa-spin fa-circle-notch"></i> Ophalen van analytische gegevens...
+    </div>
+  </div>
+  <div class="flex items-center justify-between w-full" *ngIf="!loading">
     <div>
       <div class="text-3xl font-semibold tracking-tight leading-8">
         Overzicht
@@ -15,15 +20,14 @@
       </div>
     </div>
     <div class="flex items-center ml-6">
-      <button
-        class="bg-lynch-500 text-white rounded-full px-1 px-5 h-10 disabled:bg-gray-300 border-none hover:bg-lynch-600"
-        tabindex="0" title="Exporteer">
+      <button tabindex="0" title="Exporteer" (click)="export()"
+        class="bg-lynch-500 text-white rounded-full px-1 px-5 h-10 disabled:bg-gray-300 border-none hover:bg-lynch-600">
         <i class="far fa-file-export"></i>
-        <span class="hidden md:inline-flex">Exporteer</span>
+        <span class="hidden md:inline-flex">&nbsp;Exporteer</span>
       </button>
     </div>
   </div>
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full mt-8">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full mt-8" *ngIf="!loading">
     <div class="flex flex-col flex-auto bg-gray-800 dark text-white shadow rounded-2xl overflow-hidden
           dark:shadow-none sm:col-span-2 lg:col-span-3" *ngIf="networth_history">
       <div class="flex items-center justify-between mt-10 ml-10 mr-6 sm:mr-10">
@@ -336,7 +340,7 @@
     </div>
   </div>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 w-full mt-6 md:mt-8">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 w-full mt-6 md:mt-8" *ngIf="!loading">
     <div
       class="flex flex-col bg-white shadow rounded-2xl overflow-hidden p-6 h-[fit-content] dark:bg-gray-800 dark:shadow-none"
       *ngFor="let item of demoGraphics">

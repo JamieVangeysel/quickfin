@@ -15,6 +15,8 @@ export class ExpensesPageComponent {
   private _forms: { [key: string]: FormGroup } = {}
   private _expenses: ListItem[] = []
 
+  loading: boolean = true
+
   constructor(
     private ref: ChangeDetectorRef,
     private fb: FormBuilder,
@@ -23,6 +25,9 @@ export class ExpensesPageComponent {
 
   async ngOnInit() {
     try {
+      this.loading = true
+      this.ref.markForCheck()
+
       const journal = await this.journalApi.getEntries(false)
       if (journal) {
         journal.forEach(e => e.amount = Math.abs(e.amount))
@@ -32,6 +37,7 @@ export class ExpensesPageComponent {
     } catch (err) {
       console.log(err)
     } finally {
+      this.loading = false
       this.ref.markForCheck()
     }
   }

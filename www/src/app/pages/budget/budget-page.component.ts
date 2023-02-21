@@ -18,6 +18,8 @@ export class BudgetPageComponent implements OnInit {
   private _incomes: ListItem[] = []
   private _expenses: ListItem[] = []
 
+  loading: boolean = true
+
   constructor(
     private fb: FormBuilder,
     private ref: ChangeDetectorRef,
@@ -26,6 +28,9 @@ export class BudgetPageComponent implements OnInit {
 
   async ngOnInit() {
     try {
+      this.loading = true
+      this.ref.markForCheck()
+
       const overview = await this.budgetApi.getOverview()
       if (overview) {
 
@@ -39,6 +44,7 @@ export class BudgetPageComponent implements OnInit {
     } catch (err) {
       console.log(err)
     } finally {
+      this.loading = false
       this.ref.markForCheck()
     }
   }
