@@ -1,4 +1,125 @@
-<div class="w-full flex flex-col">
+<div class="flex flex-col w-full max-w-screen-xl mx-auto p-6 md:p-8">
+  <div class="flex items-center justify-between w-full">
+    <div>
+      <div class="text-3xl font-semibold tracking-tight leading-8">
+        Nettowaarde
+      </div>
+      <div class="font-medium tracking-tight text-secondary">
+        Hier vind je een kort overzicht van je nettowaarde, een verdeling van je activa alsook een top 3 activa en
+        passiva
+      </div>
+    </div>
+    <!-- <div class="flex items-center ml-6">
+      <button tabindex="0" title="Exporteer" (click)="export()"
+        class="bg-lynch-500 text-white rounded-full px-1 px-5 h-10 disabled:bg-gray-300 border-none hover:bg-lynch-600">
+        <i class="far fa-file-export"></i>
+        <span class="hidden md:inline-flex">&nbsp;Exporteer</span>
+      </button>
+    </div> -->
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
+    <div
+      class="bg-lynch-500 text-white font-light rounded-xl p-6 space-y-4 w-full drop-shadow-lg dark:bg-lynch-700 dark:filter-none">
+      <div class="flex flex-col"> <!--  mt-2 -->
+        <div class="text-md uppercase">
+          Nettowaarde
+        </div>
+        <div class="text-4xl font-medium">
+          {{ networth | currency:'EUR':'symbol-narrow':'1.0-2':culture }}
+        </div>
+      </div>
+      <div class="flex flex-row items-center justify-between">
+        <div class="flex flex-col">
+          <div class="text-xs uppercase">
+            Jouw activa
+          </div>
+          <div class="text-2xl font-medium">
+            {{ assetsValue | currency:'EUR':'symbol-narrow':'1.0-2':culture }}
+          </div>
+        </div>
+        <div class="flex flex-col">
+          <div class="text-xs uppercase">
+            Jouw passiva
+          </div>
+          <div class="text-2xl font-medium">
+            {{ liabilitiesValue | currency:'EUR':'symbol-narrow':'1.0-2':culture }}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bg-white rounded-xl p-6 space-y-4 w-full drop-shadow-lg dark:bg-gray-800 dark:filter-none">
+      <div class="flex flex-row items-center justify-between">
+        <div class="flex flex-col">
+          <span class="font-bold">Nettowaarde historiek</span>
+        </div>
+        <div class="flex flex-col text-gray-400">
+          {{ today | date:'EEEE d MMM YYYY':undefined:culture }}
+        </div>
+      </div>
+    </div>
+    <div class="w-full">
+      <div class="flex flex-col mt-12">
+        <div class="text-xl font-bold">
+          Activa verdeling
+        </div>
+
+      </div>
+    </div>
+    <div class="w-full">
+      <div class="flex flex-col">
+        <div class="flex flex-row items-center justify-between mt-12 mb-4">
+          <div class="text-xl font-bold">
+            Top activa
+          </div>
+          <a routerLink="/networth/assets" class="text-md font-bold text-accent hover:underline hover:cursor-pointer">
+            Bekijk alles
+          </a>
+        </div>
+        <div class="flex flex-col">
+          <div class="flex flex-row py-2 items-center border-b space-x-4 last:border-none"
+            *ngFor="let asset of assets | slice:0:3">
+            <div class="w-10">
+              <i class="far" [ngClass]="resolveIcon(asset.name, 'fa-circle-dollar-to-slot')"></i>
+            </div>
+            <div class="flex-auto text-gray-400">
+              {{ asset.name }}
+            </div>
+            <div class="font-bold text-lg">
+              +{{ asset.value | currency:'EUR':'symbol-narrow':'1.2-2':culture }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-col">
+        <div class="flex flex-row items-center justify-between mt-12 mb-4">
+          <div class="text-xl font-bold">
+            Top passiva
+          </div>
+          <a routerLink="/networth/liabilities"
+            class="text-md font-bold text-accent hover:underline hover:cursor-pointer">
+            Bekijk alles
+          </a>
+        </div>
+        <div class="flex flex-col">
+          <div class="flex flex-row py-2 items-center border-b space-x-4 last:border-none"
+            *ngFor="let liability of liabilities | slice:0:3">
+            <div class="w-10">
+              <i class="far" [ngClass]="resolveIcon(liability.name, 'fa-money-bill-transfer')"></i>
+            </div>
+            <div class="flex-auto text-gray-400">
+              {{ liability.name }}
+            </div>
+            <div class="font-bold text-lg">
+              -{{ liability.value | currency:'EUR':'symbol-narrow':'1.2-2':culture }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="w-full flex flex-col" *ngIf="false">
   <div class="flex flex-col px-2 sm:flex-row mb-4 gap-4">
     <div id="assets" class="w-full sm:w-1/2">
       <div class="text-4xl font-medium text-center mb-2">Activa</div>

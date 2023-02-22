@@ -22,6 +22,7 @@ export class OverviewPageComponent implements OnInit {
   async ngOnInit() {
     try {
       const overview = await this.networthApi.getOverview()
+      console.log(overview)
       if (overview) {
         this._assets = overview.assets ?? []
         this._liabilities = overview.liabilities ?? []
@@ -31,6 +32,22 @@ export class OverviewPageComponent implements OnInit {
     } finally {
       this.ref.markForCheck()
     }
+  }
+
+  resolveIcon(name: string, fallback: string): string {
+    name = name.toLocaleLowerCase()
+
+    if (['huis', 'woning', 'home', 'house'].some(e => name.includes(e))) {
+      return 'fa-home-alt'
+    } else if (['sparen', 'invest', 'spaar', 'pensioen', 'pension'].some(e => name.includes(e))) {
+      return 'fa-piggy-bank'
+    } else if (['rekening', 'invest'].some(e => name.includes(e))) {
+      return 'fa-building-columns'
+    } else if (['cash', 'geld'].some(e => name.includes(e))) {
+      return 'fa-coins'
+    }
+
+    return fallback
   }
 
   get assets(): any[] {
@@ -51,6 +68,10 @@ export class OverviewPageComponent implements OnInit {
 
   get networth(): number {
     return this.assetsValue - this.liabilitiesValue
+  }
+
+  get today(): Date {
+    return new Date()
   }
 
   get culture(): string {
