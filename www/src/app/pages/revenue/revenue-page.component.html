@@ -1,4 +1,4 @@
-<div class="w-full py-10 px-5">
+<div class="w-full py-7 px-5">
   <div class="flex flex-col flex-auto space-y-4">
     <div class="flex flex-col item-center justify-center text-center" *ngIf="loading">
       <div class="mx-auto">
@@ -13,7 +13,7 @@
               Inkomen
             </div>
           </div>
-          <div class="flex flex-col items-start sm:flex-row sm:space-x-4 shrink-0">
+          <div class="flex flex-col items-center sm:flex-row sm:space-x-4 shrink-0">
             <button
               class="bg-lynch-500 text-white rounded-full px-1 px-5 h-10 disabled:bg-gray-300 border-none hover:bg-lynch-600"
               tabindex="0" title="Inkomen aanmaken" (click)="beginCreate()" [disabled]="isCreating">
@@ -24,7 +24,7 @@
         </div>
 
         <div *ngIf="revenues.length > 0"
-          class="flex flex-col flex-auto bg-white dark:bg-gray-800 overflow-hidden sm:overflow-y-auto mt-12 dark:text-white">
+          class="flex flex-col flex-auto bg-white dark:bg-gray-800 overflow-hidden sm:overflow-y-auto mt-4 dark:text-white">
           <div class="flex flex-row px-4 py-3 font-bold bg-gray-200 dark:text-gray-300 dark:bg-gray-700">
             <div class="w-32">
               Datum
