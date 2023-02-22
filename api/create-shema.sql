@@ -454,22 +454,26 @@ AS BEGIN
   SELECT
     [assets] = (
       SELECT
-        [name] = MIN([group].[name]),
-        [value] = SUM([asset].[value])
+        [name] = [asset].[name],
+        [category] = [group].[name],
+        [value] = [asset].[value]
       FROM [networth].[assets] [asset]
       INNER JOIN [networth].[assetGroups] [group] ON [group].[id] = [asset].[group_id]
       WHERE [asset].[user_id] = @user_id
-      GROUP BY [asset].[group_id]
+      ORDER BY [asset].[value] DESC
+      -- GROUP BY [asset].[group_id]
       FOR JSON PATH, INCLUDE_NULL_VALUES
     ),
     [liabilities] = (
       SELECT
-        [name] = MIN([group].[name]),
-        [value] = SUM([liability].[value])
+        [name] = [liability].[name],
+        [category] = [group].[name],
+        [value] = [liability].[value]
       FROM [networth].[liabilities] [liability]
       INNER JOIN [networth].[liabilityGroups] [group] ON [group].[id] = [liability].[group_id]
       WHERE [liability].[user_id] = @user_id
-      GROUP BY [liability].[group_id]
+      ORDER BY [liability].[value] DESC
+      -- GROUP BY [liability].[group_id]
       FOR JSON PATH, INCLUDE_NULL_VALUES
     )
   FOR JSON PATH
