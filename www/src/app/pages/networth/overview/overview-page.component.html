@@ -24,7 +24,7 @@
         <div class="text-md uppercase">
           Nettowaarde
         </div>
-        <div class="text-4xl font-medium">
+        <div class="text-4xl font-medium leading-tight">
           {{ networth | currency:'EUR':'symbol-narrow':'1.0-2':culture }}
         </div>
       </div>
@@ -58,7 +58,7 @@
       </div>
     </div>
     <div class="w-full">
-      <div class="flex flex-col mt-12">
+      <div class="flex flex-col mt-10">
         <div class="text-xl font-bold">
           Activa verdeling
         </div>
@@ -67,7 +67,7 @@
     </div>
     <div class="w-full">
       <div class="flex flex-col">
-        <div class="flex flex-row items-center justify-between mt-12 mb-4">
+        <div class="flex flex-row items-center justify-between mt-10 mb-4">
           <div class="text-xl font-bold">
             Top activa
           </div>
@@ -76,16 +76,16 @@
           </a>
         </div>
         <div class="flex flex-col">
-          <div class="flex flex-row py-2 items-center border-b space-x-4 last:border-none"
-            *ngFor="let asset of assets | slice:0:3">
-            <div class="w-10">
+          <div class="flex flex-row px-1 py-2 items-center border-b space-x-2 last:border-none"
+            *ngFor="let asset of assets | slice:0:5">
+            <div class="w-6">
               <i class="far" [ngClass]="resolveIcon(asset.name, 'fa-circle-dollar-to-slot')"></i>
             </div>
             <div class="flex-auto text-gray-400">
               {{ asset.name }}
             </div>
             <div class="font-bold text-lg">
-              +{{ asset.value | currency:'EUR':'symbol-narrow':'1.2-2':culture }}
+              + {{ asset.value | currency:'EUR':'symbol-narrow':'1.2-2':culture }}
             </div>
           </div>
         </div>
@@ -101,16 +101,16 @@
           </a>
         </div>
         <div class="flex flex-col">
-          <div class="flex flex-row py-2 items-center border-b space-x-4 last:border-none"
-            *ngFor="let liability of liabilities | slice:0:3">
-            <div class="w-10">
+          <div class="flex flex-row px-1 py-2 items-center border-b space-x-2 last:border-none"
+            *ngFor="let liability of liabilities | slice:0:5">
+            <div class="w-6">
               <i class="far" [ngClass]="resolveIcon(liability.name, 'fa-money-bill-transfer')"></i>
             </div>
             <div class="flex-auto text-gray-400">
               {{ liability.name }}
             </div>
             <div class="font-bold text-lg">
-              -{{ liability.value | currency:'EUR':'symbol-narrow':'1.2-2':culture }}
+              - {{ liability.value | currency:'EUR':'symbol-narrow':'1.2-2':culture }}
             </div>
           </div>
         </div>

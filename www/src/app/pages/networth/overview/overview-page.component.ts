@@ -37,14 +37,30 @@ export class OverviewPageComponent implements OnInit {
   resolveIcon(name: string, fallback: string): string {
     name = name.toLocaleLowerCase()
 
-    if (['huis', 'woning', 'home', 'house'].some(e => name.includes(e))) {
-      return 'fa-home-alt'
-    } else if (['sparen', 'invest', 'spaar', 'pensioen', 'pension'].some(e => name.includes(e))) {
+    if (['huis', 'woning', 'home', 'house', 'mortage', 'hypotheek'].some(e => name.includes(e))) {
+      return 'fa-home'
+    } else if (['sparen', 'spaar', 'pensioen', 'pension'].some(e => name.includes(e))) {
       return 'fa-piggy-bank'
-    } else if (['rekening', 'invest'].some(e => name.includes(e))) {
-      return 'fa-building-columns'
+    } else if (['invest'].some(e => name.includes(e))) {
+      return 'fa-vault'
+    } else if (['rekening'].some(e => name.includes(e))) {
+      return 'fa-landmark'
     } else if (['cash', 'geld'].some(e => name.includes(e))) {
       return 'fa-coins'
+    } else if (['rechtzaak', 'schulden', 'bemiddel', 'debt', 'loan'].some(e => name.includes(e))) {
+      return 'fa-balance-scale'
+    } else if (['mastercard'].some(e => name.includes(e))) {
+      return 'fab fa-cc-mastercard'
+    } else if (['visa'].some(e => name.includes(e))) {
+      return 'fab fa-cc-visa'
+    } else if (['paypal'].some(e => name.includes(e))) {
+      return 'fab fa-cc-paypal'
+    } else if (['auto', 'car'].some(e => name.includes(e))) {
+      return 'fa-car'
+    } else if (['bike', 'motor'].some(e => name.includes(e))) {
+      return 'fa-motorcycle'
+    } else if (['bicycle', 'fiets'].some(e => name.includes(e))) {
+      return 'fa-bicycle'
     }
 
     return fallback
