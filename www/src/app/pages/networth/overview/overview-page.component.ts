@@ -1,5 +1,78 @@
+import { CurrencyPipe } from '@angular/common'
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core'
+import { ChartType } from 'ng-apexcharts'
 import { NetworthApiService } from 'src/app/api/networth-api.service'
+
+const donutChartType: ChartType = 'donut'
+const demoGraphicTemplate = {
+  series: [.8, .2],
+  // labels: ['Dutch', 'French'],
+  chart: {
+    type: donutChartType,
+    width: '100%',
+    height: 200,
+    parentHeightOffset: 0,
+    animations: {
+      enabled: false
+    },
+    selection: {
+      enabled: false
+    }
+  },
+  legend: {
+    show: false
+  },
+  dataLabels: {
+    enabled: false
+  },
+  states: {
+    hover: {
+      filter: {
+        type: 'none'
+      }
+    }
+  },
+  plotOptions: {
+    pie: {
+      expandOnClick: false,
+      donut: {
+        size: '70%'
+      }
+    }
+  },
+  fill: {
+    type: 'solid',
+    // colors: ['rgb(49, 130, 206)', 'rgb(99, 179, 237)']
+  },
+  stroke: {
+    width: 2,
+    colors: ['var(--bg-card)']
+  },
+  // colors: ['rgb(49, 130, 206)', 'rgb(99, 179, 237)'],
+  responsive: [
+    {
+      breakpoint: 480,
+      options: {
+        chart: {
+          width: 200
+        }
+      }
+    }
+  ],
+  tooltip: {
+    enabled: true,
+    fillSeriesColor: false,
+    onDatasetHover: {
+      highlightDataSeries: false,
+    },
+    y: {
+      formatter: function (value: number) {
+        return value.toFixed(2)
+      }
+    }
+  }
+}
+const revenueColors = ['#a6c36f', '#cadba9', '#859c59', '#b8cf8c', '#647543']
 
 @Component({
   selector: 'qf-overview-page',
@@ -13,19 +86,57 @@ export class OverviewPageComponent implements OnInit {
   private _assets: any[] = []
   private _liabilities: any[] = []
 
+  item: any
+
   constructor(
     private ref: ChangeDetectorRef,
-    private networthApi: NetworthApiService
+    private networthApi: NetworthApiService,
+    private currencyPipe: CurrencyPipe
   ) {
   }
 
   async ngOnInit() {
     try {
       const overview = await this.networthApi.getOverview()
-      console.log(overview)
       if (overview) {
         this._assets = overview.assets ?? []
         this._liabilities = overview.liabilities ?? []
+
+        const groups = this._assets.reduce((group, asset) => {
+          const { category } = asset
+          group[category] = group[category] ?? []
+          group[category].push(asset)
+          return group
+        }, {})
+
+        console.log(groups)
+
+        this.item = {
+          ...demoGraphicTemplate,
+          labels: Object
+            .keys(groups),
+          series: Object
+            .keys(groups)
+            .map((e: any) => groups[e].reduce((prev: number, curr: any) => prev + curr.value, 0)),
+          colors: revenueColors,
+          groups: Object.keys(groups).map((e, i) => ({
+            label: groups[e][0].category,
+            color: revenueColors[i],
+            value: groups[e][0].value
+          })),
+          tooltip: {
+            enabled: true,
+            fillSeriesColor: false,
+            onDatasetHover: {
+              highlightDataSeries: false,
+            },
+            y: {
+              formatter: (value: number) => {
+                return this.currencyPipe.transform(value, 'EUR', 'symbol-narrow', '1.2-2', this.culture)
+              }
+            }
+          }
+        }
       }
     } catch (err) {
       console.log(err)

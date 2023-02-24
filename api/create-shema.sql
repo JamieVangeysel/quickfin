@@ -637,6 +637,15 @@ AS BEGIN
     )
   )
   FROM [sso].[users] [user]
+  WHERE EXISTS (
+    SELECT *
+    FROM [networth].[assets] [asset]
+    WHERE [asset].[user_id] = [user].[id]
+  ) AND EXISTS (
+    SELECT *
+    FROM [networth].[liabilities] [liability]
+    WHERE [liability].[user_id] = [user].[id]
+  )
 END
 GO
 

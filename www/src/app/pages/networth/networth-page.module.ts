@@ -1,10 +1,11 @@
 import { NgModule } from '@angular/core'
-import { CommonModule } from '@angular/common'
+import { CommonModule, CurrencyPipe } from '@angular/common'
 import { RouterModule } from '@angular/router'
 import { NetworthPageComponent } from './networth-page.component'
 import { AssetsPageComponent } from './assets/assets-page.component'
 import { LiabilitiesPageComponent } from './liabilities/liabilities-page.component'
 import { OverviewPageComponent } from './overview/overview-page.component'
+import { NgApexchartsModule } from 'ng-apexcharts'
 
 @NgModule({
   declarations: [
@@ -15,6 +16,7 @@ import { OverviewPageComponent } from './overview/overview-page.component'
   ],
   imports: [
     CommonModule,
+    NgApexchartsModule,
     RouterModule.forChild([{
       path: '',
       component: NetworthPageComponent,
@@ -38,6 +40,9 @@ import { OverviewPageComponent } from './overview/overview-page.component'
         }
       }]
     }])
+  ],
+  providers: [
+    CurrencyPipe
   ]
 })
 export class NetworthPageModule { }
