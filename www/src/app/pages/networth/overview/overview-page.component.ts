@@ -122,7 +122,7 @@ export class OverviewPageComponent implements OnInit {
           groups: Object.keys(groups).map((e, i) => ({
             label: groups[e][0].category,
             color: revenueColors[i],
-            value: groups[e][0].value
+            value: groups[e].reduce((prev: number, curr: any) => prev + curr.value, 0)
           })),
           tooltip: {
             enabled: true,
