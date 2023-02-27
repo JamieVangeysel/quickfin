@@ -28,6 +28,7 @@ import { VerticalNavigationComponent } from './navigation/vertical-navigation/ve
 import { VerticalNavigationGroupItemComponent } from './navigation/vertical-navigation-group-item/vertical-navigation-group-item.component'
 import { VerticalNavigationAsideItemComponent } from './navigation/vertical-navigation-aside-item/vertical-navigation-aside-item.component'
 import { RouterModule } from '@angular/router'
+import { FormsModule } from '@angular/forms'
 
 @NgModule({
   declarations: [
@@ -60,6 +61,7 @@ import { RouterModule } from '@angular/router'
   imports: [
     CommonModule,
     SharedModule,
+    FormsModule,
     MatMenuModule,
     RouterModule
   ],

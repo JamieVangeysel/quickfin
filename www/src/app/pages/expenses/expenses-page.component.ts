@@ -100,7 +100,7 @@ export class ExpensesPageComponent {
         expense.category = formValue.category
         expense.date = formValue.date
         expense.amount = Math.abs(formValue.amount) // revert to positive/absolute value
-        expense.note = formValue.note.length > 0 ? formValue.note : undefined
+        expense.note = formValue.note?.length > 0 ? formValue.note : undefined
 
         this.ref.markForCheck()
       }

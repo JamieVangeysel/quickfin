@@ -98,7 +98,7 @@ export class RevenuePageComponent {
         revenue.category = formValue.category
         revenue.date = formValue.date
         revenue.amount = Math.abs(formValue.amount) // revert to positive/absolute value
-        revenue.note = formValue.note.length > 0 ? formValue.note : undefined
+        revenue.note = formValue.note?.length > 0 ? formValue.note : undefined
 
         this.ref.markForCheck()
       }
