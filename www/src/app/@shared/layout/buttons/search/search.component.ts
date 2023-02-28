@@ -120,7 +120,7 @@ export class SearchComponent {
       this.suggestions.push({
         action: 'route',
         text: 'Beheer Inkomen',
-        route: ['/revenue']
+        route: '/revenue'
       })
     }
 
@@ -128,7 +128,7 @@ export class SearchComponent {
       this.suggestions.push({
         action: 'route',
         text: 'Beheer uitgaven',
-        route: ['/expenses']
+        route: '/expenses'
       })
     }
 
@@ -136,7 +136,7 @@ export class SearchComponent {
       this.suggestions.push({
         action: 'route',
         text: 'Beheer begroting',
-        route: ['/budget']
+        route: '/budget'
       })
     }
 
@@ -144,7 +144,7 @@ export class SearchComponent {
       this.suggestions.push({
         action: 'route',
         text: 'Beheer activa',
-        route: ['/networth/assets']
+        route: '/networth/assets'
       })
     }
 
@@ -152,7 +152,7 @@ export class SearchComponent {
       this.suggestions.push({
         action: 'route',
         text: 'Beheer passiva',
-        route: ['/networth/liabilities']
+        route: '/networth/liabilities'
       })
     }
   }
@@ -194,7 +194,7 @@ export class SearchComponent {
       case 'route':
         if (!suggestion.route) return
 
-        this.router.navigate(suggestion.route, {
+        this.router.navigate([suggestion.route], {
           queryParams: suggestion.params
         })
         this.hideDropdown()
@@ -236,6 +236,6 @@ export interface ISuggestedAction {
   action: 'route' | 'search',
   text: string,
   query?: string
-  route?: any[],
+  route?: string,
   params?: any
 }
