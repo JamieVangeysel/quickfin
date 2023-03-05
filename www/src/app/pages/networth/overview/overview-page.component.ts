@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@
 import { ChartType } from 'ng-apexcharts'
 import { NetworthApiService } from 'src/app/api/networth-api.service'
 
+const areaChartType: ChartType = 'area'
 const donutChartType: ChartType = 'donut'
 const demoGraphicTemplate = {
   series: [.8, .2],
@@ -72,6 +73,70 @@ const demoGraphicTemplate = {
     }
   }
 }
+const demoTriChart = {
+  chart: {
+    type: areaChartType,
+    height: 96,
+    parentHeightOffset: 0,
+    toolbar: {
+      show: false
+    },
+    zoom: {
+      enabled: false
+    },
+    selection: {
+      enabled: false
+    },
+    sparkline: {
+      enabled: true
+    }
+  },
+  grid: {
+    show: false
+  },
+  legend: {
+    show: false
+  },
+  stroke: {
+    curve: 'smooth',
+    lineCap: 'round'
+  },
+  dataLabels: {
+    enabled: false
+  },
+  tooltip: {
+    enabled: true,
+    fillSeriesColor: false,
+    theme: 'dark',
+    followCursor: true,
+    onDatasetHover: {
+      highlightDataSeries: false,
+    }
+  },
+  xaxis: {
+    type: 'datetime',
+    labels: {
+      show: false
+    },
+    axisBorder: {
+      show: false
+    },
+    axisTicks: {
+      show: false
+    }
+  },
+  yaxis: {
+    labels: {
+      show: false
+    },
+    axisBorder: {
+      show: false
+    },
+    axisTicks: {
+      show: false
+    }
+  }
+}
 const revenueColors = ['#a6c36f', '#cadba9', '#859c59', '#b8cf8c', '#647543']
 
 @Component({
@@ -86,7 +151,10 @@ export class OverviewPageComponent implements OnInit {
   private _assets: any[] = []
   private _liabilities: any[] = []
 
+  diff: number = 0
   item: any
+  history: any
+  stocks: any[] = []
 
   constructor(
     private ref: ChangeDetectorRef,
@@ -102,14 +170,40 @@ export class OverviewPageComponent implements OnInit {
         this._assets = overview.assets ?? []
         this._liabilities = overview.liabilities ?? []
 
+        if (this.liabilities.length > 0 || this.assets.length > 0) {
+          const firstValue = overview.history[0].value
+          const currentValue = this.networth
+
+          this.diff = 1 - currentValue / firstValue
+          console.log(this.diff.toFixed(2))
+
+          if (!overview.history) {
+            overview.history = []
+          }
+          overview.history.push({
+            date: new Date(),
+            value: currentValue
+          })
+        }
+
+        this.history = {
+          ...demoTriChart,
+          colors: ['#38bdf8'],
+          series: [{
+            name: 'Nettowaarde',
+            data: overview.history.map(e => ({
+              x: new Date(e.date).getTime(),
+              y: e.value.toFixed(2)
+            }))
+          }]
+        }
+
         const groups = this._assets.reduce((group, asset) => {
           const { category } = asset
           group[category] = group[category] ?? []
           group[category].push(asset)
           return group
         }, {})
-
-        console.log(groups)
 
         this.item = {
           ...demoGraphicTemplate,
@@ -175,6 +269,10 @@ export class OverviewPageComponent implements OnInit {
     }
 
     return fallback
+  }
+
+  get diffAbs(): number {
+    return Math.abs(this.diff)
   }
 
   get assets(): any[] {

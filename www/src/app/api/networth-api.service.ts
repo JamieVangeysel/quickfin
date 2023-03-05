@@ -57,6 +57,10 @@ export interface IGetNetworthResponse {
 export interface IGetNetworthOverviewResponse {
   assets: INameValueEntry[],
   liabilities: INameValueEntry[]
+  history: {
+    date: Date,
+    value: number
+  }[]
 }
 
 export interface IGetNetworthAssetsResponse {
