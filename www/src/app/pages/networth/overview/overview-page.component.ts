@@ -76,7 +76,7 @@ const demoGraphicTemplate = {
 const demoTriChart = {
   chart: {
     type: areaChartType,
-    height: 96,
+    height: 80,
     parentHeightOffset: 0,
     toolbar: {
       show: false
@@ -175,7 +175,6 @@ export class OverviewPageComponent implements OnInit {
           const currentValue = this.networth
 
           this.diff = 1 - currentValue / firstValue
-          console.log(this.diff.toFixed(2))
 
           if (!overview.history) {
             overview.history = []
@@ -273,6 +272,10 @@ export class OverviewPageComponent implements OnInit {
 
   get diffAbs(): number {
     return Math.abs(this.diff)
+  }
+
+  get historyClass(): string {
+    return this.diff > 0 ? 'text-red-500 fa-chart-line-down' : 'text-green-500 fa-chart-line'
   }
 
   get assets(): any[] {

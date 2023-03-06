@@ -55,7 +55,8 @@ export class BudgetPageComponent implements OnInit {
     if (!this._forms[`${type}-${item.id}`]) {
       this._forms[`${type}-${item.id}`] = this.fb.group({
         name: [item.name, [Validators.required]],
-        value: [item.value, [Validators.required]]
+        value: [item.value, [Validators.required]],
+        year: [item.year, [Validators.required]]
       })
     }
 
@@ -83,7 +84,7 @@ export class BudgetPageComponent implements OnInit {
 
   async save(type: 0 | 1, item: ListItem) {
     if (this._forms[`${type}-${item.id}`].valid) {
-      const formValue = this._forms[item.id].value
+      const formValue = this._forms[`${type}-${item.id}`].value
 
       formValue.id = item.id
       // make sure value is positive number
@@ -113,11 +114,12 @@ export class BudgetPageComponent implements OnInit {
         }
         item.name = formValue.name
         item.value = formValue.value
+        item.year = formValue.year
 
         this.ref.markForCheck()
       }
     } else {
-      console.warn('form is invallid', this._forms[item.id].value)
+      console.warn('form is invallid', this._forms[`${type}-${item.id}`].value)
     }
   }
 

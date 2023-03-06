@@ -10,6 +10,7 @@ const journalController = require('./controllers/journal.controller')
 const networthController = require('./controllers/networth.controller')
 const budgetController = require('./controllers/budget.controller')
 const analyticsController = require('./controllers/analytics.controller')
+const stocksController = require('./controllers/stocks.controller')
 
 module.exports.routes = [{
   method: 'POST',
@@ -144,5 +145,25 @@ module.exports.routes = [{
   method: 'GET',
   url: '/analytics',
   handler: analyticsController.get,
+  requiredPermissions: []
+}, {
+  method: 'GET',
+  url: '/stocks/positions',
+  handler: stocksController.getPositions,
+  requiredPermissions: []
+}, {
+  method: 'POST',
+  url: '/stocks/positions',
+  handler: stocksController.postPosition,
+  requiredPermissions: []
+}, {
+  method: 'PUT',
+  url: '/stocks/positions/:id',
+  handler: stocksController.putPosition,
+  requiredPermissions: []
+}, {
+  method: 'DELETE',
+  url: '/stocks/positions/:id',
+  handler: stocksController.deletePosition,
   requiredPermissions: []
 }]

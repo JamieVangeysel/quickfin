@@ -1,0 +1,175 @@
+<div class="flex flex-col w-full max-w-screen-xl mx-auto p-6 md:p-8">
+  <!-- <blockquote class="p-4 border-l-4 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-800">
+    <p class="text-xl italic font-medium leading-relaxed text-gray-900 dark:text-gray-200">
+      Op deze pagina krijg je overzicht van al je uitgaven, inkomens, gemiddeldes, maandelijkse vergelijking,
+      voorspellingen en waarschuwingen indien je over je budget gaat.
+    </p>
+  </blockquote> -->
+  <div class="flex flex-col item-center justify-center text-center" *ngIf="loading">
+    <div class="mx-auto">
+      <i class="fal fa-fw fa-2x fa-spin fa-circle-notch"></i> Ophalen van stocks...
+    </div>
+  </div>
+  <div class="flex items-center justify-between w-full" *ngIf="!loading">
+    <div>
+      <div class="text-3xl font-semibold tracking-tight leading-8">
+        Stocks
+      </div>
+      <div class="font-medium tracking-tight text-secondary">
+        Overzicht van al je beleggingen, inclusief historiek en voorspelling van je beleggingen.
+      </div>
+    </div>
+    <div class="flex flex-row space-x-2 items-center ml-6">
+      <button tabindex="0" title="Stock aanmaken" (click)="beginCreate()" [disabled]="isCreating"
+        class="bg-lynch-500 text-white rounded-full px-1 px-5 h-10 disabled:bg-gray-300 border-none hover:bg-lynch-600">
+        <i class="far fa-plus"></i>&nbsp;
+        <span class="hidden md:inline-flex">Stock toevoegen</span>
+      </button>
+      <button tabindex="0" title="Exporteer" (click)="export()"
+        class="bg-lynch-500 text-white rounded-full px-1 px-5 h-10 disabled:bg-gray-300 border-none hover:bg-lynch-600">
+        <i class="far fa-file-export"></i>
+        <span class="hidden md:inline-flex">&nbsp;Exporteer</span>
+      </button>
+    </div>
+  </div>
+  <div class="flex flex-col px-2 md:flex-row mb-4 gap-4" *ngIf="!loading">
+    <div id="stocks" class="w-full">
+      <div *ngIf="stocks.length > 0"
+        class="flex flex-col flex-auto bg-white dark:bg-gray-800 overflow-hidden sm:overflow-y-auto mt-4 dark:text-white">
+        <div class="flex flex-row px-4 py-3 font-bold bg-gray-200 dark:text-gray-300 dark:bg-gray-700">
+          <div class="w-32">
+            Datum
+          </div>
+          <div class="flex-auto">
+            Label (Categorie)
+          </div>
+          <div class="w-24 text-right">
+            Bedrag
+          </div>
+          <div class="w-8">
+            &nbsp;
+          </div>
+        </div>
+
+        <ng-container *ngFor="let stock of stocks">
+          <div class="flex flex-row items-center px-4 py-2 border-b text-gray-400 last:border-0">
+            <div class="w-32">
+              {{ stock.date | date:'d MMMM YYYY':undefined:culture }}
+            </div>
+            <div class="flex-auto">
+              <span class="text-black dark:text-white">{{ stock.ticker }}</span>
+              <br>
+              <span>{{ stock.note }}</span>
+            </div>
+            <div class="w-24 text-right">
+              {{ stock.amount | currency:'EUR':'symbol-narrow':'1.2-2':culture }}
+            </div>
+            <div class="w-8">
+              <button class="flex justify-center items-center ml-2 w-6 h-6 rounded-full cursor-pointer bg-gray-100
+              hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600" (click)="edit(stock)">
+                <span class="font-medium text-sm dark:text-white">
+                  <i class="far text-lg leading-loose dark:text-gray-100"
+                    [ngClass]="{ 'fa-angle-up': stock.editing, 'fa-angle-down': !stock.editing }"></i>
+                </span>
+              </button>
+            </div>
+          </div>
+          <div id="editor" class="grid" *ngIf="stock.editing && stockForm[stock.id] !== undefined">
+            <div class="shadow-lg overflow-hidden">
+              <div class="flex border-b">
+                <form class="flex flex-col w-full" [formGroup]="stockForm[stock.id]" (submit)="save(stock)">
+                  <!-- main editor -->
+                  <div class="flex flex-col sm:flex-row p-8">
+                    <!-- side container, picure + status... -->
+                    <div class="flex flex-col items-center sm:items-start mb-8 sm:mb-0">
+                    </div>
+                    <!-- main fields -->
+                    <div class="flex flex-auto flex-wrap space-y-4 lg:space-y-0">
+                      <div class="flex flex-col w-full space-y-4 lg:w-1/4 sm:pl-8">
+                        <div class="flex flex-col space-y-2">
+                          <h3 class="text-md font-bold text-black dark:text-white">Ticker *</h3>
+                          <input
+                            class="bg-white border border-gray-200 text-md text-md px-4 h-12 leading-6 rounded-md dark:bg-transparent dark:border-gray-500 dark:text-white focus:border-accent disabled:bg-gray-300 disabled:border-transparent focus:invalid:border-danger invalid:border-danger"
+                            formControlName="ticker" type="text" required>
+                        </div>
+                      </div>
+                      <div class="flex flex-col w-full space-y-4 lg:w-1/4 sm:pl-8">
+                        <div class="flex flex-col space-y-2">
+                          <h3 class="text-md font-bold text-black dark:text-white">Aantal *</h3>
+                          <input
+                            class="bg-white border border-gray-200 text-md text-md px-4 h-12 leading-6 rounded-md dark:bg-transparent dark:border-gray-500 dark:text-white focus:border-accent disabled:bg-gray-300 disabled:border-transparent focus:invalid:border-danger invalid:border-danger"
+                            formControlName="amount" type="number" step="0.00000001" required>
+                        </div>
+                      </div>
+                      <div class="flex flex-col w-full space-y-4 lg:w-1/4 sm:pl-8">
+                        <div class="flex flex-col space-y-2">
+                          <h3 class="text-md font-bold text-black dark:text-white">Waarde *</h3>
+                          <input
+                            class="bg-white border border-gray-200 text-md text-md px-4 h-12 leading-6 rounded-md dark:bg-transparent dark:border-gray-500 dark:text-white focus:border-accent disabled:bg-gray-300 disabled:border-transparent focus:invalid:border-danger invalid:border-danger"
+                            formControlName="value" type="number" step="0.01" required>
+                        </div>
+                      </div>
+                      <div class="flex flex-col w-full space-y-4 lg:w-1/4 sm:pl-8">
+                        <div class="flex flex-col space-y-2">
+                          <h3 class="text-md font-bold text-black dark:text-white">Datum *</h3>
+                          <input
+                            class="bg-white border border-gray-200 text-md text-md px-4 h-12 leading-6 rounded-md dark:bg-transparent dark:border-gray-500 dark:text-white focus:border-accent disabled:bg-gray-300 disabled:border-transparent focus:invalid:border-danger invalid:border-danger"
+                            formControlName="date" type="text" required>
+                        </div>
+                      </div>
+                      <div class="flex flex-col w-full space-y-4 lg:w-1/4 sm:pl-8">
+                        <div class="flex flex-col space-y-2">
+                          <h3 class="text-md font-bold text-black dark:text-white">Waarde *</h3>
+                          <input
+                            class="bg-white border border-gray-200 text-md text-md px-4 h-12 leading-6 rounded-md dark:bg-transparent dark:border-gray-500 dark:text-white focus:border-accent disabled:bg-gray-300 disabled:border-transparent focus:invalid:border-danger invalid:border-danger"
+                            formControlName="amount" type="number" step="0.01" required>
+                        </div>
+                      </div>
+                      <div class="flex flex-col w-full space-y-4 sm:pl-8 lg:pt-4">
+                        <div class="flex flex-col space-y-2">
+                          <h3 class="text-md font-bold text-black dark:text-white">Notitie *</h3>
+                          <textarea maxlength="200"
+                            class="bg-white border border-gray-200 text-md text-md px-4 h-12 leading-6 rounded-md outline-none dark:bg-transparent dark:border-gray-500 dark:text-white focus:border-accent disabled:bg-gray-300 disabled:border-transparent focus:invalid:border-danger invalid:border-danger"
+                            formControlName="note"></textarea>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- actions, delete / save -->
+                  <div class="flex items-center justify-between w-full border-t px-8 py-4">
+                    <button
+                      class="text-red-600 border-none rounded-full h-10 px-5 hover:bg-red-100 dark:hover:bg-gray-900"
+                      type="button" (click)="delete(stock)">
+                      <i class="fal text-lg fa-trash fa-fw"></i> Verwijderen
+                    </button>
+                    <div>&nbsp;
+                      <!-- placeholder -->
+                    </div>
+                    <button class="bg-lynch-500 text-white border-none rounded-full h-10 px-5 hover:bg-lynch-600"
+                      type="submit">
+                      <ng-template [ngIf]="stock.id <= 0">
+                        <i class="fal text-lg fa-plus fa-fw"></i> Aanmaken
+                      </ng-template>
+                      <ng-template [ngIf]="stock.id > 0">
+                        <i class="fal text-lg fa-save fa-fw"></i> Opslaan
+                      </ng-template>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+
+      <div class="mt-4" *ngIf="!stocks || stocks.length === 0">
+        <blockquote class="p-4 border-l-4 mx-2 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-800">
+          <p class="text-xl italic font-medium leading-relaxed text-gray-900 dark:text-gray-200">
+            Je hebt nog geen stocks geregistreerd, klik op de knop 'Stock toevoegen' om van start te gaan met het
+            beheren van je aandelen.
+          </p>
+        </blockquote>
+      </div>
+    </div>
+  </div>
+</div>

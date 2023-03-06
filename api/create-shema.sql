@@ -475,6 +475,12 @@ AS BEGIN
       ORDER BY [liability].[value] DESC
       -- GROUP BY [liability].[group_id]
       FOR JSON PATH, INCLUDE_NULL_VALUES
+    ),
+    [history] = (
+      SELECT [date] = cast([date] as DATE), [value] = [value]
+      FROM [networth].[snapshots]
+      WHERE cast([date] as DATE) > cast((getdate()-14) as date) AND [user_id] = @user_id
+      FOR JSON PATH, INCLUDE_NULL_VALUES
     )
   FOR JSON PATH
 END
@@ -1325,3 +1331,90 @@ GRANT EXEC ON [analytics].[usp_getAnalytics] TO [sso] -- TEMPORARY ACTION
 
 -- To-Do: Add stocks schema and table for tracking stock values
 CREATE SCHEMA [stocks]
+
+CREATE USER [stocks_agent] WITHOUT LOGIN
+  WITH DEFAULT_SCHEMA = [guest]
+GO
+
+CREATE TABLE [stocks].[positions](
+  [id] INT PRIMARY KEY IDENTITY(1, 1),
+  [user_id] INT NOT NULL,
+  [date] DATETIME NOT NULL,
+  [ticker] VARCHAR(40) NOT NULL,
+  [amount] DECIMAL(18,8) NOT NULL,
+  [value] MONEY NOT NULL,
+  [currency] CHAR(3) NOT NULL,
+  [note] VARCHAR(200) NULL,
+  [created] DATETIME NOT NULL DEFAULT GETUTCDATE(),
+  [modified] DATETIME NULL
+)
+
+CREATE PROCEDURE [stocks].[usp_getPositions]
+  @user_id INT
+WITH EXECUTE AS 'stocks_agent'
+AS BEGIN
+  SELECT [id],
+    [date],
+    [ticker],
+    [amount],
+    [value],
+    [currency],
+    [note]
+  FROM [stocks].[positions] [position]
+  WHERE [User_id] = @user_id
+  -- GROUP BY [ticker]
+  ORDER BY [ticker] DESC
+END
+GO
+
+CREATE PROCEDURE [stocks].[usp_insertPosition]
+  @user_id INT,
+  @date DATETIME,
+  @ticker VARCHAR(40),
+  @amount DECIMAL(18,8),
+  @value MONEY,
+  @currency CHAR(3),
+  @note VARCHAR(200) = NULL
+WITH EXECUTE AS 'stocks_agent'
+AS BEGIN
+  INSERT INTO [stocks].[positions] ([user_id], [date], [ticker], [amount], [value], [currency], [note])
+  VALUES (@user_id, @date, @ticker, @amount, @value, @currency, @note)
+
+  SELECT [id] = SCOPE_IDENTITY()
+END
+GO
+
+CREATE PROCEDURE [stocks].[usp_updatePosition]
+  @user_id INT,
+  @id INT,
+  @date DATETIME,
+  @ticker VARCHAR(40),
+  @amount DECIMAL(18,8),
+  @value MONEY,
+  @currency CHAR(3),
+  @note VARCHAR(200) = NULL
+WITH EXECUTE AS 'stocks_agent'
+AS BEGIN
+  UPDATE [stocks].[positions]
+  SET [date] = @date,
+    [ticker] = @ticker,
+    [amount] = @amount,
+    [value] = @value,
+    [currency] = @currency,
+    [note] = @note,
+    [modified] = GETUTCDATE()
+  WHERE [id] = @id
+    AND [user_id] = @user_id
+END
+GO
+
+CREATE PROCEDURE [stocks].[usp_deletePosition]
+  @user_id INT,
+  @id INT
+WITH EXECUTE AS 'stocks_agent'
+AS BEGIN
+  DELETE FROM [stocks].[positions]
+  WHERE [id] = @id
+    AND [user_id] = @user_id
+END
+GO

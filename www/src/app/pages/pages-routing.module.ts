@@ -41,6 +41,13 @@ const routes: Routes = [{
     layout: 'modern'
   }
 }, {
+  path: 'stocks',
+  loadChildren: () => import('./stocks/stocks-page.module').then(m => m.StocksPageModule),
+  canActivate: [AuthGuard],
+  data: {
+    layout: 'modern'
+  }
+}, {
   /* Temporarily fix all auth issues */
   path: '**',
   // component: DashboardPageComponent,

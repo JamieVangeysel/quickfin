@@ -47,30 +47,30 @@
         </div>
       </div>
     </div>
-    <div class="bg-white rounded-xl space-y-4 w-full drop-shadow-lg overflow-hidden dark:bg-gray-800 dark:filter-none">
+    <div class="bg-white rounded-xl space-y-4 w-full dark:bg-gray-800 drop-shadow-lg dark:filter-none">
       <div class="flex flex-row items-start justify-between mx-6 mt-6">
         <div class="flex flex-col lg:items-center">
-          <div class="text-2xl font-bold tracking-tighter leading-tight">
+          <div class="text-2xl font-bold tracking-tighter">
             <span class="text-lg font-medium tracking-tight leading-6 truncate">Nettowaarde historiek</span>
           </div>
-          <div class="flex lg:flex-col">
-            <i class="far text-lg" [ngClass]="{ 'text-red-500 fa-chart-line-down': diff > 0, 'text-green-500 fa-chart-line': diff <= 0
-                }"></i>
-            <div class="flex items-center ml-1 lg:ml-0 lg:mt-0.5 text-md leading-none whitespace-nowrap text-secondary">
-              <span class="font-medium" [ngClass]="{ 'text-red-500': diff > 0, 'text-green-500': diff <= 0 }">{{
-                diffAbs | percent
-                }}</span>
-              <span class="ml-1" *ngIf="diff > 0">stijging sinds begin</span>
-              <span class="ml-1" *ngIf="diff <= 0">daling sinds begin</span>
-            </div>
+          <div class="flex flex-col text-gray-400">
+            {{ today | date:'EEEE d MMM YYYY':undefined:culture }}
           </div>
         </div>
-        <div class="flex flex-col text-gray-400">
-          {{ today | date:'EEEE d MMM YYYY':undefined:culture }}
+        <div class="flex flex-row space-x-1">
+          <i class="far text-lg" [ngClass]="{ 'text-red-500 fa-chart-line-down': diff > 0, 'text-green-500 fa-chart-line': diff <= 0
+              }"></i>
+          <div class="flex items-center ml-1 lg:ml-0 lg:mt-0.5 text-md leading-none whitespace-nowrap text-secondary">
+            <span class="font-medium" [ngClass]="{ 'text-red-500': diff > 0, 'text-green-500': diff <= 0 }">
+              {{ diffAbs | percent }}
+            </span>
+            <span class="ml-1" *ngIf="diff > 0">daling sinds begin</span>
+            <span class="ml-1" *ngIf="diff <= 0">stijging sinds begin</span>
+          </div>
         </div>
       </div>
-      <div class="flex flex-col flex-auto h-24" *ngIf="history">
-        <apx-chart class="flex-auto w-full h-full" [series]="history.series" [xaxis]="history.xaxis"
+      <div class="flex flex-col flex-auto h-20" *ngIf="history">
+        <apx-chart class="w-full h-full overflow-hidden rounded-b-xl" [series]="history.series" [xaxis]="history.xaxis"
           [yaxis]="history.yaxis" [chart]="history.chart" [stroke]="history.stroke" [dataLabels]="history.dataLabels"
           [colors]="history.colors" [grid]="history.grid" [legend]="history.legend" [tooltip]="history.tooltip">
         </apx-chart>
@@ -160,7 +160,7 @@
           <div class="text-xl font-bold">
             Aandelen
           </div>
-          <a routerLink="/networth/assets" class="text-md font-bold text-accent hover:underline hover:cursor-pointer">
+          <a routerLink="/stocks" class="text-md font-bold text-accent hover:underline hover:cursor-pointer">
             Bekijk alles
           </a>
         </div>
