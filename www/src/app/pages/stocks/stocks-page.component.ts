@@ -29,7 +29,7 @@ export class StocksPageComponent {
 
       const response = await this.stockApi.getStocks()
       if (response) {
-        this._stocks = (response.stocks ?? []) as ListItem[]
+        this._stocks = (response ?? []) as ListItem[]
         this._stocks.forEach(e => e.editing = false)
       }
     } catch (err) {
@@ -59,8 +59,19 @@ export class StocksPageComponent {
         currency: [item.currency, [Validators.required, Validators.pattern('[EUR]|[GBP]|[USD]')]],
         note: [item.note, []]
       })
-    } else {
-      this._forms[item.id].reset()
+    } else if (item.id === 0) {
+      let date = item.date.toString().split('T')[0]
+      if (item.date instanceof Date) {
+        date = item.date.toISOString().split('T')[0]
+      }
+      this._forms[item.id] = this.fb.group({
+        ticker: [item.ticker, [Validators.required, Validators.pattern('[A-Z]+(.[A-Z]+)?')]],
+        amount: [item.amount, [Validators.required]],
+        value: [item.value, [Validators.required]],
+        date: [date, [Validators.required, Validators.pattern('[0-9]{4}-[0-9]{2}-[0-9]{2}')]],
+        currency: [item.currency, [Validators.required, Validators.pattern('[EUR]|[GBP]|[USD]')]],
+        note: [item.note, []]
+      })
     }
     this.ref.markForCheck()
   }
@@ -87,8 +98,6 @@ export class StocksPageComponent {
       const formValue = this._forms[stock.id].value
 
       formValue.id = stock.id
-      // make sure value is negative number
-      formValue.amount = Math.abs(formValue.amount) * -1
 
       const response = stock.id > 0 ? await this.stockApi.updateStock(formValue) : await this.stockApi.createStock(formValue)
       console.log(response)
@@ -103,10 +112,10 @@ export class StocksPageComponent {
           stock.id = response.id
         }
         stock.date = formValue.date
-        stock.ticker = formValue.name
+        stock.ticker = formValue.ticker
         stock.amount = formValue.amount
         stock.value = formValue.value
-        stock.currency = formValue.curreny
+        stock.currency = formValue.currency
         stock.note = formValue.note?.length > 0 ? formValue.note : undefined
 
         this.ref.markForCheck()

@@ -62,7 +62,7 @@ module.exports = {
     },
     extend: {
       colors: {
-        'primary': '#607d8b',
+        'primary': '#0c4c84',
         'secondary': '#74909c',
         'accent': '#4169E1', // royal blue
         'danger': '#FF6347', // tomato

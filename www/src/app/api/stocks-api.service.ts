@@ -9,8 +9,8 @@ import { environment } from 'src/environments/environment'
 export class StockApiService {
   constructor(private http: HttpClient) { }
 
-  getStocks(): Promise<IGetStocksResponse> {
-    return firstValueFrom(this.http.get<IGetStocksResponse>(`${environment.api}stocks/positions`, { headers: { 'Authorization': 'yes' } }))
+  getStocks(): Promise<IStockEntry[]> {
+    return firstValueFrom(this.http.get<IStockEntry[]>(`${environment.api}stocks/positions`, { headers: { 'Authorization': 'yes' } }))
   }
 
   createStock(stock: IWStockEntry): Promise<IPostResponse> {
@@ -26,9 +26,9 @@ export class StockApiService {
   }
 }
 
-export interface IGetStocksResponse {
-  stocks: IStockEntry[]
-}
+// export interface IGetStocksResponse {
+//   positions: IStockEntry[]
+// }
 
 export interface IWStockEntry {
   date: Date

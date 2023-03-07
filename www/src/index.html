@@ -1,12 +1,26 @@
 <!doctype html>
-<html lang="en">
+<html lang="nl">
 
 <head>
   <meta charset="utf-8">
-  <title>QuickfinFrontend</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="author" content="Jamie Vangeysel">
+  <meta name="description"
+    content="Quickfin is een persoonlijk finance dashboard, krijg inzichten in jw in en uitgave d.m.v budgetten en bereken je eigen nettowaarde">
+  <meta name="keywords" content="quickfin">
+  <meta name="robots" content="index, follow">
+  <meta name="revisit-after" content="7 days">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="format-detection" content="telephone=no">
+  <meta property="og:title" content="Quickfin persoonlijk finance overzicht, networth portfolio" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://quickfin.be" />
+  <meta property="og:image" content="https://quickfin.be/assets/banner/banner.webp" />
+  <meta property="og:description"
+    content="Quickfin is een persoonlijk finance dashboard, krijg inzichten in jw in en uitgave d.m.v budgetten en bereken je eigen nettowaarde">
+  <title>Quickfin persoonlijk finance overzicht, networth portfolio</title>
   <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" href="favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -14,11 +28,33 @@
     rel="stylesheet">
   <script src="https://kit.fontawesome.com/af7c14e028.js" crossorigin="anonymous"></script>
   <meta name="theme-color" content="#1f2937">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XGX507KESM"></script>
+  <!-- Google Analytics -->
+  <script>
+    window.loadGA = function () {
+      if (navigator.cookieEnabled) {
+        if (window.localStorage.getItem('allow_ga') === 'yes') {
+          window.dataLayer = window.dataLayer || []
+          function gtag() { dataLayer.push(arguments) }
+          gtag('js', new Date())
+          gtag('config', 'G-XGX507KESM')
+        }
+      }
+    }
+
+  </script>
+  <!-- End Google Analytics -->
 </head>
 
 <body class="light bg-gray-100 dark:bg-gray-900 dark:text-white">
+  <!--[if IE]>
+    Beste gebruiker, u maakt momenteel gebruik van een verouderde webbrowser. <br>
+    Door de mogelijke beveiligingsrisico's hebben wij dus ook besloten om ondersteuning voor Internet Explorer volledig te schrappen. <br>
+    Gelieve gebruikt te maken van een andere webrowser. <br>
+  <![endif]-->
   <qf-root></qf-root>
-  <noscript>Please enable JavaScript to continue using this application.</noscript>
+  <noscript>JavaScript moet ingeschakeld zijn om deze pagina te laden.</noscript>
 </body>
 
 </html>

@@ -2,6 +2,7 @@ import { CurrencyPipe } from '@angular/common'
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { ChartType } from 'ng-apexcharts'
 import { NetworthApiService } from 'src/app/api/networth-api.service'
+import { StockApiService } from 'src/app/api/stocks-api.service'
 
 const areaChartType: ChartType = 'area'
 const donutChartType: ChartType = 'donut'
@@ -159,7 +160,8 @@ export class OverviewPageComponent implements OnInit {
   constructor(
     private ref: ChangeDetectorRef,
     private networthApi: NetworthApiService,
-    private currencyPipe: CurrencyPipe
+    private currencyPipe: CurrencyPipe,
+    private stockApi: StockApiService
   ) {
   }
 
@@ -230,6 +232,11 @@ export class OverviewPageComponent implements OnInit {
             }
           }
         }
+      }
+
+      const response = await this.stockApi.getStocks()
+      if (response) {
+        this.stocks = response ?? []
       }
     } catch (err) {
       console.log(err)
