@@ -10,19 +10,19 @@ export class StockApiService {
   constructor(private http: HttpClient) { }
 
   getStocks(): Promise<IGetStocksResponse> {
-    return firstValueFrom(this.http.get<IGetStocksResponse>(`${environment.api}stock/positions`, { headers: { 'Authorization': 'yes' } }))
+    return firstValueFrom(this.http.get<IGetStocksResponse>(`${environment.api}stocks/positions`, { headers: { 'Authorization': 'yes' } }))
   }
 
   createStock(stock: IWStockEntry): Promise<IPostResponse> {
-    return firstValueFrom(this.http.post<IPostResponse>(`${environment.api}stock/positions`, stock, { headers: { 'Authorization': 'yes' } }))
+    return firstValueFrom(this.http.post<IPostResponse>(`${environment.api}stocks/positions`, stock, { headers: { 'Authorization': 'yes' } }))
   }
 
   updateStock(stock: IStockEntry): Promise<IPostResponse> {
-    return firstValueFrom(this.http.put<IPostResponse>(`${environment.api}stock/positions/${stock.id}`, stock, { headers: { 'Authorization': 'yes' } }))
+    return firstValueFrom(this.http.put<IPostResponse>(`${environment.api}stocks/positions/${stock.id}`, stock, { headers: { 'Authorization': 'yes' } }))
   }
 
   deleteStock(id: number): Promise<IPostResponse> {
-    return firstValueFrom(this.http.delete<IPostResponse>(`${environment.api}stock/positions/${id}`, { headers: { 'Authorization': 'yes' } }))
+    return firstValueFrom(this.http.delete<IPostResponse>(`${environment.api}stocks/positions/${id}`, { headers: { 'Authorization': 'yes' } }))
   }
 }
 
@@ -35,7 +35,7 @@ export interface IWStockEntry {
   ticker: string,
   amount: number,
   value: number,
-  currency: 'usd' | 'gbp' | 'eur',
+  currency: 'usd' | 'gbp' | 'eur' | '',
   note?: string
 }
 

@@ -1418,3 +1418,8 @@ AS BEGIN
     AND [user_id] = @user_id
 END
 GO
+
+GRANT EXEC ON [stocks].[usp_getPositions] TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [stocks].[usp_insertPosition] TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [stocks].[usp_updatePosition] TO [sso] -- TEMPORARY ACTION
+GRANT EXEC ON [stocks].[usp_deletePosition] TO [sso] -- TEMPORARY ACTION

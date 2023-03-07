@@ -52,11 +52,11 @@ export class StocksPageComponent {
         date = item.date.toISOString().split('T')[0]
       }
       this._forms[item.id] = this.fb.group({
-        ticker: [item.ticker, [Validators.required]],
+        ticker: [item.ticker, [Validators.required, Validators.pattern('[A-Z]+(.[A-Z]+)?')]],
         amount: [item.amount, [Validators.required]],
         value: [item.value, [Validators.required]],
         date: [date, [Validators.required, Validators.pattern('[0-9]{4}-[0-9]{2}-[0-9]{2}')]],
-        currency: [item.currency, [Validators.required]],
+        currency: [item.currency, [Validators.required, Validators.pattern('[EUR]|[GBP]|[USD]')]],
         note: [item.note, []]
       })
     } else {
@@ -74,7 +74,7 @@ export class StocksPageComponent {
       value: 0,
       date: new Date(),
       amount: 0,
-      currency: 'eur',
+      currency: '',
       note: undefined,
       editing: false
     }
@@ -112,7 +112,7 @@ export class StocksPageComponent {
         this.ref.markForCheck()
       }
     } else {
-      console.warn('form is invallid', this._forms[stock.id].value)
+      console.warn('form is invallid', this._forms[stock.id].value, this._forms[stock.id].errors)
     }
   }
 

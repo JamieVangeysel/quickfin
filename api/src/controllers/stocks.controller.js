@@ -34,7 +34,7 @@ exports.postPosition = async (request, reply) => {
     /** @type {JwtPayload} */
     const token = request.token
 
-    return Networth.insertAsset(token.sub, request.body)
+    return Stock.insertPosition(token.sub, request.body)
   } catch (err) {
     return reply
       .status(500)
@@ -53,7 +53,7 @@ exports.putPosition = async (request, reply) => {
     const token = request.token
     const id = +request.params.id
 
-    return Networth.updateAsset(token.sub, id, request.body)
+    return Stock.updatePosition(token.sub, id, request.body)
   } catch (err) {
     return reply
       .status(500)
@@ -72,7 +72,7 @@ exports.deletePosition = async (request, reply) => {
     const token = request.token
     const id = +request.params.id
 
-    return Networth.deleteAsset(token.sub, id)
+    return Stock.deletePosition(token.sub, id)
   } catch (err) {
     return reply
       .status(500)
